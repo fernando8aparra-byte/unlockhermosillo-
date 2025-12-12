@@ -3,34 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
+    <title>Iniciar Sesión - COMPROPAGO</title>
+    <!-- Firebase App + Firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+
     <style>
-        body {font-family: 'Segoe UI', sans-serif;background: linear-gradient(135deg, #667eea, #764ba2);margin:0;padding:0;height:100vh;display:flex;justify-content:center;align-items:center;}
-        .login-box {background:white;padding:40px 30px;border-radius:20px;box-shadow:0 15px 35px rgba(0,0,0,0.3);width:100%;max-width:400px;text-align:center;}
-        h2 {margin-bottom:30px;color:#333;}
-        input {width:100%;padding:14px;margin:10px 0;border:2px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box;}
+        body {font-family: 'Segoe UI', sans-serif;background: linear-gradient(135deg, #667eea, #764ba2);margin:0;height:100vh;display:flex;justify-content:center;align-items:center;}
+        .login-box {background:white;padding:50px 40px;border-radius:25px;box-shadow:0 20px 50px rgba(0,0,0,0.4);width:90%;max-width:420px;text-align:center;}
+        h2 {margin-bottom:35px;color:#333;font-size:26px;}
+        input {width:100%;padding:16px;margin:12px 0;border:2px solid #ddd;border-radius:12px;font-size:17px;box-sizing:border-box;}
         input:focus {border-color:#667eea;outline:none;}
-        button {width:100%;padding:14px;background:#667eea;color:white;border:none;border-radius:10px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:15px;transition:0.3s;}
+        button {width:100%;padding:16px;background:#667eea;color:white;border:none;border-radius:12px;font-size:19px;font-weight:bold;cursor:pointer;margin-top:20px;transition:0.3s;}
         button:hover {background:#5a6fd8;}
-        .error {color:#e74c3c;font-weight:bold;margin-top:15px;min-height:24px;}
-        .loading {display:none;color:#667eea;margin-top:10px;}
+        .error {color:#e74c3c;font-weight:bold;margin-top:20px;min-height:28px;font-size:15px;}
+        .loading {display:none;color:#667eea;margin-top:15px;font-size:15px;}
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h2>Iniciar Sesión</h2>
+        <h2>COMPROPAGO</h2>
+        <h3>Iniciar Sesión</h3>
         <form id="loginForm">
             <input type="text" id="usuario" placeholder="Usuario" required autocomplete="username">
             <input type="password" id="password" placeholder="Contraseña" required autocomplete="current-password">
             <button type="submit">ENTRAR</button>
         </form>
-        <div class="loading" id="loading">Verificando...</div>
+        <div class="loading" id="loading">Verificando credenciales...</div>
         <div class="error" id="errorMsg"></div>
     </div>
 
     <script>
+        // TU MISMA CONFIGURACIÓN
         const firebaseConfig = {
             apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
             authDomain: "comprobantes-363c9.firebaseapp.com",
@@ -42,7 +46,7 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const db = firebase.firestore();  // ← FIRESTORE
 
         const loginForm = document.getElementById('loginForm');
         const errorMsg = document.getElementById('errorMsg');
@@ -57,26 +61,31 @@
             const password = document.getElementById('password').value;
 
             try {
-                const snapshot = await db.ref('cuentas/' + usuario).once('value');
-                const datos = snapshot.val();
+                // Busca el documento con ID = nombre de usuario
+                const docRef = db.collection('cuentas').doc(usuario);
+                const doc = await docRef.get();
 
-                if (!datos) {
+                if (!doc.exists) {
                     errorMsg.textContent = "Usuario incorrecto";
-                } else if (datos.password !== password) {
-                    errorMsg.textContent = "Contraseña incorrecta";
                 } else {
-                    // GUARDA TODO EN LOCALSTORAGE
-                    localStorage.setItem('logueado', 'true');
-                    localStorage.setItem('usuario', usuario);
-                    localStorage.setItem('nombre', datos.nombre || usuario);
-                    localStorage.setItem('loginTime', Date.now()); // opcional: para expirar sesión
+                    const data = doc.data();
+                    if (data.password !== password) {
+                        errorMsg.textContent = "Contraseña incorrecta";
+                    } else if (data.activo === false) {
+                        errorMsg.textContent = "Cuenta desactivada";
+                    } else {
+                        // LOGIN EXITOSO → guarda en localStorage
+                        localStorage.setItem('logueado', 'true');
+                        localStorage.setItem('usuario', usuario);
+                        localStorage.setItem('nombre', data.nombre || usuario);
+                        localStorage.setItem('loginTime', Date.now());
 
-                    // Redirige a la página principal
-                    window.location.href = 'index.html';
+                        window.location.href = 'index.html';
+                    }
                 }
             } catch (err) {
                 errorMsg.textContent = "Error de conexión";
-                console.error(err);
+                console.error("Error Firestore:", err);
             } finally {
                 loading.style.display = 'none';
             }
