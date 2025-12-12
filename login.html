@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-box {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 24px;
+        }
+        .loading {
+            display: none;
+            color: #667eea;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <input type="text" id="usuario" placeholder="Usuario" required autocomplete="username">
+            <input type="password" id="password" placeholder="Contraseña" required autocomplete="current-password">
+            <button type="submit">ENTRAR</button>
+        </form>
+        <div class="loading" id="loading">Verificando...</div>
+        <div class="error" id="errorMsg"></div>
+    </div>
+
+    <script>
+        // MISMA CONFIGURACIÓN QUE TU OTRA PÁGINA
+        const firebaseConfig = {
+            apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
+            authDomain: "comprobantes-363c9.firebaseapp.com",
+            databaseURL: "https://comprobantes-363c9-default-rtdb.firebaseio.com",
+            projectId: "comprobantes-363c9",
+            storageBucket: "comprobantes-363c9.firebasestorage.app",
+            messagingSenderId: "390391998056",
+            appId: "1:390391998056:web:23e22073d88bc247d43ddd"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const loginForm = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('errorMsg');
+        const loading = document.getElementById('loading');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMsg.textContent = '';
+            loading.style.display = 'block';
+
+            const usuario = document.getElementById('usuario').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+
+            try {
+                const snapshot = await db.ref('cuentas/' + usuario).once('value');
+                const datosUsuario = snapshot.val();
+
+                if (!datosUsuario) {
+                    errorMsg.textContent = "Usuario incorrecto";
+                } else if (datosUsuario.password !== password) {
+                    errorMsg.textContent = "Contraseña incorrecta";
+                } else {
+                    // ¡LOGIN EXITOSO!
+                    localStorage.setItem('usuarioLogueado', usuario);
+                    localStorage.setItem('nombreUsuario', datosUsuario.nombre || usuario);
+                    
+                    // Redirigir a tu página principal
+                    window.location.href = 'index.html'; // Cambia si tu archivo tiene otro nombre
+                }
+            } catch (err) {
+                errorMsg.textContent = "Error de conexión. Intenta de nuevo.";
+                console.error(err);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
