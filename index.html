@@ -1,62 +1,36 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRUEBA FIREBASE</title>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+<html><body>
+<h2>PRUEBA FINAL (30 segundos)</h2>
+<button onclick="enviar()" style="padding:20px;font-size:20px;background:red;color:white;border:none;border-radius:15px;">
+  ENVIAR DATO DE PRUEBA
+</button>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
-            authDomain: "comprobantes-363c9.firebaseapp.com",
-            databaseURL: "https://comprobantes-363c9-default-rtdb.firebaseio.com",
-            projectId: "comprobantes-363c9",
-            storageBucket: "comprobantes-363c9.firebasestorage.app",
-            messagingSenderId: "390391998056",
-            appId: "1:390391998056:web:23e22073d88bc247d43ddd"
-        };
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const testRef = ref(db, 'prueba_rapida');
+const app = initializeApp({
+  databaseURL: "https://comprobantes-363c9-default-rtdb.firebaseio.com"
+});
 
-        window.enviarPrueba = async () => {
-            const btn = document.getElementById('btn');
-            btn.textContent = "ENVIANDO...";
-            btn.style.background = "#f1c40f";
+const db = getDatabase(app);
 
-            const dato = {
-                mensaje: "¡Funciona!",
-                fecha: new Date().toLocaleString('es-MX')
-            };
-
-            try {
-                await push(testRef, dato);
-                alert("¡ÉXITO! Ya se guardó en Firebase.\nVe a Realtime Database → nodo 'prueba_rapida'");
-                btn.textContent = "¡FUNCIONA!";
-                btn.style.background = "#27ae60";
-            } catch (error) {
-                alert("ERROR:\n" + error.code + "\n" + error.message);
-                btn.textContent = "ERROR";
-                btn.style.background = "#e74c3c";
-                console.error(error);
-            }
-        };
-    </script>
-    <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background: #2c3e50; color: white; }
-        h1 { font-size: 28px; }
-        button { margin-top: 50px; padding: 25px 50px; font-size: 24px; font-weight: bold; 
-                 background: #e74c3c; color: white; border: none; border-radius: 20px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h1>PRUEBA RÁPIDA FIREBASE</h1>
-    <p>Dale al botón rojo ↓</p>
-    <button id="btn" onclick="enviarPrueba()">ENVIAR DATO DE PRUEBA</button>
-    <br><br>
-    <small>Si funciona → verás un nodo "prueba_rapida" en tu Firebase</small>
-</body>
-</html>
+window.enviar = async () => {
+  const btn = event.target;
+  btn.textContent = "ENVIANDO...";
+  try {
+    await set(ref(db, 'test_' + Date.now()), {
+      mensaje: "¡YA FUNCIONA!",
+      hora: new Date().toLocaleString('es-MX')
+    });
+    btn.textContent = "¡FUNCIONÓ!";
+    btn.style.background = "green";
+    alert("¡ÉXITO! Ve a Firebase → verás un nodo que dice test_xxxxxx");
+  } catch (e) {
+    btn.textContent = "ERROR";
+    btn.style.background = "black";
+    alert("ERROR: " + e.message);
+  }
+}
+</script>
+</body></html>
