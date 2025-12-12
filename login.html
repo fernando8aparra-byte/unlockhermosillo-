@@ -7,73 +7,15 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-box {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        h2 {
-            margin-bottom: 30px;
-            color: #333;
-        }
-        input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        input:focus {
-            border-color: #667eea;
-            outline: none;
-        }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.3s;
-        }
-        button:hover {
-            background: #5a6fd8;
-        }
-        button:active {
-            transform: scale(0.98);
-        }
-        .error {
-            color: #e74c3c;
-            font-weight: bold;
-            margin-top: 15px;
-            min-height: 24px;
-        }
-        .loading {
-            display: none;
-            color: #667eea;
-            font-size: 14px;
-            margin-top: 10px;
-        }
+        body {font-family: 'Segoe UI', sans-serif;background: linear-gradient(135deg, #667eea, #764ba2);margin:0;padding:0;height:100vh;display:flex;justify-content:center;align-items:center;}
+        .login-box {background:white;padding:40px 30px;border-radius:20px;box-shadow:0 15px 35px rgba(0,0,0,0.3);width:100%;max-width:400px;text-align:center;}
+        h2 {margin-bottom:30px;color:#333;}
+        input {width:100%;padding:14px;margin:10px 0;border:2px solid #ddd;border-radius:10px;font-size:16px;box-sizing:border-box;}
+        input:focus {border-color:#667eea;outline:none;}
+        button {width:100%;padding:14px;background:#667eea;color:white;border:none;border-radius:10px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:15px;transition:0.3s;}
+        button:hover {background:#5a6fd8;}
+        .error {color:#e74c3c;font-weight:bold;margin-top:15px;min-height:24px;}
+        .loading {display:none;color:#667eea;margin-top:10px;}
     </style>
 </head>
 <body>
@@ -89,7 +31,6 @@
     </div>
 
     <script>
-        // MISMA CONFIGURACIÓN QUE TU OTRA PÁGINA
         const firebaseConfig = {
             apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
             authDomain: "comprobantes-363c9.firebaseapp.com",
@@ -117,22 +58,24 @@
 
             try {
                 const snapshot = await db.ref('cuentas/' + usuario).once('value');
-                const datosUsuario = snapshot.val();
+                const datos = snapshot.val();
 
-                if (!datosUsuario) {
+                if (!datos) {
                     errorMsg.textContent = "Usuario incorrecto";
-                } else if (datosUsuario.password !== password) {
+                } else if (datos.password !== password) {
                     errorMsg.textContent = "Contraseña incorrecta";
                 } else {
-                    // ¡LOGIN EXITOSO!
-                    localStorage.setItem('usuarioLogueado', usuario);
-                    localStorage.setItem('nombreUsuario', datosUsuario.nombre || usuario);
-                    
-                    // Redirigir a tu página principal
-                    window.location.href = 'index.html'; // Cambia si tu archivo tiene otro nombre
+                    // GUARDA TODO EN LOCALSTORAGE
+                    localStorage.setItem('logueado', 'true');
+                    localStorage.setItem('usuario', usuario);
+                    localStorage.setItem('nombre', datos.nombre || usuario);
+                    localStorage.setItem('loginTime', Date.now()); // opcional: para expirar sesión
+
+                    // Redirige a la página principal
+                    window.location.href = 'index.html';
                 }
             } catch (err) {
-                errorMsg.textContent = "Error de conexión. Intenta de nuevo.";
+                errorMsg.textContent = "Error de conexión";
                 console.error(err);
             } finally {
                 loading.style.display = 'none';
