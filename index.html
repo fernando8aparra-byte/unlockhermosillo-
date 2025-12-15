@@ -8,7 +8,12 @@
         body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center;}
         .container {background:white; padding:35px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.4); max-width:500px; width:100%;}
         h1 {text-align:center; color:#333; font-size:28px; margin-bottom:10px;}
-        #usuarioNombre {text-align:center; color:#667eea; font-size:20px; margin-bottom:30px; font-weight:bold; border:2px dashed #ccc; padding:10px; border-radius:12px; cursor:text;}
+        #usuarioNombre {
+            text-align:center; color:#667eea; font-size:20px; margin-bottom:30px; font-weight:bold;
+            padding:12px; border-radius:12px; background:#f0f4ff; cursor:pointer;
+            transition:0.3s;
+        }
+        #usuarioNombre:hover {background:#e0e8ff;}
         label {display:block; margin-top:20px; font-weight:bold; color:#444;}
         select, input, textarea {width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;}
         select:focus, input:focus, textarea:focus {border-color:#667eea; outline:none;}
@@ -28,9 +33,8 @@
     <div class="container">
         <h1>COMPROPAGO</h1>
         
-        <div id="usuarioNombre" contenteditable="true">
-            Técnico (haz clic para editar tu nombre)
-        </div>
+        <!-- Nombre del técnico o botón de login -->
+        <div id="usuarioNombre">Cargando...</div>
 
         <form id="formTrabajo">
             <label>Tipo de servicio</label>
@@ -97,7 +101,6 @@
 
     <div id="notificacion">¡ENVIADO!</div>
 
-    <!-- TODO EL CÓDIGO JAVASCRIPT EN UN SOLO BLOQUE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
         import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
@@ -116,7 +119,23 @@
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
 
-        // Elementos del DOM
+        const usuarioNombre = document.getElementById('usuarioNombre');
+
+        // Detectar si hay nombre guardado en localStorage
+        const nombreGuardado = localStorage.getItem('nombreTecnico');
+
+        if (nombreGuardado && nombreGuardado.trim() !== '') {
+            usuarioNombre.textContent = `Tec. ${nombreGuardado.trim()}`;
+            usuarioNombre.style.cursor = 'default';
+        } else {
+            usuarioNombre.textContent = 'Iniciar sesión';
+            usuarioNombre.style.cursor = 'pointer';
+            usuarioNombre.onclick = () => {
+                window.location.href = 'login.html';
+            };
+        }
+
+        // === RESTO DEL CÓDIGO (formulario, validación, envío) ===
         const tipoServicio = document.getElementById('tipoServicio');
         const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
         const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
@@ -132,7 +151,6 @@
         const vistaGanancia = document.getElementById('vistaGanancia');
         const btnRealizado = document.getElementById('btnRealizado');
         const notificacion = document.getElementById('notificacion');
-        const usuarioNombre = document.getElementById('usuarioNombre');
 
         function getPrecioBase(modelo) {
             if (["iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XR","iPhone XS","iPhone XS Max"].includes(modelo)) return 450;
@@ -218,11 +236,11 @@
             const cobrado = parseFloat(montoInput.value);
             const gastos = parseFloat(gastosInput.value) || 0;
             const ganancia = cobrado - gastos;
-            const nombreTecnico = usuarioNombre.textContent.trim() || 'Técnico desconocido';
+            const nombreTecnico = nombreGuardado ? nombreGuardado.trim() : 'Técnico desconocido';
 
             const datos = {
                 fecha: new Date().toLocaleString('es-MX'),
-                tecnico: nombreTecnico,
+                tecnico: `Tec. ${nombreTecnico}`,
                 tipo: tipoServicio.options[tipoServicio.selectedIndex].text,
                 tipoDesbloqueo: tipoDesbloqueo.value === 'pago' ? 'FRP' : (tipoDesbloqueo.value === 'pantalla' ? 'Pantalla' : ''),
                 cuenta: cuentaBloqueo.value || '',
