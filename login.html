@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,10 +12,11 @@
             font-family: 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea, #764ba2);
             margin: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
         .box {
             background: white;
@@ -28,9 +28,28 @@
             text-align: center;
         }
         h2 {
-            margin-bottom: 35px;
+            margin-bottom: 20px;
             color: #333;
             font-size: 26px;
+        }
+        .sesion-activa {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+        .cerrar-sesion {
+            background: none;
+            border: none;
+            color: #dc2626;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 8px;
+            display: block;
         }
         h3 {
             margin: 20px 0 25px;
@@ -102,6 +121,13 @@
     <div class="box">
         <h2>COMPROPAGO</h2>
 
+        <!-- Mensaje de sesión activa -->
+        <div id="sesionActiva" style="display:none;">
+            <div class="sesion-activa" id="mensajeSesion"></div>
+            <button type="button" class="cerrar-sesion" id="btnCerrarSesion">Cerrar sesión actual</button>
+            <hr style="margin: 30px 0;">
+        </div>
+
         <!-- Login -->
         <div id="loginContainer" class="form-container">
             <h3>Iniciar Sesión</h3>
@@ -147,6 +173,9 @@
         const db = firebase.database();
 
         // Elementos
+        const sesionActivaDiv = document.getElementById('sesionActiva');
+        const mensajeSesion = document.getElementById('mensajeSesion');
+        const btnCerrarSesion = document.getElementById('btnCerrarSesion');
         const loginContainer = document.getElementById('loginContainer');
         const registerContainer = document.getElementById('registerContainer');
         const showRegister = document.getElementById('showRegister');
@@ -158,7 +187,25 @@
         const loadingLogin = document.getElementById('loadingLogin');
         const loadingRegistro = document.getElementById('loadingRegistro');
 
-        // Alternar entre login y registro
+        // === MOSTRAR SI HAY SESIÓN ACTIVA ===
+        const logueado = localStorage.getItem('logueado') === 'true';
+        const nombreTecnico = localStorage.getItem('nombreTecnico');
+
+        if (logueado && nombreTecnico && nombreTecnico.trim() !== '') {
+            mensajeSesion.textContent = `Sesión activa: Tec. ${nombreTecnico.trim()}`;
+            sesionActivaDiv.style.display = 'block';
+        }
+
+        // Cerrar sesión
+        btnCerrarSesion.addEventListener('click', () => {
+            localStorage.removeItem('logueado');
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('nombreTecnico');
+            localStorage.removeItem('loginTime');
+            location.reload();
+        });
+
+        // Alternar formularios
         showRegister.addEventListener('click', (e) => {
             e.preventDefault();
             loginContainer.classList.add('hidden');
@@ -174,11 +221,6 @@
             errorRegistro.textContent = '';
             errorLogin.textContent = '';
         });
-
-        // Si ya está logueado → ir directo a index.html
-        if (localStorage.getItem('logueado') === 'true') {
-            window.location.href = 'index.html';
-        }
 
         // === LOGIN ===
         loginForm.addEventListener('submit', (e) => {
@@ -204,9 +246,8 @@
                         if (key === entrada || (data.email && data.email.toLowerCase() === entrada)) {
                             encontrado = data;
                             usuarioKey = key;
-                            // Prioridad: campo 'nombre' → si no existe, usar el username
                             nombreTecnico = (data.nombre && data.nombre.trim() !== '') ? data.nombre.trim() : key;
-                            return true; // detener bucle
+                            return true;
                         }
                     });
 
@@ -225,7 +266,7 @@
                         return;
                     }
 
-                    // Login exitoso → guardar en localStorage
+                    // Guardar nueva sesión (sobrescribe la anterior)
                     localStorage.setItem('logueado', 'true');
                     localStorage.setItem('usuario', usuarioKey);
                     localStorage.setItem('nombreTecnico', nombreTecnico);
@@ -279,7 +320,6 @@
                         return;
                     }
 
-                    // Crear la cuenta
                     return refUsuario.set({
                         nombre: nombre,
                         email: email,
@@ -289,7 +329,6 @@
                     });
                 })
                 .then(() => {
-                    // Registro exitoso → login automático
                     localStorage.setItem('logueado', 'true');
                     localStorage.setItem('usuario', usuario);
                     localStorage.setItem('nombreTecnico', nombre);
