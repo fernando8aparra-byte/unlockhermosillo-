@@ -113,14 +113,18 @@
         }
         .menu-lateral ul li:hover {
             background: #34495e;
-            border-left: 4px solid #e74c3c;
+            border-left: 4px solid #667eea;
         }
         .menu-lateral ul li.cerrar-sesion {
             color: #e74c3c;
             margin-top: 40px;
+            border-left-color: transparent;
+        }
+        .menu-lateral ul li.cerrar-sesion:hover {
+            border-left: 4px solid #e74c3c;
         }
 
-        /* Overlay para cerrar al hacer clic fuera */
+        /* Overlay */
         .overlay {
             position: fixed;
             top: 0; left: 0;
@@ -219,6 +223,7 @@
             <h3 id="nombreMenu">Tec. Cargando...</h3>
         </div>
         <ul>
+            <li id="opcionMisTrabajos">Mis trabajos</li>
             <li class="cerrar-sesion" id="opcionCerrarSesion">Cerrar sesión</li>
         </ul>
     </div>
@@ -231,6 +236,7 @@
         <div id="usuarioNombre">Cargando sesión...</div>
 
         <form id="formTrabajo">
+            <!-- Todo el formulario igual que antes -->
             <label>Tipo de servicio</label>
             <select id="tipoServicio" required>
                 <option value="">Seleccionar...</option>
@@ -341,6 +347,7 @@
         const menuHamburguesa = document.getElementById('menuHamburguesa');
         const menuLateral = document.getElementById('menuLateral');
         const overlay = document.getElementById('overlay');
+        const opcionMisTrabajos = document.getElementById('opcionMisTrabajos');
         const opcionCerrarSesion = document.getElementById('opcionCerrarSesion');
         const nombreMenu = document.getElementById('nombreMenu');
 
@@ -358,7 +365,7 @@
             const nombre = `Tec. ${nombreTecnico.trim()}`;
             usuarioNombre.textContent = nombre;
             nombreMenu.textContent = nombre;
-            menuHamburguesa.style.display = 'flex'; // Mostrar menú hamburguesa
+            menuHamburguesa.style.display = 'flex';
         } else {
             usuarioNombre.textContent = 'Iniciar sesión';
             usuarioNombre.onclick = () => { window.location.href = 'login.html'; };
@@ -379,10 +386,14 @@
             overlay.classList.remove('activo');
         });
 
+        // === MIS TRABAJOS ===
+        opcionMisTrabajos.addEventListener('click', () => {
+            window.location.href = 'chambing.html';
+        });
+
         // === CERRAR SESIÓN ===
         opcionCerrarSesion.addEventListener('click', () => {
             modalConfirmacion.style.display = 'flex';
-            // Cerrar menú
             menuHamburguesa.classList.remove('activo');
             menuLateral.classList.remove('abierto');
             overlay.classList.remove('activo');
@@ -398,13 +409,13 @@
             window.location.href = 'login.html';
         });
 
-        // Cerrar modal si interactúa con formulario
+        // Cerrar modal al interactuar con formulario
         document.querySelectorAll('select, input, textarea').forEach(el => {
             el.addEventListener('input', () => modalConfirmacion.style.display = 'none');
             el.addEventListener('change', () => modalConfirmacion.style.display = 'none');
         });
 
-        // === RESTO DEL FORMULARIO (igual que antes) ===
+        // === RESTO DEL CÓDIGO DEL FORMULARIO (sin cambios) ===
         const tipoServicio = document.getElementById('tipoServicio');
         const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
         const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
