@@ -26,7 +26,7 @@
         body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center;}
         .container {background:white; padding:35px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.4); max-width:500px; width:100%;}
         h1 {text-align:center; color:#333; font-size:28px; margin-bottom:10px;}
-        #usuarioNombre {text-align:center; color:#667eea; font-size:20px; margin-bottom:30px; font-weight:bold;}
+        #usuarioNombre {text-align:center; color:#667eea; font-size:20px; margin-bottom:30px; font-weight:bold; border:2px dashed #ccc; padding:10px; border-radius:12px; cursor:text;}
         label {display:block; margin-top:20px; font-weight:bold; color:#444;}
         select, input, textarea {width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;}
         select:focus, input:focus, textarea:focus {border-color:#667eea; outline:none;}
@@ -40,16 +40,14 @@
         .ganancia {font-size:22px; font-weight:bold; text-align:center; margin:25px 0; padding:18px; background:#f8f9fa; border-radius:15px; border:3px solid #27ae60;}
         #notificacion {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold; box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;}
         #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
-        #terminosModal {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999;}
-        #terminosContent {background:white; padding:30px; border-radius:20px; max-width:90%; max-height:90%; overflow-y:auto;}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>COMPROPAGO</h1>
         
-        <!-- Campo para poner el nombre del técnico (puedes cambiarlo o dejarlo fijo) -->
-        <div id="usuarioNombre" contenteditable="true" style="border:2px dashed #ccc; padding:10px; border-radius:12px; cursor:text;">
+        <!-- Nombre del técnico (editable) -->
+        <div id="usuarioNombre" contenteditable="true">
             Técnico (haz clic para editar tu nombre)
         </div>
 
@@ -112,36 +110,11 @@
             <div id="precioInfo" class="precio-info"></div>
             <div id="vistaGanancia" class="ganancia" style="display:none;"></div>
 
-            <div style="margin-top:30px; text-align:center;">
-                <input type="checkbox" id="aceptoTerminos" required>
-                <label for="aceptoTerminos" style="display:inline; font-weight:normal;">
-                    Acepto los <a href="#" id="verTerminos">Términos y Condiciones</a>
-                </label>
-            </div>
-
             <button type="submit" id="btnRealizado">REALIZADO</button>
         </form>
     </div>
 
     <div id="notificacion">¡ENVIADO!</div>
-
-    <!-- Modal Términos -->
-    <div id="terminosModal">
-        <div id="terminosContent">
-            <h2 style="text-align:center;">Términos y Condiciones</h2>
-            <p>Al utilizar este servicio de registro técnico, usted declara y acepta lo siguiente:</p>
-            <ul>
-                <li>El técnico actúa como independiente y no emite facturas con validez fiscal oficial.</li>
-                <li>Nos deslindamos expresamente de cualquier responsabilidad fiscal derivada de los servicios prestados. Toda responsabilidad fiscal recae exclusivamente en el técnico y/o cliente.</li>
-                <li>El cliente confirma que el equipo le pertenece legítimamente.</li>
-                <li>No nos responsabilizamos por pérdida de datos o daños adicionales.</li>
-                <li>La garantía es limitada.</li>
-            </ul>
-            <p style="text-align:center; margin-top:30px;">
-                <button onclick="document.getElementById('terminosModal').style.display='none';">Cerrar</button>
-            </p>
-        </div>
-    </div>
 
     <script type="module">
         const tipoServicio = document.getElementById('tipoServicio');
@@ -159,7 +132,6 @@
         const vistaGanancia = document.getElementById('vistaGanancia');
         const btnRealizado = document.getElementById('btnRealizado');
         const notificacion = document.getElementById('notificacion');
-        const aceptoTerminos = document.getElementById('aceptoTerminos');
         const usuarioNombre = document.getElementById('usuarioNombre');
 
         function getPrecioBase(modelo) {
@@ -210,7 +182,7 @@
             validarFormulario();
         }
         function validarFormulario() {
-            let valido = tipoServicio.value && montoInput.value > 0 && aceptoTerminos.checked;
+            let valido = tipoServicio.value && montoInput.value > 0;
             if (tipoServicio.value === 'desbloqueo') {
                 valido &&= tipoDesbloqueo.value;
                 if (tipoDesbloqueo.value === 'pantalla') {
@@ -229,13 +201,9 @@
         document.getElementById('modeloIphoneSelect').addEventListener('change', calcularPrecioIcloud);
         montoInput.addEventListener('input', actualizarGanancia);
         gastosInput.addEventListener('input', actualizarGanancia);
-        document.querySelectorAll('select, input, textarea, #aceptoTerminos').forEach(el => {
+        document.querySelectorAll('select, input, textarea').forEach(el => {
             el.addEventListener('input', validarFormulario);
             el.addEventListener('change', validarFormulario);
-        });
-        document.getElementById('verTerminos').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('terminosModal').style.display = 'flex';
         });
 
         document.getElementById('formTrabajo').addEventListener('submit', async (e) => {
@@ -249,10 +217,10 @@
 
             const datos = {
                 fecha: new Date().toLocaleString('es-MX'),
-                usuarioNombre: nombreTecnico,
+                tecnico: nombreTecnico,
                 tipo: tipoServicio.options[tipoServicio.selectedIndex].text,
-                tipo1: tipoDesbloqueo.value === 'pago' ? 'FRP' : (tipoDesbloqueo.value === 'pantalla' ? 'Pantalla' : ''),
-                tipo2: cuentaBloqueo.value || '',
+                tipoDesbloqueo: tipoDesbloqueo.value === 'pago' ? 'FRP' : (tipoDesbloqueo.value === 'pantalla' ? 'Pantalla' : ''),
+                cuenta: cuentaBloqueo.value || '',
                 modelo: cuentaBloqueo.value === 'google' ? document.getElementById('modeloAndroidInput').value.trim() :
                         cuentaBloqueo.value === 'icloud' ? document.getElementById('modeloIphoneSelect').value : '',
                 tiempo: document.getElementById('tiempo').value || 'No especificado',
@@ -271,7 +239,6 @@
                 setTimeout(() => {
                     notificacion.classList.remove('mostrar');
                     document.getElementById('formTrabajo').reset();
-                    aceptoTerminos.checked = false;
                     btnRealizado.textContent = 'REALIZADO';
                     btnRealizado.classList.remove('enviando', 'habilitado');
                     precioInfo.textContent = '';
