@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COMPROPAGO - Registro Técnico</title>
-
-    <!-- Firebase Modular (tu versión corregida) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+        import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
@@ -21,174 +20,284 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
 
-        // Exportamos para usar en el script principal
-        window.db = db;
-        window.ordenesRef = ordenesRef;
-        window.push = push;
+        // Redirección si no hay usuario autenticado
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Usuario logueado: mostrar nombre
+                document.getElementById('usuarioNombre').textContent = user.displayName || user.email || 'Usuario';
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            } else {
+                // No logueado: redirigir a login.html
+                window.location.href = 'login.html';
+            }
+        });
     </script>
-
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            margin:0;
-            padding:20px;
-            min-height:100vh;
-            display:flex;
-            justify-content:center;
-            position: relative;
-        }
-        .container {
-            background:white;
-            padding:35px;
-            border-radius:25px;
-            box-shadow:0 20px 50px rgba(0,0,0,0.4);
-            max-width:500px;
-            width:100%;
-            z-index: 10;
-        }
-        h1 {text-align:center; color:#333; font-size:28px; margin-bottom:30px;}
-
+        body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center;}
+        .container {background:white; padding:35px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.4); max-width:500px; width:100%;}
+        h1 {text-align:center; color:#333; font-size:28px; margin-bottom:10px;}
+        #usuarioNombre {text-align:center; color:#667eea; font-size:20px; margin-bottom:30px; font-weight:bold;}
         label {display:block; margin-top:20px; font-weight:bold; color:#444;}
-        select, input, textarea {
-            width:100%;
-            padding:14px;
-            margin-top:8px;
-            border:2px solid #ddd;
-            border-radius:12px;
-            font-size:16px;
-            box-sizing:border-box;
-        }
+        select, input, textarea {width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;}
         select:focus, input:focus, textarea:focus {border-color:#667eea; outline:none;}
-
-        /* Botones de sesión */
-        .btn-cerrar {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            background: #e74c3c;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 9999;
-            transition: all 0.3s;
-        }
-        .btn-cerrar:hover {background: #c0392b; transform: scale(1.05);}
-
-        .bienvenida {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: #27ae60;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 9999;
-        }
+        .hidden {display:none !important;}
+        #btnRealizado {margin-top:50px; padding:20px; font-size:24px; font-weight:bold; color:white; background:#95a5a6; border:none; border-radius:18px; cursor:not-allowed; width:100%; transition:0.4s;}
+        #btnRealizado.habilitado {background:#e74c3c; cursor:pointer; animation:pulsar 2s infinite;}
+        #btnRealizado.enviando {background:#27ae60 !important; animation:pulseGreen 1.5s infinite; cursor:not-allowed;}
+        @keyframes pulsar {0%,100%{background:#e74c3c} 50%{background:#c0392b}}
+        @keyframes pulseGreen {0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)}}
+        .precio-info {font-size:14px; color:#27ae60; font-weight:bold; text-align:center; margin-top:8px;}
+        .ganancia {font-size:22px; font-weight:bold; text-align:center; margin:25px 0; padding:18px; background:#f8f9fa; border-radius:15px; border:3px solid #27ae60;}
+        #notificacion {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold; box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;}
+        #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
+        #terminosModal {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999;}
+        #terminosContent {background:white; padding:30px; border-radius:20px; max-width:80%; max-height:80%; overflow-y:auto;}
+        #aceptoCheckbox {margin-top:20px;}
     </style>
 </head>
 <body>
-
-    <!-- PROTECCIÓN: Si no está logueado → fuera -->
-    <script>
-        if (!localStorage.getItem('logueado')) {
-            window.location.href = 'login.html';
-        }
-
-        // Mostrar nombre del usuario
-        const nombre = localStorage.getItem('nombre') || localStorage.getItem('usuario') || 'Técnico';
-        document.write(`<div class="bienvenida">Bienvenido, ${nombre}</div>`);
-
-        // Botón Cerrar Sesión con confirmación
-        document.write(`
-            <div class="btn-cerrar" onclick="cerrarSesion()">
-                Cerrar sesión
-            </div>
-        `);
-
-        function cerrarSesion() {
-            if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-                localStorage.clear();
-                window.location.href = 'login.html';
-            }
-        }
-    </script>
-
-    <div class="container">
-        <h1>COMPROPAGO - Registro Técnico</h1>
-        <form id="formTrabajo">
-            <!-- TODO TU FORMULARIO ORIGINAL AQUÍ (lo mantengo igual) -->
-            <label>Tipo de servicio</label>
-            <select id="tipoServicio" required>
-                <option value="">Seleccionar...</option>
-                <option value="reparacion">Reparación</option>
-                <option value="desbloqueo">Desbloqueo</option>
-                <option value="otro">Otro</option>
-            </select>
-
-            <!-- (Aquí va todo tu formulario original: desbloqueo, iCloud, gastos, etc.) -->
-            <!-- Lo omito por espacio, pero tú ya lo tienes completo -->
-
-            <label>A COBRAR (MXN)</label>
-            <input type="number" id="monto" min="0" step="0.01" required placeholder="0.00">
-            <div id="precioInfo" class="precio-info"></div>
-            <div id="vistaGanancia" class="ganancia"></div>
-            <button type="submit" id="btnRealizado">REALIZADO</button>
-        </form>
+    <!-- Sección oculta hasta que el usuario esté autenticado -->
+    <div id="authSection" style="display:block;" class="container">
+        <h1>Cargando...</h1>
     </div>
 
-    <div id="notificacion">ENVIADO</div>
+    <div id="mainContent" style="display:none;">
+        <div class="container">
+            <h1>COMPROPAGO</h1>
+            <div id="usuarioNombre"></div>
+            <form id="formTrabajo">
+                <label>Tipo de servicio</label>
+                <select id="tipoServicio" required>
+                    <option value="">Seleccionar...</option>
+                    <option value="reparacion">Reparación</option>
+                    <option value="desbloqueo">Desbloqueo</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <!-- El resto del formulario es idéntico al original -->
+                <div id="seccionDesbloqueo" class="hidden">
+                    <label>Tipo de desbloqueo</label>
+                    <select id="tipoDesbloqueo">
+                        <option value="">Seleccionar...</option>
+                        <option value="pantalla">Desbloqueo de pantalla</option>
+                        <option value="pago">Pantalla de pago / FRP</option>
+                    </select>
+                    <div id="subseccionPantalla" class="hidden">
+                        <label>Cuenta bloqueada</label>
+                        <select id="cuentaBloqueo">
+                            <option value="">Seleccionar...</option>
+                            <option value="google">Google (Android)</option>
+                            <option value="icloud">iCloud (iPhone)</option>
+                        </select>
+                        <div id="modeloAndroid" class="hidden">
+                            <label>Modelo Android</label>
+                            <input type="text" id="modeloAndroidInput" placeholder="Ej: Samsung A54">
+                        </div>
+                        <div id="modeloIphone" class="hidden">
+                            <label>Modelo de iPhone</label>
+                            <select id="modeloIphoneSelect">
+                                <option value="">Seleccionar modelo...</option>
+                                <!-- Opciones iguales que antes -->
+                                <optgroup label="7 al XS"><option>iPhone 7</option><option>iPhone 7 Plus</option><option>iPhone 8</option><option>iPhone 8 Plus</option><option>iPhone X</option><option>iPhone XR</option><option>iPhone XS</option><option>iPhone XS Max</option></optgroup>
+                                <optgroup label="11 Series"><option>iPhone 11</option><option>iPhone 11 Pro</option><option>iPhone 11 Pro Max</option></optgroup>
+                                <optgroup label="12-14"><option>iPhone 12 mini</option><option>iPhone 12</option><option>iPhone 12 Pro</option><option>iPhone 12 Pro Max</option><option>iPhone 13 mini</option><option>iPhone 13</option><option>iPhone 13 Pro</option><option>iPhone 13 Pro Max</option><option>iPhone 14</option><option>iPhone 14 Plus</option><option>iPhone 14 Pro</option><option>iPhone 14 Pro Max</option></optgroup>
+                                <optgroup label="15-17"><option>iPhone 15</option><option>iPhone 15 Plus</option><option>iPhone 15 Pro</option><option>iPhone 15 Pro Max</option><option>iPhone 16e</option><option>iPhone 16</option><option>iPhone 16 Plus</option><option>iPhone 16 Pro</option><option>iPhone 16 Pro Max</option><option>iPhone 17 Air</option><option>iPhone 17</option><option>iPhone 17 Pro</option><option>iPhone 17 Pro Max</option></optgroup>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="descripcionOtro" class="hidden">
+                    <label>Descripción del trabajo</label>
+                    <textarea id="descripcionTextarea" rows="3" placeholder="Cambio de pantalla, etc..."></textarea>
+                </div>
+                <div id="seccionGastos" class="hidden">
+                    <label>Gastos (transporte, etc.)</label>
+                    <input type="number" id="gastos" min="0" step="0.01" placeholder="0.00">
+                </div>
+                <label>Tiempo empleado (opcional)</label>
+                <input type="text" id="tiempo" placeholder="Ej: 45 min">
+                <label>A COBRAR (MXN)</label>
+                <input type="number" id="monto" min="0" step="0.01" required placeholder="0.00">
+                <div id="precioInfo" class="precio-info"></div>
+                <div id="vistaGanancia" class="ganancia"></div>
 
-    <!-- TU SCRIPT ORIGINAL (adaptado al sistema modular) -->
+                <div style="margin-top:30px; text-align:center;">
+                    <input type="checkbox" id="aceptoTerminos" required>
+                    <label for="aceptoTerminos" style="display:inline; font-weight:normal;">
+                        Acepto los <a href="#" id="verTerminos">Términos y Condiciones</a>
+                    </label>
+                </div>
+
+                <button type="submit" id="btnRealizado">REALIZADO</button>
+            </form>
+        </div>
+
+        <div id="notificacion">¡ENVIADO!</div>
+    </div>
+
+    <!-- Modal de Términos y Condiciones -->
+    <div id="terminosModal">
+        <div id="terminosContent">
+            <h2 style="text-align:center;">Términos y Condiciones</h2>
+            <p>Al utilizar este servicio de registro técnico, usted declara y acepta lo siguiente:</p>
+            <ul>
+                <li>El técnico actúa como independiente y no emite facturas con validez fiscal oficial.</li>
+                <li>Nos deslindamos expresamente de cualquier responsabilidad fiscal derivada de los servicios prestados. Toda responsabilidad en materia fiscal (declaración de ingresos, emisión de comprobantes fiscales, pago de impuestos, etc.) recae exclusivamente en el cliente y/o el propietario del equipo.</li>
+                <li>El cliente confirma que el equipo entregado para reparación o desbloqueo le pertenece legítimamente o que cuenta con autorización del propietario.</li>
+                <li>No nos responsabilizamos por pérdida de datos, daños adicionales derivados de fallas preexistentes o manipulación posterior.</li>
+                <li>La garantía de los trabajos realizados es limitada y no cubre fallas por mal uso o intervención de terceros.</li>
+            </ul>
+            <p style="text-align:center; margin-top:30px;">
+                <button onclick="document.getElementById('terminosModal').style.display='none';">Cerrar</button>
+            </p>
+        </div>
+    </div>
+
     <script type="module">
-        import { push, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        // Elementos del formulario (igual que antes)
+        const tipoServicio = document.getElementById('tipoServicio');
+        const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
+        const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
+        const subseccionPantalla = document.getElementById('subseccionPantalla');
+        const cuentaBloqueo = document.getElementById('cuentaBloqueo');
+        const modeloAndroid = document.getElementById('modeloAndroid');
+        const modeloIphone = document.getElementById('modeloIphone');
+        const descripcionOtro = document.getElementById('descripcionOtro');
+        const seccionGastos = document.getElementById('seccionGastos');
+        const gastosInput = document.getElementById('gastos');
+        const montoInput = document.getElementById('monto');
+        const precioInfo = document.getElementById('precioInfo');
+        const vistaGanancia = document.getElementById('vistaGanancia');
+        const btnRealizado = document.getElementById('btnRealizado');
+        const notificacion = document.getElementById('notificacion');
 
-        const db = window.db;
-        const ordenesRef = window.ordenesRef;
+        // Funciones de cálculo (idénticas)
+        function getPrecioBase(modelo) {
+            if (["iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XR","iPhone XS","iPhone XS Max"].includes(modelo)) return 450;
+            if (modelo.startsWith("iPhone 11")) return 550;
+            if (modelo.match(/^iPhone (12|13|14)/)) return 750;
+            if (modelo.match(/^iPhone (15|16|17)/) || modelo.includes("16e") || modelo.includes("17 Air")) return 1000;
+            return 0;
+        }
+        function getExtraDia() { const d = new Date().getDay(); return [1,3,5].includes(d) ? 0 : d === 6 ? 200 : 100; }
+        function calcularPrecioIcloud() {
+            const modelo = document.getElementById('modeloIphoneSelect').value;
+            if (modelo && cuentaBloqueo.value === 'icloud') {
+                const base = getPrecioBase(modelo);
+                const extra = getExtraDia();
+                const total = base + extra;
+                montoInput.value = total;
+                const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+                precioInfo.textContent = `Base $${base} + $${extra} (${dias[new Date().getDay()]}) = $${total} MXN`;
+            } else precioInfo.textContent = '';
+            actualizarGanancia();
+        }
+        function actualizarGanancia() {
+            const cobrado = parseFloat(montoInput.value) || 0;
+            const gastos = parseFloat(gastosInput.value) || 0;
+            const ganancia = cobrado - gastos;
+            if (tipoServicio.value === 'desbloqueo' && cobrado > 0) {
+                vistaGanancia.style.display = 'block';
+                vistaGanancia.innerHTML = `GANANCIA NETA: <span style="color:#27ae60">$${ganancia.toFixed(2)} MXN</span>`;
+            } else vistaGanancia.style.display = 'none';
+        }
+        function mostrarCampos() {
+            seccionDesbloqueo.classList.add('hidden'); subseccionPantalla.classList.add('hidden');
+            modeloAndroid.classList.add('hidden'); modeloIphone.classList.add('hidden');
+            seccionGastos.classList.add('hidden'); descripcionOtro.classList.add('hidden');
+            if (tipoServicio.value === 'desbloqueo') {
+                seccionDesbloqueo.classList.remove('hidden'); seccionGastos.classList.remove('hidden');
+                if (tipoDesbloqueo.value === 'pantalla') {
+                    subseccionPantalla.classList.remove('hidden');
+                    if (cuentaBloqueo.value === 'google') { modeloAndroid.classList.remove('hidden'); modeloIphone.classList.add('hidden'); }
+                    if (cuentaBloqueo.value === 'icloud') { modeloIphone.classList.remove('hidden'); modeloAndroid.classList.add('hidden'); calcularPrecioIcloud(); }
+                }
+            }
+            if (tipoServicio.value === 'reparacion' || tipoServicio.value === 'otro') descripcionOtro.classList.remove('hidden');
+            validarFormulario();
+        }
+        function validarFormulario() {
+            let valido = tipoServicio.value && montoInput.value > 0 && document.getElementById('aceptoTerminos').checked;
+            if (tipoServicio.value === 'desbloqueo') {
+                valido &&= tipoDesbloqueo.value;
+                if (tipoDesbloqueo.value === 'pantalla') {
+                    valido &&= cuentaBloqueo.value;
+                    if (cuentaBloqueo.value === 'google') valido &&= document.getElementById('modeloAndroidInput').value.trim();
+                    if (cuentaBloqueo.value === 'icloud') valido &&= document.getElementById('modeloIphoneSelect').value;
+                }
+            }
+            if ((tipoServicio.value === 'reparacion' || tipoServicio.value === 'otro') && !document.getElementById('descripcionTextarea').value.trim()) valido = false;
+            btnRealizado.classList.toggle('habilitado', valido);
+        }
 
-        // Aquí pega TODO tu <script> original de lógica del formulario
-        // Solo cambia esta línea al final cuando guardes:
-        /*
-        db.ref('ordenes').push(datos)   → CAMBIA A:
-        push(ordenesRef, datos)
-        */
+        // Eventos (iguales + checkbox de términos)
+        tipoServicio.addEventListener('change', () => { precioInfo.textContent = ''; vistaGanancia.style.display = 'none'; mostrarCampos(); });
+        tipoDesbloqueo.addEventListener('change', mostrarCampos);
+        cuentaBloqueo.addEventListener('change', mostrarCampos);
+        document.getElementById('modeloIphoneSelect').addEventListener('change', calcularPrecioIcloud);
+        montoInput.addEventListener('input', actualizarGanancia);
+        gastosInput.addEventListener('input', actualizarGanancia);
+        document.querySelectorAll('select, input, textarea, #aceptoTerminos').forEach(el => el.addEventListener('input', validarFormulario));
+        document.querySelectorAll('select, input, textarea, #aceptoTerminos').forEach(el => el.addEventListener('change', validarFormulario));
 
-        // Ejemplo rápido de cómo queda el envío:
-        document.getElementById('formTrabajo').addEventListener('submit', function(e) {
+        // Modal términos
+        document.getElementById('verTerminos').addEventListener('click', (e) => {
             e.preventDefault();
-            if (!document.getElementById('btnRealizado').classList.contains('habilitado')) return;
-
-            const datos = { /* todos tus datos */ };
-
-            document.getElementById('btnRealizado').textContent = 'ENVIANDO...';
-            document.getElementById('btnRealizado').classList.add('enviando');
-
-            push(ordenesRef, datos)
-                .then(() => {
-                    document.getElementById('notificacion').classList.add('mostrar');
-                    setTimeout(() => {
-                        document.getElementById('notificacion').classList.remove('mostrar');
-                        document.getElementById('formTrabajo').reset();
-                        // ... resto de tu lógica
-                    }, 2000);
-                })
-                .catch(err => {
-                    alert("Error: " + err.message);
-                });
+            document.getElementById('terminosModal').style.display = 'flex';
         });
 
-        // El resto de tu código JavaScript original (calcularPrecioIcloud, validar, etc.)
-        // lo pegas aquí dentro del <script type="module">
+        // Submit
+        document.getElementById('formTrabajo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!btnRealizado.classList.contains('habilitado')) return;
+
+            const cobrado = parseFloat(montoInput.value);
+            const gastos = parseFloat(gastosInput.value) || 0;
+            const ganancia = cobrado - gastos;
+
+            const user = auth.currentUser;
+            const datos = {
+                fecha: new Date().toLocaleString('es-MX'),
+                usuarioId: user.uid,
+                usuarioNombre: user.displayName || user.email,
+                tipo: tipoServicio.options[tipoServicio.selectedIndex].text,
+                tipo1: tipoDesbloqueo.value === 'pago' ? 'FRP' : (tipoDesbloqueo.value === 'pantalla' ? 'Pantalla' : ''),
+                tipo2: cuentaBloqueo.value || '',
+                modelo: cuentaBloqueo.value === 'google' ? document.getElementById('modeloAndroidInput').value.trim() :
+                        cuentaBloqueo.value === 'icloud' ? document.getElementById('modeloIphoneSelect').value : '',
+                tiempo: document.getElementById('tiempo').value || 'No especificado',
+                cobrado: cobrado.toString(),
+                gastos: gastos.toString(),
+                ganancia: ganancia.toFixed(2),
+                descripcion: document.getElementById('descripcionTextarea')?.value.trim() || ''
+            };
+
+            btnRealizado.textContent = 'ENVIANDO...';
+            btnRealizado.classList.add('enviando');
+            try {
+                await push(ordenesRef, datos);
+                notificacion.classList.add('mostrar');
+                setTimeout(() => {
+                    notificacion.classList.remove('mostrar');
+                    document.getElementById('formTrabajo').reset();
+                    document.getElementById('aceptoTerminos').checked = false;
+                    btnRealizado.textContent = 'REALIZADO';
+                    btnRealizado.classList.remove('enviando', 'habilitado');
+                    precioInfo.textContent = ''; vistaGanancia.style.display = 'none';
+                    tipoServicio.value = ''; mostrarCampos();
+                }, 2200);
+            } catch (error) {
+                alert("Error: " + error.message);
+                btnRealizado.textContent = 'REALIZADO';
+                btnRealizado.classList.remove('enviando');
+            }
+        });
+
+        mostrarCampos();
     </script>
 </body>
 </html>
