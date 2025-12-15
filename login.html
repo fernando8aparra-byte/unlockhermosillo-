@@ -30,7 +30,7 @@
         <div id="loginContainer" class="form-container">
             <h3>Iniciar Sesión</h3>
             <form id="loginForm">
-                <input type="text" id="usuarioLogin" placeholder="Usuario" required autocomplete="username">
+                <input type="text" id="usuarioLogin" placeholder="Usuario o Correo electrónico" required autocomplete="username">
                 <input type="password" id="passwordLogin" placeholder="Contraseña" required autocomplete="current-password">
                 <button type="submit">ENTRAR</button>
             </form>
@@ -67,9 +67,9 @@
             appId: "1:390391998056:web:23e22073d88bc247d43ddd"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();  // Realtime Database
+        const db = firebase.database();
 
-        // Elementos
+        // Elementos UI
         const loginContainer = document.getElementById('loginContainer');
         const registerContainer = document.getElementById('registerContainer');
         const showRegister = document.getElementById('showRegister');
@@ -83,7 +83,7 @@
         const loadingLogin = document.getElementById('loadingLogin');
         const loadingRegistro = document.getElementById('loadingRegistro');
 
-        // Cambiar entre login y registro
+        // Alternar formularios
         showRegister.addEventListener('click', () => {
             loginContainer.classList.add('hidden');
             registerContainer.classList.remove('hidden');
@@ -98,41 +98,64 @@
             errorLogin.textContent = '';
         });
 
-        // Si ya está logueado, ir a index.html
+        // Redirigir si ya está logueado
         if (localStorage.getItem('logueado') === 'true') {
             window.location.href = 'index.html';
         }
 
-        // LOGIN
+        // === LOGIN: permite usuario o correo ===
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorLogin.textContent = '';
             loadingLogin.style.display = 'block';
 
-            const usuario = document.getElementById('usuarioLogin').value.trim().toLowerCase();
+            const entrada = document.getElementById('usuarioLogin').value.trim().toLowerCase();
             const password = document.getElementById('passwordLogin').value;
 
-            const ref = db.ref('cuentas/' + usuario);
+            const cuentasRef = db.ref('cuentas');
 
-            ref.once('value')
+            cuentasRef.once('value')
                 .then((snapshot) => {
                     if (!snapshot.exists()) {
-                        errorLogin.textContent = "Usuario incorrecto";
-                    } else {
-                        const data = snapshot.val();
-                        if (data.password !== password) {
-                            errorLogin.textContent = "Contraseña incorrecta";
-                        } else if (data.activo === false) {
-                            errorLogin.textContent = "Cuenta desactivada";
-                        } else {
-                            // Login exitoso
-                            localStorage.setItem('logueado', 'true');
-                            localStorage.setItem('usuario', usuario);
-                            localStorage.setItem('nombre', data.nombre || usuario);
-                            localStorage.setItem('loginTime', Date.now());
-                            window.location.href = 'index.html';
-                        }
+                        errorLogin.textContent = "No hay cuentas registradas";
+                        return;
                     }
+
+                    let encontrado = null;
+                    let usuarioEncontrado = null;
+
+                    snapshot.forEach((child) => {
+                        const data = child.val();
+                        const usuarioKey = child.key;
+
+                        if (usuarioKey === entrada || data.email === entrada) {
+                            encontrado = data;
+                            usuarioEncontrado = usuarioKey;
+                            return true; // detener el forEach
+                        }
+                    });
+
+                    if (!encontrado) {
+                        errorLogin.textContent = "Usuario o correo no encontrado";
+                        return;
+                    }
+
+                    if (encontrado.password !== password) {
+                        errorLogin.textContent = "Contraseña incorrecta";
+                        return;
+                    }
+
+                    if (encontrado.activo === false) {
+                        errorLogin.textContent = "Cuenta desactivada";
+                        return;
+                    }
+
+                    // Login exitoso
+                    localStorage.setItem('logueado', 'true');
+                    localStorage.setItem('usuario', usuarioEncontrado);
+                    localStorage.setItem('nombre', encontrado.nombre || usuarioEncontrado);
+                    localStorage.setItem('loginTime', Date.now());
+                    window.location.href = 'index.html';
                 })
                 .catch((err) => {
                     errorLogin.textContent = "Error de conexión";
@@ -143,7 +166,7 @@
                 });
         });
 
-        // REGISTRO
+        // === REGISTRO (sin cambios importantes) ===
         registroForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorRegistro.textContent = '';
@@ -176,17 +199,15 @@
                         return;
                     }
 
-                    // Crear cuenta
                     return ref.set({
                         nombre: nombre,
                         email: email,
-                        password: password,  // En producción: nunca en texto plano
+                        password: password,
                         activo: true,
                         creadoEn: firebase.database.ServerValue.TIMESTAMP
                     });
                 })
                 .then(() => {
-                    // Login automático
                     localStorage.setItem('logueado', 'true');
                     localStorage.setItem('usuario', usuario);
                     localStorage.setItem('nombre', nombre);
