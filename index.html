@@ -4,28 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COMPROPAGO - Registro Técnico</title>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { 
-            getDatabase, 
-            ref, 
-            push 
-        } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
-            authDomain: "comprobantes-363c9.firebaseapp.com",
-            databaseURL: "https://comprobantes-363c9-default-rtdb.firebaseio.com",
-            projectId: "comprobantes-363c9",
-            storageBucket: "comprobantes-363c9.firebasestorage.app",
-            messagingSenderId: "390391998056",
-            appId: "1:390391998056:web:23e22073d88bc247d43ddd"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const ordenesRef = ref(db, 'ordenes');
-    </script>
     <style>
         body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center;}
         .container {background:white; padding:35px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.4); max-width:500px; width:100%;}
@@ -119,7 +97,25 @@
 
     <div id="notificacion">¡ENVIADO!</div>
 
+    <!-- TODO EL CÓDIGO JAVASCRIPT EN UN SOLO BLOQUE -->
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
+            authDomain: "comprobantes-363c9.firebaseapp.com",
+            databaseURL: "https://comprobantes-363c9-default-rtdb.firebaseio.com",
+            projectId: "comprobantes-363c9",
+            storageBucket: "comprobantes-363c9.firebasestorage.app",
+            messagingSenderId: "390391998056",
+            appId: "1:390391998056:web:23e22073d88bc247d43ddd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const ordenesRef = ref(db, 'ordenes');
+
         // Elementos del DOM
         const tipoServicio = document.getElementById('tipoServicio');
         const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
@@ -138,7 +134,6 @@
         const notificacion = document.getElementById('notificacion');
         const usuarioNombre = document.getElementById('usuarioNombre');
 
-        // Funciones de precio
         function getPrecioBase(modelo) {
             if (["iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XR","iPhone XS","iPhone XS Max"].includes(modelo)) return 450;
             if (modelo.startsWith("iPhone 11")) return 550;
@@ -146,10 +141,12 @@
             if (modelo.match(/^iPhone (15|16|17)/) || modelo.includes("16e") || modelo.includes("17 Air")) return 1000;
             return 0;
         }
+
         function getExtraDia() { 
             const d = new Date().getDay(); 
             return [1,3,5].includes(d) ? 0 : d === 6 ? 200 : 100; 
         }
+
         function calcularPrecioIcloud() {
             const modelo = document.getElementById('modeloIphoneSelect').value;
             if (modelo && cuentaBloqueo.value === 'icloud') {
@@ -162,6 +159,7 @@
             } else precioInfo.textContent = '';
             actualizarGanancia();
         }
+
         function actualizarGanancia() {
             const cobrado = parseFloat(montoInput.value) || 0;
             const gastos = parseFloat(gastosInput.value) || 0;
@@ -172,7 +170,6 @@
             } else vistaGanancia.style.display = 'none';
         }
 
-        // Mostrar/ocultar campos
         function mostrarCampos() {
             seccionDesbloqueo.classList.add('hidden'); subseccionPantalla.classList.add('hidden');
             modeloAndroid.classList.add('hidden'); modeloIphone.classList.add('hidden');
@@ -189,7 +186,6 @@
             validarFormulario();
         }
 
-        // Validar formulario
         function validarFormulario() {
             let valido = tipoServicio.value && montoInput.value > 0;
             if (tipoServicio.value === 'desbloqueo') {
@@ -204,7 +200,6 @@
             btnRealizado.classList.toggle('habilitado', valido);
         }
 
-        // Eventos
         tipoServicio.addEventListener('change', () => { precioInfo.textContent = ''; vistaGanancia.style.display = 'none'; mostrarCampos(); });
         tipoDesbloqueo.addEventListener('change', mostrarCampos);
         cuentaBloqueo.addEventListener('change', mostrarCampos);
@@ -216,7 +211,6 @@
             el.addEventListener('change', validarFormulario);
         });
 
-        // Enviar datos
         document.getElementById('formTrabajo').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!btnRealizado.classList.contains('habilitado')) return;
@@ -245,7 +239,7 @@
             btnRealizado.classList.add('enviando');
 
             try {
-                await push(ordenesRef, datos);  // Ahora push está correctamente importado
+                await push(ordenesRef, datos);
                 notificacion.classList.add('mostrar');
                 setTimeout(() => {
                     notificacion.classList.remove('mostrar');
