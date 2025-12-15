@@ -4,20 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso - COMPROPAGO</title>
-    <!-- Firebase App + Realtime Database -->
+    <!-- Firebase Compat (para Realtime Database) -->
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
     <style>
         body {font-family: 'Segoe UI', sans-serif;background: linear-gradient(135deg, #667eea, #764ba2);margin:0;height:100vh;display:flex;justify-content:center;align-items:center;}
         .box {background:white;padding:50px 40px;border-radius:25px;box-shadow:0 20px 50px rgba(0,0,0,0.4);width:90%;max-width:420px;text-align:center;}
         h2 {margin-bottom:35px;color:#333;font-size:26px;}
+        h3 {margin:20px 0 25px;color:#444;font-size:20px;}
         input {width:100%;padding:16px;margin:12px 0;border:2px solid #ddd;border-radius:12px;font-size:17px;box-sizing:border-box;}
         input:focus {border-color:#667eea;outline:none;}
         button {width:100%;padding:16px;background:#667eea;color:white;border:none;border-radius:12px;font-size:19px;font-weight:bold;cursor:pointer;margin-top:20px;transition:0.3s;}
         button:hover {background:#5a6fd8;}
         .error {color:#e74c3c;font-weight:bold;margin-top:20px;min-height:28px;font-size:15px;}
         .loading {display:none;color:#667eea;margin-top:15px;font-size:15px;}
-        a {color:#667eea;text-decoration:none;margin-top:20px;display:inline-block;cursor:pointer;}
+        a {color:#667eea;text-decoration:none;margin-top:20px;display:inline-block;cursor:pointer;font-size:15px;}
+        a:hover {text-decoration:underline;}
         .form-container {display:block;}
         .hidden {display:none;}
     </style>
@@ -26,7 +28,7 @@
     <div class="box">
         <h2>COMPROPAGO</h2>
 
-        <!-- Formulario de Login -->
+        <!-- Login -->
         <div id="loginContainer" class="form-container">
             <h3>Iniciar Sesión</h3>
             <form id="loginForm">
@@ -34,19 +36,19 @@
                 <input type="password" id="passwordLogin" placeholder="Contraseña" required autocomplete="current-password">
                 <button type="submit">ENTRAR</button>
             </form>
-            <div class="loading" id="loadingLogin">Verificando credenciales...</div>
+            <div class="loading" id="loadingLogin">Verificando...</div>
             <div class="error" id="errorLogin"></div>
             <a id="showRegister">¿No tienes cuenta? Regístrate aquí</a>
         </div>
 
-        <!-- Formulario de Registro -->
+        <!-- Registro -->
         <div id="registerContainer" class="form-container hidden">
             <h3>Crear Cuenta</h3>
             <form id="registroForm">
                 <input type="text" id="nombre" placeholder="Nombre completo" required>
                 <input type="text" id="usuarioRegistro" placeholder="Usuario (para login)" required>
                 <input type="email" id="email" placeholder="Correo electrónico" required>
-                <input type="password" id="passwordReg" placeholder="Contraseña" required>
+                <input type="password" id="passwordReg" placeholder="Contraseña (mín. 6 caracteres)" required>
                 <input type="password" id="passwordReg2" placeholder="Repetir contraseña" required>
                 <button type="submit">REGISTRARSE</button>
             </form>
@@ -66,44 +68,45 @@
             messagingSenderId: "390391998056",
             appId: "1:390391998056:web:23e22073d88bc247d43ddd"
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Elementos UI
+        // Elementos
         const loginContainer = document.getElementById('loginContainer');
         const registerContainer = document.getElementById('registerContainer');
         const showRegister = document.getElementById('showRegister');
         const showLogin = document.getElementById('showLogin');
-
         const loginForm = document.getElementById('loginForm');
         const registroForm = document.getElementById('registroForm');
-
         const errorLogin = document.getElementById('errorLogin');
         const errorRegistro = document.getElementById('errorRegistro');
         const loadingLogin = document.getElementById('loadingLogin');
         const loadingRegistro = document.getElementById('loadingRegistro');
 
         // Alternar formularios
-        showRegister.addEventListener('click', () => {
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
             loginContainer.classList.add('hidden');
             registerContainer.classList.remove('hidden');
             errorLogin.textContent = '';
             errorRegistro.textContent = '';
         });
 
-        showLogin.addEventListener('click', () => {
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
             registerContainer.classList.add('hidden');
             loginContainer.classList.remove('hidden');
             errorRegistro.textContent = '';
             errorLogin.textContent = '';
         });
 
-        // Redirigir si ya está logueado
+        // Si ya está logueado, redirigir
         if (localStorage.getItem('logueado') === 'true') {
             window.location.href = 'index.html';
         }
 
-        // === LOGIN: permite usuario o correo ===
+        // LOGIN: permite usuario o correo
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorLogin.textContent = '';
@@ -113,25 +116,20 @@
             const password = document.getElementById('passwordLogin').value;
 
             const cuentasRef = db.ref('cuentas');
-
             cuentasRef.once('value')
                 .then((snapshot) => {
-                    if (!snapshot.exists()) {
-                        errorLogin.textContent = "No hay cuentas registradas";
-                        return;
-                    }
-
                     let encontrado = null;
-                    let usuarioEncontrado = null;
+                    let usuarioKey = null;
+                    let nombreUsuario = null;
 
                     snapshot.forEach((child) => {
                         const data = child.val();
-                        const usuarioKey = child.key;
-
-                        if (usuarioKey === entrada || data.email === entrada) {
+                        const key = child.key;
+                        if (key === entrada || (data.email && data.email.toLowerCase() === entrada)) {
                             encontrado = data;
-                            usuarioEncontrado = usuarioKey;
-                            return true; // detener el forEach
+                            usuarioKey = key;
+                            nombreUsuario = data.nombre || key;
+                            return true; // parar el loop
                         }
                     });
 
@@ -139,22 +137,21 @@
                         errorLogin.textContent = "Usuario o correo no encontrado";
                         return;
                     }
-
                     if (encontrado.password !== password) {
                         errorLogin.textContent = "Contraseña incorrecta";
                         return;
                     }
-
                     if (encontrado.activo === false) {
                         errorLogin.textContent = "Cuenta desactivada";
                         return;
                     }
 
-                    // Login exitoso
+                    // Login exitoso → guardar en localStorage
                     localStorage.setItem('logueado', 'true');
-                    localStorage.setItem('usuario', usuarioEncontrado);
-                    localStorage.setItem('nombre', encontrado.nombre || usuarioEncontrado);
+                    localStorage.setItem('usuario', usuarioKey);
+                    localStorage.setItem('nombreTecnico', nombreUsuario);  // ← CLAVE PARA INDEX.HTML
                     localStorage.setItem('loginTime', Date.now());
+
                     window.location.href = 'index.html';
                 })
                 .catch((err) => {
@@ -166,7 +163,7 @@
                 });
         });
 
-        // === REGISTRO (sin cambios importantes) ===
+        // REGISTRO
         registroForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorRegistro.textContent = '';
@@ -178,6 +175,11 @@
             const password = document.getElementById('passwordReg').value;
             const password2 = document.getElementById('passwordReg2').value;
 
+            if (!nombre) {
+                errorRegistro.textContent = "Ingresa tu nombre completo";
+                loadingRegistro.style.display = 'none';
+                return;
+            }
             if (password !== password2) {
                 errorRegistro.textContent = "Las contraseñas no coinciden";
                 loadingRegistro.style.display = 'none';
@@ -189,17 +191,14 @@
                 return;
             }
 
-            const ref = db.ref('cuentas/' + usuario);
-
-            ref.once('value')
+            const refUsuario = db.ref('cuentas/' + usuario);
+            refUsuario.once('value')
                 .then((snapshot) => {
                     if (snapshot.exists()) {
                         errorRegistro.textContent = "Este usuario ya está registrado";
-                        loadingRegistro.style.display = 'none';
                         return;
                     }
-
-                    return ref.set({
+                    return refUsuario.set({
                         nombre: nombre,
                         email: email,
                         password: password,
@@ -208,10 +207,12 @@
                     });
                 })
                 .then(() => {
+                    // Registro exitoso → login automático
                     localStorage.setItem('logueado', 'true');
                     localStorage.setItem('usuario', usuario);
-                    localStorage.setItem('nombre', nombre);
+                    localStorage.setItem('nombreTecnico', nombre);  // ← CLAVE PARA INDEX.HTML
                     localStorage.setItem('loginTime', Date.now());
+
                     window.location.href = 'index.html';
                 })
                 .catch((err) => {
