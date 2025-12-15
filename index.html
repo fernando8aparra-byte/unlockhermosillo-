@@ -6,7 +6,6 @@
     <title>COMPROPAGO - Registro Técnico</title>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
         import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
         const firebaseConfig = {
@@ -20,43 +19,11 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
-
-        // Elementos de autenticación
-        const loadingAuth = document.getElementById('loadingAuth');
-        const mainContent = document.getElementById('mainContent');
-        const usuarioNombre = document.getElementById('usuarioNombre');
-
-        let userLoggedIn = false;
-
-        // Escuchar cambios de autenticación
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // Usuario autenticado
-                userLoggedIn = true;
-                const nombre = user.displayName || user.email.split('@')[0] || 'Técnico';
-                usuarioNombre.textContent = nombre;
-                loadingAuth.style.display = 'none';
-                mainContent.style.display = 'block';
-            } else {
-                // Solo redirigir si ya terminó de cargar y no hay usuario
-                if (!auth.currentUser && !userLoggedIn) {
-                    window.location.href = 'login.html';
-                }
-            }
-        });
-
-        // Seguridad extra: si después de 5 segundos no hay usuario, redirigir
-        setTimeout(() => {
-            if (!userLoggedIn && !auth.currentUser) {
-                window.location.href = 'login.html';
-            }
-        }, 5000);
     </script>
     <style>
-        body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center; align-items:center;}
+        body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center;}
         .container {background:white; padding:35px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.4); max-width:500px; width:100%;}
         h1 {text-align:center; color:#333; font-size:28px; margin-bottom:10px;}
         #usuarioNombre {text-align:center; color:#667eea; font-size:20px; margin-bottom:30px; font-weight:bold;}
@@ -73,111 +40,90 @@
         .ganancia {font-size:22px; font-weight:bold; text-align:center; margin:25px 0; padding:18px; background:#f8f9fa; border-radius:15px; border:3px solid #27ae60;}
         #notificacion {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold; box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;}
         #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
-        #terminosModal {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999; flex-direction:column;}
+        #terminosModal {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999;}
         #terminosContent {background:white; padding:30px; border-radius:20px; max-width:90%; max-height:90%; overflow-y:auto;}
-        #loadingAuth {text-align:center; color:white; font-size:28px; font-weight:bold;}
     </style>
 </head>
 <body>
-
-    <!-- Pantalla de carga mientras verifica sesión -->
-    <div id="loadingAuth">
-        <h1>Verificando sesión...</h1>
-        <p style="color:white; text-align:center;">Un momento por favor</p>
-    </div>
-
-    <!-- Contenido principal -->
-    <div id="mainContent" style="display:none;">
-        <div class="container">
-            <h1>COMPROPAGO</h1>
-            <div id="usuarioNombre"></div>
-
-            <!-- TODO EL FORMULARIO SIGUE IGUAL -->
-            <form id="formTrabajo">
-                <label>Tipo de servicio</label>
-                <select id="tipoServicio" required>
-                    <option value="">Seleccionar...</option>
-                    <option value="reparacion">Reparación</option>
-                    <option value="desbloqueo">Desbloqueo</option>
-                    <option value="otro">Otro</option>
-                </select>
-
-                <div id="seccionDesbloqueo" class="hidden">
-                    <label>Tipo de desbloqueo</label>
-                    <select id="tipoDesbloqueo">
-                        <option value="">Seleccionar...</option>
-                        <option value="pantalla">Desbloqueo de pantalla</option>
-                        <option value="pago">Pantalla de pago / FRP</option>
-                    </select>
-                    <div id="subseccionPantalla" class="hidden">
-                        <label>Cuenta bloqueada</label>
-                        <select id="cuentaBloqueo">
-                            <option value="">Seleccionar...</option>
-                            <option value="google">Google (Android)</option>
-                            <option value="icloud">iCloud (iPhone)</option>
-                        </select>
-                        <div id="modeloAndroid" class="hidden">
-                            <label>Modelo Android</label>
-                            <input type="text" id="modeloAndroidInput" placeholder="Ej: Samsung A54">
-                        </div>
-                        <div id="modeloIphone" class="hidden">
-                            <label>Modelo de iPhone</label>
-                            <select id="modeloIphoneSelect">
-                                <option value="">Seleccionar modelo...</option>
-                                <optgroup label="7 al XS">
-                                    <option>iPhone 7</option><option>iPhone 7 Plus</option><option>iPhone 8</option><option>iPhone 8 Plus</option>
-                                    <option>iPhone X</option><option>iPhone XR</option><option>iPhone XS</option><option>iPhone XS Max</option>
-                                </optgroup>
-                                <optgroup label="11 Series">
-                                    <option>iPhone 11</option><option>iPhone 11 Pro</option><option>iPhone 11 Pro Max</option>
-                                </optgroup>
-                                <optgroup label="12-14">
-                                    <option>iPhone 12 mini</option><option>iPhone 12</option><option>iPhone 12 Pro</option><option>iPhone 12 Pro Max</option>
-                                    <option>iPhone 13 mini</option><option>iPhone 13</option><option>iPhone 13 Pro</option><option>iPhone 13 Pro Max</option>
-                                    <option>iPhone 14</option><option>iPhone 14 Plus</option><option>iPhone 14 Pro</option><option>iPhone 14 Pro Max</option>
-                                </optgroup>
-                                <optgroup label="15-17">
-                                    <option>iPhone 15</option><option>iPhone 15 Plus</option><option>iPhone 15 Pro</option><option>iPhone 15 Pro Max</option>
-                                    <option>iPhone 16e</option><option>iPhone 16</option><option>iPhone 16 Plus</option><option>iPhone 16 Pro</option><option>iPhone 16 Pro Max</option>
-                                    <option>iPhone 17 Air</option><option>iPhone 17</option><option>iPhone 17 Pro</option><option>iPhone 17 Pro Max</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="descripcionOtro" class="hidden">
-                    <label>Descripción del trabajo</label>
-                    <textarea id="descripcionTextarea" rows="3" placeholder="Cambio de pantalla, etc..."></textarea>
-                </div>
-
-                <div id="seccionGastos" class="hidden">
-                    <label>Gastos (transporte, etc.)</label>
-                    <input type="number" id="gastos" min="0" step="0.01" placeholder="0.00">
-                </div>
-
-                <label>Tiempo empleado (opcional)</label>
-                <input type="text" id="tiempo" placeholder="Ej: 45 min">
-
-                <label>A COBRAR (MXN)</label>
-                <input type="number" id="monto" min="0" step="0.01" required placeholder="0.00">
-
-                <div id="precioInfo" class="precio-info"></div>
-                <div id="vistaGanancia" class="ganancia" style="display:none;"></div>
-
-                <div style="margin-top:30px; text-align:center;">
-                    <input type="checkbox" id="aceptoTerminos" required>
-                    <label for="aceptoTerminos" style="display:inline; font-weight:normal;">
-                        Acepto los <a href="#" id="verTerminos">Términos y Condiciones</a>
-                    </label>
-                </div>
-
-                <button type="submit" id="btnRealizado">REALIZADO</button>
-            </form>
+    <div class="container">
+        <h1>COMPROPAGO</h1>
+        
+        <!-- Campo para poner el nombre del técnico (puedes cambiarlo o dejarlo fijo) -->
+        <div id="usuarioNombre" contenteditable="true" style="border:2px dashed #ccc; padding:10px; border-radius:12px; cursor:text;">
+            Técnico (haz clic para editar tu nombre)
         </div>
 
-        <div id="notificacion">¡ENVIADO!</div>
+        <form id="formTrabajo">
+            <label>Tipo de servicio</label>
+            <select id="tipoServicio" required>
+                <option value="">Seleccionar...</option>
+                <option value="reparacion">Reparación</option>
+                <option value="desbloqueo">Desbloqueo</option>
+                <option value="otro">Otro</option>
+            </select>
+
+            <div id="seccionDesbloqueo" class="hidden">
+                <label>Tipo de desbloqueo</label>
+                <select id="tipoDesbloqueo">
+                    <option value="">Seleccionar...</option>
+                    <option value="pantalla">Desbloqueo de pantalla</option>
+                    <option value="pago">Pantalla de pago / FRP</option>
+                </select>
+                <div id="subseccionPantalla" class="hidden">
+                    <label>Cuenta bloqueada</label>
+                    <select id="cuentaBloqueo">
+                        <option value="">Seleccionar...</option>
+                        <option value="google">Google (Android)</option>
+                        <option value="icloud">iCloud (iPhone)</option>
+                    </select>
+                    <div id="modeloAndroid" class="hidden">
+                        <label>Modelo Android</label>
+                        <input type="text" id="modeloAndroidInput" placeholder="Ej: Samsung A54">
+                    </div>
+                    <div id="modeloIphone" class="hidden">
+                        <label>Modelo de iPhone</label>
+                        <select id="modeloIphoneSelect">
+                            <option value="">Seleccionar modelo...</option>
+                            <optgroup label="7 al XS"><option>iPhone 7</option><option>iPhone 7 Plus</option><option>iPhone 8</option><option>iPhone 8 Plus</option><option>iPhone X</option><option>iPhone XR</option><option>iPhone XS</option><option>iPhone XS Max</option></optgroup>
+                            <optgroup label="11 Series"><option>iPhone 11</option><option>iPhone 11 Pro</option><option>iPhone 11 Pro Max</option></optgroup>
+                            <optgroup label="12-14"><option>iPhone 12 mini</option><option>iPhone 12</option><option>iPhone 12 Pro</option><option>iPhone 12 Pro Max</option><option>iPhone 13 mini</option><option>iPhone 13</option><option>iPhone 13 Pro</option><option>iPhone 13 Pro Max</option><option>iPhone 14</option><option>iPhone 14 Plus</option><option>iPhone 14 Pro</option><option>iPhone 14 Pro Max</option></optgroup>
+                            <optgroup label="15-17"><option>iPhone 15</option><option>iPhone 15 Plus</option><option>iPhone 15 Pro</option><option>iPhone 15 Pro Max</option><option>iPhone 16e</option><option>iPhone 16</option><option>iPhone 16 Plus</option><option>iPhone 16 Pro</option><option>iPhone 16 Pro Max</option><option>iPhone 17 Air</option><option>iPhone 17</option><option>iPhone 17 Pro</option><option>iPhone 17 Pro Max</option></optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="descripcionOtro" class="hidden">
+                <label>Descripción del trabajo</label>
+                <textarea id="descripcionTextarea" rows="3" placeholder="Cambio de pantalla, etc..."></textarea>
+            </div>
+
+            <div id="seccionGastos" class="hidden">
+                <label>Gastos (transporte, etc.)</label>
+                <input type="number" id="gastos" min="0" step="0.01" placeholder="0.00">
+            </div>
+
+            <label>Tiempo empleado (opcional)</label>
+            <input type="text" id="tiempo" placeholder="Ej: 45 min">
+
+            <label>A COBRAR (MXN)</label>
+            <input type="number" id="monto" min="0" step="0.01" required placeholder="0.00">
+
+            <div id="precioInfo" class="precio-info"></div>
+            <div id="vistaGanancia" class="ganancia" style="display:none;"></div>
+
+            <div style="margin-top:30px; text-align:center;">
+                <input type="checkbox" id="aceptoTerminos" required>
+                <label for="aceptoTerminos" style="display:inline; font-weight:normal;">
+                    Acepto los <a href="#" id="verTerminos">Términos y Condiciones</a>
+                </label>
+            </div>
+
+            <button type="submit" id="btnRealizado">REALIZADO</button>
+        </form>
     </div>
+
+    <div id="notificacion">¡ENVIADO!</div>
 
     <!-- Modal Términos -->
     <div id="terminosModal">
@@ -186,7 +132,7 @@
             <p>Al utilizar este servicio de registro técnico, usted declara y acepta lo siguiente:</p>
             <ul>
                 <li>El técnico actúa como independiente y no emite facturas con validez fiscal oficial.</li>
-                <li>Nos deslindamos expresamente de cualquier responsabilidad fiscal derivada de los servicios prestados. Toda responsabilidad en materia fiscal recae exclusivamente en el técnico y/o cliente.</li>
+                <li>Nos deslindamos expresamente de cualquier responsabilidad fiscal derivada de los servicios prestados. Toda responsabilidad fiscal recae exclusivamente en el técnico y/o cliente.</li>
                 <li>El cliente confirma que el equipo le pertenece legítimamente.</li>
                 <li>No nos responsabilizamos por pérdida de datos o daños adicionales.</li>
                 <li>La garantía es limitada.</li>
@@ -198,7 +144,6 @@
     </div>
 
     <script type="module">
-        // === TODO EL CÓDIGO DEL FORMULARIO (IGUAL QUE ANTES) ===
         const tipoServicio = document.getElementById('tipoServicio');
         const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
         const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
@@ -215,6 +160,7 @@
         const btnRealizado = document.getElementById('btnRealizado');
         const notificacion = document.getElementById('notificacion');
         const aceptoTerminos = document.getElementById('aceptoTerminos');
+        const usuarioNombre = document.getElementById('usuarioNombre');
 
         function getPrecioBase(modelo) {
             if (["iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XR","iPhone XS","iPhone XS Max"].includes(modelo)) return 450;
@@ -296,21 +242,14 @@
             e.preventDefault();
             if (!btnRealizado.classList.contains('habilitado')) return;
 
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Sesión expirada. Redirigiendo al login...");
-                window.location.href = 'login.html';
-                return;
-            }
-
             const cobrado = parseFloat(montoInput.value);
             const gastos = parseFloat(gastosInput.value) || 0;
             const ganancia = cobrado - gastos;
+            const nombreTecnico = usuarioNombre.textContent.trim() || 'Técnico desconocido';
 
             const datos = {
                 fecha: new Date().toLocaleString('es-MX'),
-                usuarioId: user.uid,
-                usuarioNombre: user.displayName || user.email,
+                usuarioNombre: nombreTecnico,
                 tipo: tipoServicio.options[tipoServicio.selectedIndex].text,
                 tipo1: tipoDesbloqueo.value === 'pago' ? 'FRP' : (tipoDesbloqueo.value === 'pantalla' ? 'Pantalla' : ''),
                 tipo2: cuentaBloqueo.value || '',
