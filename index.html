@@ -5,47 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>COMPROPAGO - Registro Técnico</title>
     <style>
-        body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center;}
-        .container {background:white; padding:35px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.4); max-width:500px; width:100%;}
-        h1 {text-align:center; color:#333; font-size:28px; margin-bottom:10px;}
-        #usuarioNombre {
-            text-align:center; color:#667eea; font-size:20px; margin-bottom:10px; font-weight:bold;
-            padding:12px; border-radius:12px; background:#f0f4ff; cursor:pointer;
-            transition:0.3s;
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
-        #usuarioNombre:hover {background:#e0e8ff;}
-        #usuarioNombre.no-cursor {cursor: default;}
+        .container {
+            background: white;
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            margin-top: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
 
-        /* Botón pequeño de cerrar sesión */
-        #cerrarSesion {
-            display: block;
-            margin: 0 auto 30px;
-            padding: 6px 14px;
-            font-size: 14px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 10px;
+        /* === MENÚ HAMBURGUESA === */
+        .menu-hamburguesa {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: 0.3s;
+            z-index: 100;
+        }
+        .menu-hamburguesa:hover {
+            background: white;
+            transform: scale(1.05);
+        }
+        .barra {
+            width: 24px;
+            height: 3px;
+            background: #333;
+            margin: 3px 0;
+            border-radius: 2px;
             transition: 0.3s;
         }
-        #cerrarSesion:hover {
-            background: #c0392b;
-            transform: scale(1.05);
+        .menu-hamburguesa.activo .barra:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+        .menu-hamburguesa.activo .barra:nth-child(2) {
+            opacity: 0;
+        }
+        .menu-hamburguesa.activo .barra:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* === MENÚ LATERAL DESPLEGABLE === */
+        .menu-lateral {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: #2c3e50;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.4);
+            transition: left 0.4s ease;
+            z-index: 999;
+            padding-top: 80px;
+        }
+        .menu-lateral.abierto {
+            left: 0;
+        }
+        .menu-lateral .usuario-info {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            background: #34495e;
+        }
+        .menu-lateral .usuario-info h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .menu-lateral ul {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0 0;
+        }
+        .menu-lateral ul li {
+            padding: 18px 25px;
+            color: #ecf0f1;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+        .menu-lateral ul li:hover {
+            background: #34495e;
+            border-left: 4px solid #e74c3c;
+        }
+        .menu-lateral ul li.cerrar-sesion {
+            color: #e74c3c;
+            margin-top: 40px;
+        }
+
+        /* Overlay para cerrar al hacer clic fuera */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.4s;
+            z-index: 998;
+        }
+        .overlay.activo {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #usuarioNombre {
+            text-align: center;
+            color: #667eea;
+            font-size: 20px;
+            margin: 20px 0 30px;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 12px;
+            background: #f0f4ff;
         }
 
         label {display:block; margin-top:20px; font-weight:bold; color:#444;}
-        select, input, textarea {width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;}
+        select, input, textarea {
+            width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;
+        }
         select:focus, input:focus, textarea:focus {border-color:#667eea; outline:none;}
         .hidden {display:none !important;}
-        #btnRealizado {margin-top:50px; padding:20px; font-size:24px; font-weight:bold; color:white; background:#95a5a6; border:none; border-radius:18px; cursor:not-allowed; width:100%; transition:0.4s;}
+        #btnRealizado {
+            margin-top:50px; padding:20px; font-size:24px; font-weight:bold; color:white; background:#95a5a6; border:none; border-radius:18px; cursor:not-allowed; width:100%; transition:0.4s;
+        }
         #btnRealizado.habilitado {background:#e74c3c; cursor:pointer; animation:pulsar 2s infinite;}
         #btnRealizado.enviando {background:#27ae60 !important; animation:pulseGreen 1.5s infinite; cursor:not-allowed;}
         @keyframes pulsar {0%,100%{background:#e74c3c} 50%{background:#c0392b}}
         @keyframes pulseGreen {0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)}}
         .precio-info {font-size:14px; color:#27ae60; font-weight:bold; text-align:center; margin-top:8px;}
         .ganancia {font-size:22px; font-weight:bold; text-align:center; margin:25px 0; padding:18px; background:#f8f9fa; border-radius:15px; border:3px solid #27ae60;}
-        #notificacion {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold; box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;}
+        #notificacion {
+            position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+            background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold;
+            box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;
+        }
         #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
 
         /* Modal de confirmación */
@@ -67,11 +188,7 @@
             max-width: 400px;
             width: 90%;
         }
-        .modal-contenido h3 {
-            margin: 0 0 20px;
-            color: #333;
-            font-size: 22px;
-        }
+        .modal-contenido h3 {margin: 0 0 20px; color: #333; font-size: 22px;}
         .modal-botones button {
             padding: 12px 24px;
             margin: 0 10px;
@@ -81,24 +198,37 @@
             cursor: pointer;
             transition: 0.3s;
         }
-        #btnCancelar {
-            background: #95a5a6;
-            color: white;
-        }
+        #btnCancelar {background: #95a5a6; color: white;}
         #btnCancelar:hover {background: #7f8c8d;}
-        #btnConfirmarCerrar {
-            background: #e74c3c;
-            color: white;
-        }
+        #btnConfirmarCerrar {background: #e74c3c; color: white;}
         #btnConfirmarCerrar:hover {background: #c0392b;}
     </style>
 </head>
 <body>
+
+    <!-- Menú hamburguesa -->
+    <div class="menu-hamburguesa" id="menuHamburguesa">
+        <div class="barra"></div>
+        <div class="barra"></div>
+        <div class="barra"></div>
+    </div>
+
+    <!-- Menú lateral -->
+    <div class="menu-lateral" id="menuLateral">
+        <div class="usuario-info">
+            <h3 id="nombreMenu">Tec. Cargando...</h3>
+        </div>
+        <ul>
+            <li class="cerrar-sesion" id="opcionCerrarSesion">Cerrar sesión</li>
+        </ul>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
     <div class="container">
         <h1>COMPROPAGO</h1>
-      
         <div id="usuarioNombre">Cargando sesión...</div>
-        <button id="cerrarSesion" class="hidden">Cerrar sesión</button>
 
         <form id="formTrabajo">
             <label>Tipo de servicio</label>
@@ -178,7 +308,7 @@
 
     <div id="notificacion">¡ENVIADO!</div>
 
-    <!-- Modal de confirmación de cierre de sesión -->
+    <!-- Modal confirmación cerrar sesión -->
     <div id="modalConfirmacion">
         <div class="modal-contenido">
             <h3>¿Estás seguro de cerrar sesión?</h3>
@@ -207,30 +337,55 @@
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
 
-        // === ELEMENTOS NUEVOS PARA CERRAR SESIÓN ===
-        const cerrarSesionBtn = document.getElementById('cerrarSesion');
+        // === ELEMENTOS DEL MENÚ ===
+        const menuHamburguesa = document.getElementById('menuHamburguesa');
+        const menuLateral = document.getElementById('menuLateral');
+        const overlay = document.getElementById('overlay');
+        const opcionCerrarSesion = document.getElementById('opcionCerrarSesion');
+        const nombreMenu = document.getElementById('nombreMenu');
+
+        // === MODAL CONFIRMACIÓN ===
         const modalConfirmacion = document.getElementById('modalConfirmacion');
         const btnCancelar = document.getElementById('btnCancelar');
         const btnConfirmarCerrar = document.getElementById('btnConfirmarCerrar');
 
-        // === DETECCIÓN DE SESIÓN ===
+        // === SESIÓN ===
         const usuarioNombre = document.getElementById('usuarioNombre');
         const logueado = localStorage.getItem('logueado') === 'true';
         let nombreTecnico = localStorage.getItem('nombreTecnico');
 
         if (logueado && nombreTecnico && nombreTecnico.trim() !== '') {
-            usuarioNombre.textContent = `Tec. ${nombreTecnico.trim()}`;
-            usuarioNombre.classList.add('no-cursor');
-            cerrarSesionBtn.classList.remove('hidden'); // Mostrar botón cerrar sesión
+            const nombre = `Tec. ${nombreTecnico.trim()}`;
+            usuarioNombre.textContent = nombre;
+            nombreMenu.textContent = nombre;
+            menuHamburguesa.style.display = 'flex'; // Mostrar menú hamburguesa
         } else {
             usuarioNombre.textContent = 'Iniciar sesión';
             usuarioNombre.onclick = () => { window.location.href = 'login.html'; };
-            cerrarSesionBtn.classList.add('hidden');
+            nombreMenu.textContent = 'No logueado';
+            menuHamburguesa.style.display = 'none';
         }
 
-        // === FUNCIONALIDAD CERRAR SESIÓN ===
-        cerrarSesionBtn.addEventListener('click', () => {
+        // === ABRIR/CERRAR MENÚ ===
+        menuHamburguesa.addEventListener('click', () => {
+            menuHamburguesa.classList.toggle('activo');
+            menuLateral.classList.toggle('abierto');
+            overlay.classList.toggle('activo');
+        });
+
+        overlay.addEventListener('click', () => {
+            menuHamburguesa.classList.remove('activo');
+            menuLateral.classList.remove('abierto');
+            overlay.classList.remove('activo');
+        });
+
+        // === CERRAR SESIÓN ===
+        opcionCerrarSesion.addEventListener('click', () => {
             modalConfirmacion.style.display = 'flex';
+            // Cerrar menú
+            menuHamburguesa.classList.remove('activo');
+            menuLateral.classList.remove('abierto');
+            overlay.classList.remove('activo');
         });
 
         btnCancelar.addEventListener('click', () => {
@@ -243,17 +398,13 @@
             window.location.href = 'login.html';
         });
 
-        // Cerrar modal automáticamente si el usuario interactúa con el formulario
+        // Cerrar modal si interactúa con formulario
         document.querySelectorAll('select, input, textarea').forEach(el => {
-            el.addEventListener('input', () => {
-                modalConfirmacion.style.display = 'none';
-            });
-            el.addEventListener('change', () => {
-                modalConfirmacion.style.display = 'none';
-            });
+            el.addEventListener('input', () => modalConfirmacion.style.display = 'none');
+            el.addEventListener('change', () => modalConfirmacion.style.display = 'none');
         });
 
-        // === ELEMENTOS DEL FORMULARIO ===
+        // === RESTO DEL FORMULARIO (igual que antes) ===
         const tipoServicio = document.getElementById('tipoServicio');
         const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
         const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
@@ -270,7 +421,6 @@
         const btnRealizado = document.getElementById('btnRealizado');
         const notificacion = document.getElementById('notificacion');
 
-        // === FUNCIONES DE CÁLCULO ===
         function getPrecioBase(modelo) {
             if (["iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XR","iPhone XS","iPhone XS Max"].includes(modelo)) return 450;
             if (modelo.startsWith("iPhone 11")) return 550;
@@ -280,7 +430,7 @@
         }
 
         function getExtraDia() {
-            const d = new Date().getDay(); // 0=Domingo, 6=Sábado
+            const d = new Date().getDay();
             if (d === 0 || d === 6) return d === 0 ? 200 : 100;
             if ([1,3,5].includes(d)) return 0;
             return 100;
@@ -313,7 +463,6 @@
             }
         }
 
-        // === MOSTRAR/OCULTAR CAMPOS ===
         function mostrarCampos() {
             seccionDesbloqueo.classList.add('hidden');
             subseccionPantalla.classList.add('hidden');
@@ -327,9 +476,7 @@
                 seccionGastos.classList.remove('hidden');
                 if (tipoDesbloqueo.value === 'pantalla') {
                     subseccionPantalla.classList.remove('hidden');
-                    if (cuentaBloqueo.value === 'google') {
-                        modeloAndroid.classList.remove('hidden');
-                    }
+                    if (cuentaBloqueo.value === 'google') modeloAndroid.classList.remove('hidden');
                     if (cuentaBloqueo.value === 'icloud') {
                         modeloIphone.classList.remove('hidden');
                         calcularPrecioIcloud();
@@ -342,7 +489,6 @@
             validarFormulario();
         }
 
-        // === VALIDACIÓN ===
         function validarFormulario() {
             let valido = tipoServicio.value && montoInput.value > 0;
             if (tipoServicio.value === 'desbloqueo') {
@@ -359,7 +505,6 @@
             btnRealizado.classList.toggle('habilitado', valido);
         }
 
-        // === EVENTOS ===
         tipoServicio.addEventListener('change', () => {
             precioInfo.textContent = '';
             vistaGanancia.style.display = 'none';
@@ -375,7 +520,6 @@
             el.addEventListener('change', validarFormulario);
         });
 
-        // === ENVÍO A FIREBASE ===
         document.getElementById('formTrabajo').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!btnRealizado.classList.contains('habilitado')) return;
@@ -424,7 +568,6 @@
             }
         });
 
-        // Inicializar
         mostrarCampos();
     </script>
 </body>
