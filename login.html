@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,20 +9,93 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
     <style>
-        body {font-family: 'Segoe UI', sans-serif;background: linear-gradient(135deg, #667eea, #764ba2);margin:0;height:100vh;display:flex;justify-content:center;align-items:center;}
-        .box {background:white;padding:50px 40px;border-radius:25px;box-shadow:0 20px 50px rgba(0,0,0,0.4);width:90%;max-width:420px;text-align:center;}
-        h2 {margin-bottom:35px;color:#333;font-size:26px;}
-        h3 {margin:20px 0 25px;color:#444;font-size:20px;}
-        input {width:100%;padding:16px;margin:12px 0;border:2px solid #ddd;border-radius:12px;font-size:17px;box-sizing:border-box;}
-        input:focus {border-color:#667eea;outline:none;}
-        button {width:100%;padding:16px;background:#667eea;color:white;border:none;border-radius:12px;font-size:19px;font-weight:bold;cursor:pointer;margin-top:20px;transition:0.3s;}
-        button:hover {background:#5a6fd8;}
-        .error {color:#e74c3c;font-weight:bold;margin-top:20px;min-height:28px;font-size:15px;}
-        .loading {display:none;color:#667eea;margin-top:15px;font-size:15px;}
-        a {color:#667eea;text-decoration:none;margin-top:20px;display:inline-block;cursor:pointer;font-size:15px;}
-        a:hover {text-decoration:underline;}
-        .form-container {display:block;}
-        .hidden {display:none;}
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .box {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+        }
+        h2 {
+            margin-bottom: 35px;
+            color: #333;
+            font-size: 26px;
+        }
+        h3 {
+            margin: 20px 0 25px;
+            color: #444;
+            font-size: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 16px;
+            margin: 12px 0;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 17px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 19px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 20px;
+            min-height: 28px;
+            font-size: 15px;
+        }
+        .loading {
+            display: none;
+            color: #667eea;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+            margin-top: 20px;
+            display: inline-block;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .form-container {
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -84,7 +158,7 @@
         const loadingLogin = document.getElementById('loadingLogin');
         const loadingRegistro = document.getElementById('loadingRegistro');
 
-        // Alternar formularios
+        // Alternar entre login y registro
         showRegister.addEventListener('click', (e) => {
             e.preventDefault();
             loginContainer.classList.add('hidden');
@@ -101,12 +175,12 @@
             errorLogin.textContent = '';
         });
 
-        // Si ya está logueado, redirigir
+        // Si ya está logueado → ir directo a index.html
         if (localStorage.getItem('logueado') === 'true') {
             window.location.href = 'index.html';
         }
 
-        // LOGIN: permite usuario o correo
+        // === LOGIN ===
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorLogin.textContent = '';
@@ -116,20 +190,23 @@
             const password = document.getElementById('passwordLogin').value;
 
             const cuentasRef = db.ref('cuentas');
+
             cuentasRef.once('value')
                 .then((snapshot) => {
                     let encontrado = null;
                     let usuarioKey = null;
-                    let nombreUsuario = null;
+                    let nombreTecnico = null;
 
                     snapshot.forEach((child) => {
                         const data = child.val();
                         const key = child.key;
+
                         if (key === entrada || (data.email && data.email.toLowerCase() === entrada)) {
                             encontrado = data;
                             usuarioKey = key;
-                            nombreUsuario = data.nombre || key;
-                            return true; // parar el loop
+                            // Prioridad: campo 'nombre' → si no existe, usar el username
+                            nombreTecnico = (data.nombre && data.nombre.trim() !== '') ? data.nombre.trim() : key;
+                            return true; // detener bucle
                         }
                     });
 
@@ -137,10 +214,12 @@
                         errorLogin.textContent = "Usuario o correo no encontrado";
                         return;
                     }
+
                     if (encontrado.password !== password) {
                         errorLogin.textContent = "Contraseña incorrecta";
                         return;
                     }
+
                     if (encontrado.activo === false) {
                         errorLogin.textContent = "Cuenta desactivada";
                         return;
@@ -149,7 +228,7 @@
                     // Login exitoso → guardar en localStorage
                     localStorage.setItem('logueado', 'true');
                     localStorage.setItem('usuario', usuarioKey);
-                    localStorage.setItem('nombreTecnico', nombreUsuario);  // ← CLAVE PARA INDEX.HTML
+                    localStorage.setItem('nombreTecnico', nombreTecnico);
                     localStorage.setItem('loginTime', Date.now());
 
                     window.location.href = 'index.html';
@@ -163,7 +242,7 @@
                 });
         });
 
-        // REGISTRO
+        // === REGISTRO ===
         registroForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorRegistro.textContent = '';
@@ -192,12 +271,15 @@
             }
 
             const refUsuario = db.ref('cuentas/' + usuario);
+
             refUsuario.once('value')
                 .then((snapshot) => {
                     if (snapshot.exists()) {
                         errorRegistro.textContent = "Este usuario ya está registrado";
                         return;
                     }
+
+                    // Crear la cuenta
                     return refUsuario.set({
                         nombre: nombre,
                         email: email,
@@ -210,7 +292,7 @@
                     // Registro exitoso → login automático
                     localStorage.setItem('logueado', 'true');
                     localStorage.setItem('usuario', usuario);
-                    localStorage.setItem('nombreTecnico', nombre);  // ← CLAVE PARA INDEX.HTML
+                    localStorage.setItem('nombreTecnico', nombre);
                     localStorage.setItem('loginTime', Date.now());
 
                     window.location.href = 'index.html';
