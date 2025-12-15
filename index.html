@@ -71,6 +71,39 @@
             font-size: 20px;
         }
 
+        /* Toggle para Información del dispositivo */
+        .toggle-seccion {
+            margin-top: 30px;
+            padding: 18px;
+            background: #f0f4ff;
+            border-radius: 18px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 20px;
+            color: #667eea;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.15);
+            transition: 0.3s;
+            user-select: none;
+        }
+        .toggle-seccion:hover {background: #e0e8ff; transform: translateY(-2px);}
+        .toggle-seccion .arrow {
+            float: right;
+            font-size: 24px;
+            transition: 0.3s;
+        }
+        .toggle-seccion.abierto .arrow {transform: rotate(180deg);}
+
+        /* Contenido colapsable */
+        .contenido-colapsable {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        .contenido-colapsable.abierto {
+            max-height: 1200px; /* Valor alto para que quepa todo */
+        }
+
         /* Subida de fotos */
         .evidencia-fotos {margin-top: 25px;}
         #btnSubirFoto {
@@ -101,6 +134,14 @@
         .ganancia {font-size:22px; font-weight:bold; text-align:center; margin:25px 0; padding:18px; background:#f8f9fa; border-radius:15px; border:3px solid #27ae60;}
         #notificacion {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold; box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;}
         #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
+
+        /* Modal confirmación */
+        #modalConfirmacion {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;}
+        .modal-contenido {background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); max-width: 400px; width: 90%;}
+        .modal-contenido h3 {margin: 0 0 20px; color: #333; font-size: 22px;}
+        .modal-botones button {padding: 12px 24px; margin: 0 10px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: 0.3s;}
+        #btnCancelar {background: #95a5a6; color: white;}
+        #btnConfirmarCerrar {background: #e74c3c; color: white;}
     </style>
 </head>
 <body>
@@ -202,33 +243,39 @@
             <div id="precioInfo" class="precio-info"></div>
             <div id="vistaGanancia" class="ganancia" style="display:none;"></div>
 
-            <!-- INFORMACIÓN DEL DISPOSITIVO -->
-            <div class="seccion-especial">
-                <h3>📱 Información del dispositivo</h3>
-                <label>Marca</label>
-                <input type="text" id="marcaDispositivo" placeholder="Ej: Apple, Samsung, Xiaomi">
+            <!-- TOGGLE: Información del dispositivo (oculta por defecto) -->
+            <div class="toggle-seccion" id="toggleDispositivo">
+                📱 Información del dispositivo (opcional)
+                <span class="arrow">▼</span>
+            </div>
+            <div class="contenido-colapsable" id="contenidoDispositivo">
+                <div class="seccion-especial">
+                    <h3>📱 Información del dispositivo</h3>
+                    <label>Marca</label>
+                    <input type="text" id="marcaDispositivo" placeholder="Ej: Apple, Samsung, Xiaomi">
 
-                <label>Modelo exacto</label>
-                <input type="text" id="modeloDispositivo" placeholder="Ej: iPhone 13 Pro, Galaxy S23">
+                    <label>Modelo exacto</label>
+                    <input type="text" id="modeloDispositivo" placeholder="Ej: iPhone 13 Pro, Galaxy S23">
 
-                <label>IMEI (opcional)</label>
-                <input type="text" id="imeiDispositivo" placeholder="15 dígitos">
+                    <label>IMEI (opcional)</label>
+                    <input type="text" id="imeiDispositivo" placeholder="15 dígitos">
 
-                <label>Color</label>
-                <input type="text" id="colorDispositivo" placeholder="Ej: Negro medianoche, Azul">
+                    <label>Color</label>
+                    <input type="text" id="colorDispositivo" placeholder="Ej: Negro medianoche, Azul">
 
-                <label>Capacidad de almacenamiento</label>
-                <select id="capacidadDispositivo">
-                    <option value="">Seleccionar...</option>
-                    <option>16 GB</option><option>32 GB</option><option>64 GB</option><option>128 GB</option>
-                    <option>256 GB</option><option>512 GB</option><option>1 TB</option>
-                </select>
+                    <label>Capacidad de almacenamiento</label>
+                    <select id="capacidadDispositivo">
+                        <option value="">Seleccionar...</option>
+                        <option>16 GB</option><option>32 GB</option><option>64 GB</option><option>128 GB</option>
+                        <option>256 GB</option><option>512 GB</option><option>1 TB</option>
+                    </select>
 
-                <label>Estado físico (opcional)</label>
-                <textarea id="estadoDispositivo" rows="2" placeholder="Rayones, golpes, pantalla rota, etc..."></textarea>
+                    <label>Estado físico (opcional)</label>
+                    <textarea id="estadoDispositivo" rows="2" placeholder="Rayones, golpes, pantalla rota, etc..."></textarea>
+                </div>
             </div>
 
-            <!-- INFORMACIÓN DEL CLIENTE -->
+            <!-- Información del cliente -->
             <div class="seccion-especial">
                 <h3>👤 Información del cliente</h3>
                 <label>Nombre completo</label>
@@ -244,7 +291,7 @@
                 <textarea id="notasCliente" rows="2" placeholder="Prefiere WhatsApp, horario de entrega, etc..."></textarea>
             </div>
 
-            <!-- EVIDENCIA FOTOGRÁFICA -->
+            <!-- Evidencia fotográfica -->
             <div class="seccion-especial">
                 <h3>📸 Evidencia fotográfica (recomendado)</h3>
                 <p style="text-align:center; color:#666; font-size:14px; margin:10px 0;">Antes/después, daño, IMEI, dispositivo completo, etc.</p>
@@ -316,7 +363,7 @@
             menuHamburguesa.style.display = 'none';
         }
 
-        // Menú
+        // Menú hamburguesa
         menuHamburguesa.addEventListener('click', () => {
             menuHamburguesa.classList.toggle('activo');
             menuLateral.classList.toggle('abierto');
@@ -341,7 +388,16 @@
             window.location.href = 'login.html';
         });
 
-        // === FORMULARIO ORIGINAL ===
+        // === TOGGLE DISPOSITIVO ===
+        const toggleDispositivo = document.getElementById('toggleDispositivo');
+        const contenidoDispositivo = document.getElementById('contenidoDispositivo');
+
+        toggleDispositivo.addEventListener('click', () => {
+            toggleDispositivo.classList.toggle('abierto');
+            contenidoDispositivo.classList.toggle('abierto');
+        });
+
+        // === FORMULARIO ===
         const tipoServicio = document.getElementById('tipoServicio');
         const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
         const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
@@ -358,7 +414,7 @@
         const btnRealizado = document.getElementById('btnRealizado');
         const notificacion = document.getElementById('notificacion');
 
-        // === SUBIDA DE FOTOS ===
+        // === FOTOS ===
         const inputFoto = document.getElementById('inputFoto');
         const btnSubirFoto = document.getElementById('btnSubirFoto');
         const vistaPreviaFotos = document.getElementById('vistaPreviaFotos');
@@ -479,7 +535,7 @@
             btnRealizado.classList.toggle('habilitado', valido);
         }
 
-        // Eventos originales
+        // Eventos
         tipoServicio.addEventListener('change', () => {
             precioInfo.textContent = '';
             vistaGanancia.style.display = 'none';
@@ -495,7 +551,7 @@
             el.addEventListener('change', validarFormulario);
         });
 
-        // === ENVÍO A FIREBASE CON TODOS LOS DATOS ===
+        // === ENVÍO ===
         document.getElementById('formTrabajo').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!btnRealizado.classList.contains('habilitado')) return;
@@ -557,6 +613,7 @@
                 }, 2200);
             } catch (error) {
                 alert("Error al enviar: " + error.message);
+                console.error(error);
                 btnRealizado.textContent = 'REALIZADO';
                 btnRealizado.classList.remove('enviando');
             }
