@@ -9,12 +9,31 @@
         .container {background:white; padding:35px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.4); max-width:500px; width:100%;}
         h1 {text-align:center; color:#333; font-size:28px; margin-bottom:10px;}
         #usuarioNombre {
-            text-align:center; color:#667eea; font-size:20px; margin-bottom:30px; font-weight:bold;
+            text-align:center; color:#667eea; font-size:20px; margin-bottom:10px; font-weight:bold;
             padding:12px; border-radius:12px; background:#f0f4ff; cursor:pointer;
             transition:0.3s;
         }
         #usuarioNombre:hover {background:#e0e8ff;}
         #usuarioNombre.no-cursor {cursor: default;}
+
+        /* Botón pequeño de cerrar sesión */
+        #cerrarSesion {
+            display: block;
+            margin: 0 auto 30px;
+            padding: 6px 14px;
+            font-size: 14px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #cerrarSesion:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
         label {display:block; margin-top:20px; font-weight:bold; color:#444;}
         select, input, textarea {width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;}
         select:focus, input:focus, textarea:focus {border-color:#667eea; outline:none;}
@@ -28,13 +47,59 @@
         .ganancia {font-size:22px; font-weight:bold; text-align:center; margin:25px 0; padding:18px; background:#f8f9fa; border-radius:15px; border:3px solid #27ae60;}
         #notificacion {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold; box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;}
         #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
+
+        /* Modal de confirmación */
+        #modalConfirmacion {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-contenido {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-contenido h3 {
+            margin: 0 0 20px;
+            color: #333;
+            font-size: 22px;
+        }
+        .modal-botones button {
+            padding: 12px 24px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #btnCancelar {
+            background: #95a5a6;
+            color: white;
+        }
+        #btnCancelar:hover {background: #7f8c8d;}
+        #btnConfirmarCerrar {
+            background: #e74c3c;
+            color: white;
+        }
+        #btnConfirmarCerrar:hover {background: #c0392b;}
     </style>
 </head>
 <body>
     <div class="container">
         <h1>COMPROPAGO</h1>
-       
+      
         <div id="usuarioNombre">Cargando sesión...</div>
+        <button id="cerrarSesion" class="hidden">Cerrar sesión</button>
+
         <form id="formTrabajo">
             <label>Tipo de servicio</label>
             <select id="tipoServicio" required>
@@ -43,6 +108,7 @@
                 <option value="desbloqueo">Desbloqueo</option>
                 <option value="otro">Otro</option>
             </select>
+
             <div id="seccionDesbloqueo" class="hidden">
                 <label>Tipo de desbloqueo</label>
                 <select id="tipoDesbloqueo">
@@ -86,24 +152,42 @@
                     </div>
                 </div>
             </div>
+
             <div id="descripcionOtro" class="hidden">
                 <label>Descripción del trabajo</label>
                 <textarea id="descripcionTextarea" rows="3" placeholder="Cambio de pantalla, etc..."></textarea>
             </div>
+
             <div id="seccionGastos" class="hidden">
                 <label>Gastos (transporte, etc.)</label>
                 <input type="number" id="gastos" min="0" step="0.01" placeholder="0.00">
             </div>
+
             <label>Tiempo empleado (opcional)</label>
             <input type="text" id="tiempo" placeholder="Ej: 45 min">
+
             <label>A COBRAR (MXN)</label>
             <input type="number" id="monto" min="0" step="0.01" required placeholder="0.00">
+
             <div id="precioInfo" class="precio-info"></div>
             <div id="vistaGanancia" class="ganancia" style="display:none;"></div>
+
             <button type="submit" id="btnRealizado">REALIZADO</button>
         </form>
     </div>
+
     <div id="notificacion">¡ENVIADO!</div>
+
+    <!-- Modal de confirmación de cierre de sesión -->
+    <div id="modalConfirmacion">
+        <div class="modal-contenido">
+            <h3>¿Estás seguro de cerrar sesión?</h3>
+            <div class="modal-botones">
+                <button id="btnCancelar">No</button>
+                <button id="btnConfirmarCerrar">Sí, cerrar</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
@@ -123,22 +207,51 @@
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
 
-        // === DETECCIÓN DE SESIÓN MEJORADA ===
-        const usuarioNombre = document.getElementById('usuarioNombre');
+        // === ELEMENTOS NUEVOS PARA CERRAR SESIÓN ===
+        const cerrarSesionBtn = document.getElementById('cerrarSesion');
+        const modalConfirmacion = document.getElementById('modalConfirmacion');
+        const btnCancelar = document.getElementById('btnCancelar');
+        const btnConfirmarCerrar = document.getElementById('btnConfirmarCerrar');
 
+        // === DETECCIÓN DE SESIÓN ===
+        const usuarioNombre = document.getElementById('usuarioNombre');
         const logueado = localStorage.getItem('logueado') === 'true';
         let nombreTecnico = localStorage.getItem('nombreTecnico');
 
         if (logueado && nombreTecnico && nombreTecnico.trim() !== '') {
             usuarioNombre.textContent = `Tec. ${nombreTecnico.trim()}`;
             usuarioNombre.classList.add('no-cursor');
+            cerrarSesionBtn.classList.remove('hidden'); // Mostrar botón cerrar sesión
         } else {
-            // No hay sesión válida → redirigir al login
             usuarioNombre.textContent = 'Iniciar sesión';
-            usuarioNombre.onclick = () => {
-                window.location.href = 'login.html';
-            };
+            usuarioNombre.onclick = () => { window.location.href = 'login.html'; };
+            cerrarSesionBtn.classList.add('hidden');
         }
+
+        // === FUNCIONALIDAD CERRAR SESIÓN ===
+        cerrarSesionBtn.addEventListener('click', () => {
+            modalConfirmacion.style.display = 'flex';
+        });
+
+        btnCancelar.addEventListener('click', () => {
+            modalConfirmacion.style.display = 'none';
+        });
+
+        btnConfirmarCerrar.addEventListener('click', () => {
+            localStorage.removeItem('logueado');
+            localStorage.removeItem('nombreTecnico');
+            window.location.href = 'login.html';
+        });
+
+        // Cerrar modal automáticamente si el usuario interactúa con el formulario
+        document.querySelectorAll('select, input, textarea').forEach(el => {
+            el.addEventListener('input', () => {
+                modalConfirmacion.style.display = 'none';
+            });
+            el.addEventListener('change', () => {
+                modalConfirmacion.style.display = 'none';
+            });
+        });
 
         // === ELEMENTOS DEL FORMULARIO ===
         const tipoServicio = document.getElementById('tipoServicio');
@@ -168,9 +281,9 @@
 
         function getExtraDia() {
             const d = new Date().getDay(); // 0=Domingo, 6=Sábado
-            if (d === 0 || d === 6) return d === 0 ? 200 : 100; // Domingo +200, Sábado +100
-            if ([1,3,5].includes(d)) return 0; // Lunes, Miércoles, Viernes → sin extra
-            return 100; // Martes y Jueves +100 (ajusta según tu regla real)
+            if (d === 0 || d === 6) return d === 0 ? 200 : 100;
+            if ([1,3,5].includes(d)) return 0;
+            return 100;
         }
 
         function calcularPrecioIcloud() {
@@ -232,7 +345,6 @@
         // === VALIDACIÓN ===
         function validarFormulario() {
             let valido = tipoServicio.value && montoInput.value > 0;
-
             if (tipoServicio.value === 'desbloqueo') {
                 valido &&= tipoDesbloqueo.value;
                 if (tipoDesbloqueo.value === 'pantalla') {
@@ -244,7 +356,6 @@
             if ((tipoServicio.value === 'reparacion' || tipoServicio.value === 'otro') && !document.getElementById('descripcionTextarea').value.trim()) {
                 valido = false;
             }
-
             btnRealizado.classList.toggle('habilitado', valido);
         }
 
@@ -259,7 +370,6 @@
         document.getElementById('modeloIphoneSelect').addEventListener('change', calcularPrecioIcloud);
         montoInput.addEventListener('input', actualizarGanancia);
         gastosInput.addEventListener('input', actualizarGanancia);
-
         document.querySelectorAll('select, input, textarea').forEach(el => {
             el.addEventListener('input', validarFormulario);
             el.addEventListener('change', validarFormulario);
@@ -273,7 +383,6 @@
             const cobrado = parseFloat(montoInput.value);
             const gastos = parseFloat(gastosInput.value) || 0;
             const ganancia = cobrado - gastos;
-
             const nombreParaGuardar = (logueado && nombreTecnico) ? nombreTecnico.trim() : 'Técnico desconocido';
 
             const datos = {
@@ -315,7 +424,7 @@
             }
         });
 
-        // Inicializar campos
+        // Inicializar
         mostrarCampos();
     </script>
 </body>
