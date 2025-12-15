@@ -27,7 +27,6 @@
         }
         h1 {text-align: center; color: #333; font-size: 32px; margin-bottom: 10px;}
         .subtitle {text-align: center; color: #667eea; font-size: 20px; margin-bottom: 30px; font-weight: bold;}
-
         /* Menú hamburguesa (igual) */
         .menu-hamburguesa {position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: 0.3s; z-index: 100;}
         .menu-hamburguesa:hover {background: white; transform: scale(1.05);}
@@ -35,7 +34,6 @@
         .menu-hamburguesa.activo .barra:nth-child(1) {transform: rotate(45deg) translate(6px, 6px);}
         .menu-hamburguesa.activo .barra:nth-child(2) {opacity: 0;}
         .menu-hamburguesa.activo .barra:nth-child(3) {transform: rotate(-45deg) translate(6px, -6px);}
-
         .menu-lateral {position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #2c3e50; box-shadow: 5px 0 20px rgba(0,0,0,0.4); transition: left 0.4s ease; z-index: 999; padding-top: 80px;}
         .menu-lateral.abierto {left: 0;}
         .menu-lateral .usuario-info {text-align: center; color: white; padding: 20px; background: #34495e;}
@@ -45,10 +43,8 @@
         .menu-lateral ul li:hover {background: #34495e; border-left: 4px solid #667eea;}
         .menu-lateral ul li.cerrar-sesion {color: #e74c3c; margin-top: 40px;}
         .menu-lateral ul li.cerrar-sesion:hover {border-left: 4px solid #e74c3c;}
-
         .overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: 0.4s; z-index: 998;}
         .overlay.activo {opacity: 1; visibility: visible;}
-
         /* Resumen financiero */
         .resumen {display: flex; flex-wrap: wrap; gap: 20px; margin: 30px 0; justify-content: center;}
         .card {background: #f8f9fa; padding: 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); text-align: center; flex: 1; min-width: 200px;}
@@ -57,39 +53,59 @@
         .card.ganancia .valor {color: #27ae60;}
         .card.gastos .valor {color: #e74c3c;}
         .card.cobrado .valor {color: #667eea;}
-
         /* Consejos con tachita */
         .consejos {position: relative; background: #f0f4ff; padding: 20px; border-radius: 15px; margin: 30px 0; border-left: 5px solid #667eea;}
         .consejos h2 {color: #333; margin-top: 0;}
         .cerrar-consejos {position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #999; transition: 0.3s;}
         .cerrar-consejos:hover {color: #e74c3c; transform: scale(1.2);}
-
         /* Lista de trabajos como cards */
         .trabajos-list {display: grid; gap: 15px; margin-top: 30px;}
-        .trabajo-card {background: #f9f9f9; padding: 18px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s;}
+        .trabajo-card {
+            background: #f9f9f9;
+            padding: 18px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         .trabajo-card:hover {transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15);}
+        .trabajo-info {flex: 1;}
+        .trabajo-acciones {display: flex; gap: 10px;}
+        .btn-accion {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .btn-editar {background: #667eea; color: white;}
+        .btn-editar:hover {background: #5a6fd8;}
+        .btn-eliminar {background: #e74c3c; color: white;}
+        .btn-eliminar:hover {background: #c0392b;}
         .trabajo-card .fecha {font-weight: bold; color: #667eea;}
         .trabajo-card .tipo {color: #333; font-size: 18px;}
         .trabajo-card .ganancia {font-size: 20px; font-weight: bold; color: #27ae60;}
-
         #noTrabajos {text-align: center; color: #999; font-size: 18px; margin: 40px 0;}
-
         /* Modal detalle trabajo */
         #modalDetalle {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; padding: 20px;}
         .detalle-contenido {background: white; border-radius: 20px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; padding: 30px;}
         .cerrar-detalle {position: absolute; top: 15px; right: 20px; font-size: 32px; cursor: pointer; color: #999;}
         .cerrar-detalle:hover {color: #e74c3c;}
-        .detalle-info {line-height: 1.8;}
-        .detalle-info strong {color: #333;}
-        .evidencias {display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 20px;}
-        .evidencia-img {width: 100%; border-radius: 10px; cursor: pointer; transition: 0.3s;}
-        .evidencia-img:hover {transform: scale(1.05);}
-
+        /* Modal edición */
+        #modalEdicion {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;}
+        .edicion-contenido {background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 600px;}
+        .edicion-contenido input, .edicion-contenido textarea {width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;}
+        /* Modal confirmación eliminación */
+        #modalEliminar {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;}
         /* Lightbox imagen ampliada */
         #lightbox {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10001; justify-content: center; align-items: center;}
         #lightbox img {max-width: 90%; max-height: 90%; border-radius: 10px;}
         #cerrarLightbox {position: absolute; top: 20px; right: 30px; font-size: 40px; color: white; cursor: pointer;}
-
         /* Modal confirmación sesión */
         #modalConfirmacion {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;}
         .modal-contenido {background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); max-width: 400px; width: 90%;}
@@ -100,14 +116,12 @@
     </style>
 </head>
 <body>
-
     <!-- Menú hamburguesa -->
     <div class="menu-hamburguesa" id="menuHamburguesa">
         <div class="barra"></div>
         <div class="barra"></div>
         <div class="barra"></div>
     </div>
-
     <!-- Menú lateral -->
     <div class="menu-lateral" id="menuLateral">
         <div class="usuario-info">
@@ -119,14 +133,11 @@
             <li class="cerrar-sesion" id="opcionCerrarSesion">Cerrar sesión</li>
         </ul>
     </div>
-
     <!-- Overlay menú -->
     <div class="overlay" id="overlay"></div>
-
     <div class="container">
         <h1>CHAMBING</h1>
         <div class="subtitle" id="tituloTecnico">Mis trabajos y ganancias</div>
-
         <div class="resumen">
             <div class="card cobrado">
                 <h3>Total Cobrado</h3>
@@ -141,15 +152,13 @@
                 <div class="valor" id="gananciaNeta">$0.00</div>
             </div>
         </div>
-
         <div class="consejos" id="seccionConsejos">
-            <span class="cerrar-consejos" id="cerrarConsejos">&times;</span>
+            <span class="cerrar-consejos" id="cerrarConsejos">×</span>
             <h2>Consejos para optimizar</h2>
             <ul id="listaConsejos">
                 <li>Cargando datos...</li>
             </ul>
         </div>
-
         <h2 style="text-align:center; margin-top:40px;">Trabajos realizados</h2>
         <div id="noTrabajos">Cargando tus trabajos...</div>
         <div class="trabajos-list" id="trabajosList"></div>
@@ -158,15 +167,46 @@
     <!-- Modal detalle trabajo -->
     <div id="modalDetalle">
         <div class="detalle-contenido">
-            <span class="cerrar-detalle" id="cerrarDetalle">&times;</span>
+            <span class="cerrar-detalle" id="cerrarDetalle">×</span>
             <div class="detalle-info" id="detalleInfo"></div>
             <div class="evidencias" id="evidencias"></div>
         </div>
     </div>
 
+    <!-- Modal edición -->
+    <div id="modalEdicion">
+        <div class="edicion-contenido">
+            <h2>Editar Trabajo</h2>
+            <input type="text" id="editFecha" placeholder="Fecha (DD/MM/YYYY HH:MM)">
+            <input type="text" id="editTipo" placeholder="Tipo de servicio">
+            <textarea id="editDescripcion" placeholder="Descripción"></textarea>
+            <input type="text" id="editModelo" placeholder="Modelo/Detalles">
+            <input type="text" id="editTiempo" placeholder="Tiempo empleado">
+            <input type="text" id="editCliente" placeholder="Cliente">
+            <input type="number" id="editCobrado" placeholder="Cobrado" step="0.01">
+            <input type="number" id="editGastos" placeholder="Gastos" step="0.01">
+            <div style="margin-top:20px; text-align:right;">
+                <button class="btn-accion" style="background:#95a5a6;" id="cancelarEdicion">Cancelar</button>
+                <button class="btn-accion" style="background:#27ae60;" id="guardarEdicion">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal confirmación eliminación -->
+    <div id="modalEliminar">
+        <div class="modal-contenido">
+            <h3>¿Eliminar este trabajo?</h3>
+            <p>Esta acción no se puede deshacer.</p>
+            <div class="modal-botones">
+                <button id="btnCancelarEliminar">Cancelar</button>
+                <button id="btnConfirmarEliminar" style="background:#e74c3c;">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Lightbox imagen -->
     <div id="lightbox">
-        <span id="cerrarLightbox">&times;</span>
+        <span id="cerrarLightbox">×</span>
         <img id="imagenAmpliada" src="" alt="Evidencia">
     </div>
 
@@ -183,7 +223,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+        import { getDatabase, ref, get, update, remove } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
@@ -206,37 +246,37 @@
         const nombreMenu = document.getElementById('nombreMenu');
         const opcionRegistro = document.getElementById('opcionRegistro');
         const opcionCerrarSesion = document.getElementById('opcionCerrarSesion');
-
         const modalConfirmacion = document.getElementById('modalConfirmacion');
         const btnCancelar = document.getElementById('btnCancelar');
         const btnConfirmarCerrar = document.getElementById('btnConfirmarCerrar');
-
         const seccionConsejos = document.getElementById('seccionConsejos');
         const cerrarConsejos = document.getElementById('cerrarConsejos');
-
         const modalDetalle = document.getElementById('modalDetalle');
         const cerrarDetalle = document.getElementById('cerrarDetalle');
-        const detalleInfo = document.getElementById('detalleInfo');
-        const evidencias = document.getElementById('evidencias');
-
+        const modalEdicion = document.getElementById('modalEdicion');
+        const cancelarEdicion = document.getElementById('cancelarEdicion');
+        const guardarEdicion = document.getElementById('guardarEdicion');
+        const modalEliminar = document.getElementById('modalEliminar');
+        const btnCancelarEliminar = document.getElementById('btnCancelarEliminar');
+        const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
         const lightbox = document.getElementById('lightbox');
-        const imagenAmpliada = document.getElementById('imagenAmpliada');
         const cerrarLightbox = document.getElementById('cerrarLightbox');
+
+        // Variables globales para edición/eliminación
+        let trabajoActual = null;
 
         // === SESIÓN ===
         const logueado = localStorage.getItem('logueado') === 'true';
         let nombreTecnico = localStorage.getItem('nombreTecnico');
-
         if (!logueado || !nombreTecnico) {
             window.location.href = 'login.html';
         }
-
         const nombreCompleto = `Tec. ${nombreTecnico.trim()}`;
         document.getElementById('tituloTecnico').textContent = `Trabajos de ${nombreCompleto}`;
         nombreMenu.textContent = nombreCompleto;
         menuHamburguesa.style.display = 'flex';
 
-        // Menú hamburguesa
+        // Eventos menú
         menuHamburguesa.addEventListener('click', () => {
             menuHamburguesa.classList.toggle('activo');
             menuLateral.classList.toggle('abierto');
@@ -247,39 +287,28 @@
             menuLateral.classList.remove('abierto');
             overlay.classList.remove('activo');
         });
-
-        opcionRegistro.addEventListener('click', () => window.location.href = 'index.html'); // Cambia si tu archivo principal tiene otro nombre
-
+        opcionRegistro.addEventListener('click', () => window.location.href = 'index.html');
         opcionCerrarSesion.addEventListener('click', () => {
             modalConfirmacion.style.display = 'flex';
             menuHamburguesa.classList.remove('activo');
             menuLateral.classList.remove('abierto');
             overlay.classList.remove('activo');
         });
-
         btnCancelar.addEventListener('click', () => modalConfirmacion.style.display = 'none');
         btnConfirmarCerrar.addEventListener('click', () => {
             localStorage.removeItem('logueado');
             localStorage.removeItem('nombreTecnico');
             window.location.href = 'login.html';
         });
+        cerrarConsejos.addEventListener('click', () => seccionConsejos.style.display = 'none');
 
-        // Cerrar consejos
-        cerrarConsejos.addEventListener('click', () => {
-            seccionConsejos.style.display = 'none';
-        });
-
-        // Modal detalle
+        // Modales generales
         cerrarDetalle.addEventListener('click', () => modalDetalle.style.display = 'none');
-        modalDetalle.addEventListener('click', (e) => {
-            if (e.target === modalDetalle) modalDetalle.style.display = 'none';
-        });
-
-        // Lightbox
+        modalDetalle.addEventListener('click', (e) => { if (e.target === modalDetalle) modalDetalle.style.display = 'none'; });
+        cancelarEdicion.addEventListener('click', () => modalEdicion.style.display = 'none');
+        btnCancelarEliminar.addEventListener('click', () => modalEliminar.style.display = 'none');
         cerrarLightbox.addEventListener('click', () => lightbox.style.display = 'none');
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) lightbox.style.display = 'none';
-        });
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.style.display = 'none'; });
 
         // === CARGAR TRABAJOS ===
         async function cargarTrabajos() {
@@ -289,7 +318,6 @@
                     document.getElementById('noTrabajos').textContent = 'Aún no tienes trabajos registrados.';
                     return;
                 }
-
                 const datos = snapshot.val();
                 let trabajos = Object.entries(datos).map(([id, t]) => ({id, ...t}));
                 trabajos = trabajos.filter(t => t.tecnico && t.tecnico.includes(nombreTecnico.trim()));
@@ -302,24 +330,20 @@
                 // Ordenar por fecha descendente
                 trabajos.sort((a, b) => new Date(b.fecha.split(' ')[0].split('/').reverse().join('-')) - new Date(a.fecha.split(' ')[0].split('/').reverse().join('-')));
 
-                // Resumen financiero
+                // Resumen financiero y consejos (igual que antes)
                 let totalCobrado = 0, totalGastos = 0;
                 const dias = {}, tipos = {};
-
                 trabajos.forEach(t => {
                     const cobrado = parseFloat(t.cobrado) || 0;
                     const gastos = parseFloat(t.gastos) || 0;
                     totalCobrado += cobrado;
                     totalGastos += gastos;
-
-                    // Día en español
                     const fechaParts = t.fecha.split(' ')[0].split('/');
                     const dateObj = new Date(`${fechaParts[2]}-${fechaParts[1]}-${fechaParts[0]}`);
-                    const diaNum = dateObj.getDay(); // 0 domingo ... 6 sábado
+                    const diaNum = dateObj.getDay();
                     const diasEs = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
                     const diaEsp = diasEs[diaNum];
                     dias[diaEsp] = (dias[diaEsp] || 0) + (cobrado - gastos);
-
                     const tipo = t.tipo || 'Otro';
                     tipos[tipo] = (tipos[tipo] || 0) + (cobrado - gastos);
                 });
@@ -328,38 +352,50 @@
                 document.getElementById('totalGastos').textContent = `$${totalGastos.toFixed(2)}`;
                 document.getElementById('gananciaNeta').textContent = `$${(totalCobrado - totalGastos).toFixed(2)}`;
 
-                // Consejos
                 const mejorDia = Object.keys(dias).length > 0 ? Object.keys(dias).reduce((a, b) => dias[a] > dias[b] ? a : b) : 'ninguno';
                 const mejorTipo = Object.keys(tipos).length > 0 ? Object.keys(tipos).reduce((a, b) => tipos[a] > tipos[b] ? a : b) : 'ninguno';
-
                 const consejos = [
                     mejorDia !== 'ninguno' ? `Tu día más rentable es el <strong>${mejorDia}</strong> → enfócate en promociones ese día.` : 'No hay suficientes datos para día más rentable.',
                     mejorTipo !== 'ninguno' ? `El servicio más rentable es <strong>${mejorTipo}</strong> → considera especializarte más en él.` : 'No hay suficientes datos para tipo más rentable.',
                     totalGastos > totalCobrado * 0.2 ? `⚠️ Tus gastos representan más del 20% de lo cobrado. Revisa transporte y materiales.` : `¡Bien! Tus gastos están controlados.`,
                     trabajos.length > 10 ? `Has completado ${trabajos.length} trabajos. ¡Sigue así!` : `Estás empezando fuerte. ¡Cada trabajo cuenta!`
                 ];
-
                 document.getElementById('listaConsejos').innerHTML = consejos.map(c => `<li>${c}</li>`).join('');
 
-                // Lista de cards
+                // Renderizar tarjetas
                 const list = document.getElementById('trabajosList');
                 list.innerHTML = '';
                 trabajos.forEach(t => {
                     const card = document.createElement('div');
                     card.className = 'trabajo-card';
-                    const ganancia = (parseFloat(t.cobrado) - parseFloat(t.gastos)).toFixed(2);
+                    const ganancia = (parseFloat(t.cobrado) - parseFloat(t.gastos || 0)).toFixed(2);
                     card.innerHTML = `
-                        <div class="fecha">${t.fecha}</div>
-                        <div class="tipo">${t.tipo}</div>
-                        <div>${t.descripcion || t.modelo || 'Sin descripción'}</div>
-                        <div class="ganancia">Ganancia: $${ganancia}</div>
+                        <div class="trabajo-info">
+                            <div class="fecha">${t.fecha}</div>
+                            <div class="tipo">${t.tipo}</div>
+                            <div>${t.descripcion || t.modelo || 'Sin descripción'}</div>
+                            <div class="ganancia">Ganancia: $${ganancia}</div>
+                        </div>
+                        <div class="trabajo-acciones">
+                            <button class="btn-accion btn-editar" data-id="${t.id}">✏️ Editar</button>
+                            <button class="btn-accion btn-eliminar" data-id="${t.id}">🗑️ Eliminar</button>
+                        </div>
                     `;
-                    card.addEventListener('click', () => mostrarDetalle(t));
+                    // Click en info abre detalle
+                    card.querySelector('.trabajo-info').addEventListener('click', () => mostrarDetalle(t));
+                    // Botones
+                    card.querySelector('.btn-editar').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        abrirEdicion(t);
+                    });
+                    card.querySelector('.btn-eliminar').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        trabajoActual = t;
+                        modalEliminar.style.display = 'flex';
+                    });
                     list.appendChild(card);
                 });
-
                 document.getElementById('noTrabajos').style.display = 'none';
-
             } catch (error) {
                 console.error(error);
                 document.getElementById('noTrabajos').textContent = 'Error al cargar datos.';
@@ -368,7 +404,7 @@
 
         function mostrarDetalle(trabajo) {
             const ganancia = (parseFloat(trabajo.cobrado) - parseFloat(trabajo.gastos || 0)).toFixed(2);
-            detalleInfo.innerHTML = `
+            document.getElementById('detalleInfo').innerHTML = `
                 <p><strong>Fecha:</strong> ${trabajo.fecha}</p>
                 <p><strong>Tipo de servicio:</strong> ${trabajo.tipo}</p>
                 <p><strong>Descripción:</strong> ${trabajo.descripcion || 'No especificada'}</p>
@@ -379,8 +415,7 @@
                 <p><strong>Gastos:</strong> $${trabajo.gastos || '0.00'}</p>
                 <p><strong>Ganancia neta:</strong> $${ganancia}</p>
             `;
-
-            // Evidencias (futuro: array de URLs en Firebase)
+            const evidencias = document.getElementById('evidencias');
             evidencias.innerHTML = '';
             if (trabajo.evidencias && Array.isArray(trabajo.evidencias)) {
                 trabajo.evidencias.forEach(url => {
@@ -389,7 +424,7 @@
                     img.className = 'evidencia-img';
                     img.alt = 'Evidencia';
                     img.addEventListener('click', () => {
-                        imagenAmpliada.src = url;
+                        document.getElementById('imagenAmpliada').src = url;
                         lightbox.style.display = 'flex';
                     });
                     evidencias.appendChild(img);
@@ -397,9 +432,53 @@
             } else {
                 evidencias.innerHTML = '<p>No hay evidencias fotográficas.</p>';
             }
-
             modalDetalle.style.display = 'flex';
         }
+
+        function abrirEdicion(trabajo) {
+            trabajoActual = trabajo;
+            document.getElementById('editFecha').value = trabajo.fecha || '';
+            document.getElementById('editTipo').value = trabajo.tipo || '';
+            document.getElementById('editDescripcion').value = trabajo.descripcion || '';
+            document.getElementById('editModelo').value = trabajo.modelo || '';
+            document.getElementById('editTiempo').value = trabajo.tiempo || '';
+            document.getElementById('editCliente').value = trabajo.cliente || '';
+            document.getElementById('editCobrado').value = trabajo.cobrado || '';
+            document.getElementById('editGastos').value = trabajo.gastos || '';
+            modalEdicion.style.display = 'flex';
+        }
+
+        guardarEdicion.addEventListener('click', async () => {
+            if (!trabajoActual) return;
+            const updates = {
+                fecha: document.getElementById('editFecha').value,
+                tipo: document.getElementById('editTipo').value,
+                descripcion: document.getElementById('editDescripcion').value,
+                modelo: document.getElementById('editModelo').value,
+                tiempo: document.getElementById('editTiempo').value,
+                cliente: document.getElementById('editCliente').value,
+                cobrado: document.getElementById('editCobrado').value,
+                gastos: document.getElementById('editGastos').value,
+            };
+            try {
+                await update(ref(db, 'ordenes/' + trabajoActual.id), updates);
+                modalEdicion.style.display = 'none';
+                cargarTrabajos(); // Recargar lista
+            } catch (error) {
+                alert('Error al guardar cambios: ' + error.message);
+            }
+        });
+
+        btnConfirmarEliminar.addEventListener('click', async () => {
+            if (!trabajoActual) return;
+            try {
+                await remove(ref(db, 'ordenes/' + trabajoActual.id));
+                modalEliminar.style.display = 'none';
+                cargarTrabajos();
+            } catch (error) {
+                alert('Error al eliminar: ' + error.message);
+            }
+        });
 
         cargarTrabajos();
     </script>
