@@ -20,31 +20,22 @@
             padding: 35px;
             border-radius: 25px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            max-width: 500px;
+            max-width: 550px;
             width: 100%;
             position: relative;
             margin-top: 40px;
         }
         h1 {text-align: center; color: #333; font-size: 28px; margin-bottom: 10px;}
 
-        /* Menú hamburguesa (igual que en chambing.html) */
-        .menu-hamburguesa {
-            position: absolute; top: 20px; left: 20px; width: 40px; height: 40px;
-            background: rgba(255,255,255,0.9); border-radius: 12px; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: 0.3s; z-index: 100;
-        }
+        /* Menú hamburguesa */
+        .menu-hamburguesa {position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: 0.3s; z-index: 100;}
         .menu-hamburguesa:hover {background: white; transform: scale(1.05);}
         .barra {width: 24px; height: 3px; background: #333; margin: 3px 0; border-radius: 2px; transition: 0.3s;}
         .menu-hamburguesa.activo .barra:nth-child(1) {transform: rotate(45deg) translate(6px, 6px);}
         .menu-hamburguesa.activo .barra:nth-child(2) {opacity: 0;}
         .menu-hamburguesa.activo .barra:nth-child(3) {transform: rotate(-45deg) translate(6px, -6px);}
 
-        .menu-lateral {
-            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
-            background: #2c3e50; box-shadow: 5px 0 20px rgba(0,0,0,0.4);
-            transition: left 0.4s ease; z-index: 999; padding-top: 80px;
-        }
+        .menu-lateral {position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #2c3e50; box-shadow: 5px 0 20px rgba(0,0,0,0.4); transition: left 0.4s ease; z-index: 999; padding-top: 80px;}
         .menu-lateral.abierto {left: 0;}
         .menu-lateral .usuario-info {text-align: center; color: white; padding: 20px; background: #34495e;}
         .menu-lateral .usuario-info h3 {margin: 0; font-size: 20px;}
@@ -57,45 +48,48 @@
         .overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: 0.4s; z-index: 998;}
         .overlay.activo {opacity: 1; visibility: visible;}
 
-        #usuarioNombre {
-            text-align: center; color: #667eea; font-size: 20px; margin: 20px 0 30px;
-            font-weight: bold; padding: 12px; border-radius: 12px; background: #f0f4ff;
-        }
+        #usuarioNombre {text-align: center; color: #667eea; font-size: 20px; margin: 20px 0 30px; font-weight: bold; padding: 12px; border-radius: 12px; background: #f0f4ff;}
 
         label {display:block; margin-top:20px; font-weight:bold; color:#444;}
-        select, input, textarea {
-            width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;
-        }
+        select, input, textarea {width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;}
         select:focus, input:focus, textarea:focus {border-color:#667eea; outline:none;}
         .hidden {display:none !important;}
 
-        /* Sección cliente */
-        .seccion-cliente {
-            margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px; border: 2px dashed #667eea;
+        /* Secciones especiales */
+        .seccion-especial {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 18px;
+            border: 2px dashed #667eea;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.1);
         }
-        .seccion-cliente h3 {text-align: center; color: #667eea; margin-top: 0;}
+        .seccion-especial h3 {
+            text-align: center;
+            color: #667eea;
+            margin-top: 0;
+            font-size: 20px;
+        }
 
         /* Subida de fotos */
-        .evidencia-fotos {
-            margin-top: 20px;
-        }
+        .evidencia-fotos {margin-top: 25px;}
         #btnSubirFoto {
-            display: block; margin: 15px auto; padding: 15px 30px; background: #667eea; color: white;
-            border: none; border-radius: 15px; font-size: 18px; cursor: pointer; box-shadow: 0 6px 20px rgba(102,126,234,0.3);
+            display: block; margin: 20px auto; padding: 16px 32px; background: #667eea; color: white;
+            border: none; border-radius: 18px; font-size: 18px; cursor: pointer; box-shadow: 0 8px 25px rgba(102,126,234,0.3);
             transition: 0.3s;
         }
-        #btnSubirFoto:hover {background: #5a6fd8; transform: translateY(-3px);}
+        #btnSubirFoto:hover {background: #5a6fd8; transform: translateY(-4px);}
         .vista-previa {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-top: 15px;
         }
         .foto-previa {
-            position: relative; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
         }
-        .foto-previa img {width: 100%; height: 120px; object-fit: cover;}
+        .foto-previa img {width: 100%; height: 140px; object-fit: cover;}
         .eliminar-foto {
-            position: absolute; top: 5px; right: 5px; background: rgba(231,76,60,0.9); color: white;
-            width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 14px;
+            position: absolute; top: 6px; right: 6px; background: rgba(231,76,60,0.95); color: white;
+            width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 16px; font-weight: bold;
         }
 
         #btnRealizado {margin-top:50px; padding:20px; font-size:24px; font-weight:bold; color:white; background:#95a5a6; border:none; border-radius:18px; cursor:not-allowed; width:100%; transition:0.4s;}
@@ -107,14 +101,6 @@
         .ganancia {font-size:22px; font-weight:bold; text-align:center; margin:25px 0; padding:18px; background:#f8f9fa; border-radius:15px; border:3px solid #27ae60;}
         #notificacion {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold; box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;}
         #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
-
-        /* Modal confirmación */
-        #modalConfirmacion {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;}
-        .modal-contenido {background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); max-width: 400px; width: 90%;}
-        .modal-contenido h3 {margin: 0 0 20px; color: #333; font-size: 22px;}
-        .modal-botones button {padding: 12px 24px; margin: 0 10px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; transition: 0.3s;}
-        #btnCancelar {background: #95a5a6; color: white;}
-        #btnConfirmarCerrar {background: #e74c3c; color: white;}
     </style>
 </head>
 <body>
@@ -199,11 +185,11 @@
 
             <div id="descripcionOtro" class="hidden">
                 <label>Descripción del trabajo</label>
-                <textarea id="descripcionTextarea" rows="3" placeholder="Cambio de pantalla, etc..."></textarea>
+                <textarea id="descripcionTextarea" rows="3" placeholder="Cambio de pantalla, batería, etc..."></textarea>
             </div>
 
             <div id="seccionGastos" class="hidden">
-                <label>Gastos (transporte, etc.)</label>
+                <label>Gastos (transporte, piezas, etc.)</label>
                 <input type="number" id="gastos" min="0" step="0.01" placeholder="0.00">
             </div>
 
@@ -216,20 +202,54 @@
             <div id="precioInfo" class="precio-info"></div>
             <div id="vistaGanancia" class="ganancia" style="display:none;"></div>
 
-            <!-- NUEVA SECCIÓN: INFORMACIÓN DEL CLIENTE Y EVIDENCIA -->
-            <div class="seccion-cliente">
-                <h3>Información del cliente (opcional)</h3>
-                <label>Nombre del cliente</label>
-                <input type="text" id="nombreCliente" placeholder="Ej: Juan Pérez">
+            <!-- INFORMACIÓN DEL DISPOSITIVO -->
+            <div class="seccion-especial">
+                <h3>📱 Información del dispositivo</h3>
+                <label>Marca</label>
+                <input type="text" id="marcaDispositivo" placeholder="Ej: Apple, Samsung, Xiaomi">
 
-                <label>Teléfono del cliente</label>
+                <label>Modelo exacto</label>
+                <input type="text" id="modeloDispositivo" placeholder="Ej: iPhone 13 Pro, Galaxy S23">
+
+                <label>IMEI (opcional)</label>
+                <input type="text" id="imeiDispositivo" placeholder="15 dígitos">
+
+                <label>Color</label>
+                <input type="text" id="colorDispositivo" placeholder="Ej: Negro medianoche, Azul">
+
+                <label>Capacidad de almacenamiento</label>
+                <select id="capacidadDispositivo">
+                    <option value="">Seleccionar...</option>
+                    <option>16 GB</option><option>32 GB</option><option>64 GB</option><option>128 GB</option>
+                    <option>256 GB</option><option>512 GB</option><option>1 TB</option>
+                </select>
+
+                <label>Estado físico (opcional)</label>
+                <textarea id="estadoDispositivo" rows="2" placeholder="Rayones, golpes, pantalla rota, etc..."></textarea>
+            </div>
+
+            <!-- INFORMACIÓN DEL CLIENTE -->
+            <div class="seccion-especial">
+                <h3>👤 Información del cliente</h3>
+                <label>Nombre completo</label>
+                <input type="text" id="nombreCliente" placeholder="Ej: Juan Pérez Gómez">
+
+                <label>Teléfono</label>
                 <input type="tel" id="telefonoCliente" placeholder="Ej: 55 1234 5678">
 
-                <div class="evidencia-fotos">
-                    <h3 style="text-align:center; margin:15px 0 5px;">Evidencia fotográfica (opcional)</h3>
-                    <button type="button" id="btnSubirFoto">📷 Tomar / Subir foto</button>
-                    <div class="vista-previa" id="vistaPreviaFotos"></div>
-                </div>
+                <label>Correo electrónico (opcional)</label>
+                <input type="email" id="emailCliente" placeholder="Ej: juan@example.com">
+
+                <label>Notas adicionales (opcional)</label>
+                <textarea id="notasCliente" rows="2" placeholder="Prefiere WhatsApp, horario de entrega, etc..."></textarea>
+            </div>
+
+            <!-- EVIDENCIA FOTOGRÁFICA -->
+            <div class="seccion-especial">
+                <h3>📸 Evidencia fotográfica (recomendado)</h3>
+                <p style="text-align:center; color:#666; font-size:14px; margin:10px 0;">Antes/después, daño, IMEI, dispositivo completo, etc.</p>
+                <button type="button" id="btnSubirFoto">📷 Tomar o subir foto</button>
+                <div class="vista-previa" id="vistaPreviaFotos"></div>
             </div>
 
             <button type="submit" id="btnRealizado">REALIZADO</button>
@@ -238,7 +258,7 @@
 
     <div id="notificacion">¡ENVIADO!</div>
 
-    <!-- Input oculto para subir foto -->
+    <!-- Input oculto para fotos -->
     <input type="file" id="inputFoto" accept="image/*" capture="environment" style="display:none;">
 
     <!-- Modal confirmación cerrar sesión -->
@@ -270,19 +290,17 @@
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
 
-        // === MENÚ ===
+        // === ELEMENTOS ===
         const menuHamburguesa = document.getElementById('menuHamburguesa');
         const menuLateral = document.getElementById('menuLateral');
         const overlay = document.getElementById('overlay');
         const nombreMenu = document.getElementById('nombreMenu');
         const opcionMisTrabajos = document.getElementById('opcionMisTrabajos');
         const opcionCerrarSesion = document.getElementById('opcionCerrarSesion');
-
         const modalConfirmacion = document.getElementById('modalConfirmacion');
         const btnCancelar = document.getElementById('btnCancelar');
         const btnConfirmarCerrar = document.getElementById('btnConfirmarCerrar');
 
-        // === SESIÓN ===
         const usuarioNombre = document.getElementById('usuarioNombre');
         const logueado = localStorage.getItem('logueado') === 'true';
         let nombreTecnico = localStorage.getItem('nombreTecnico');
@@ -298,6 +316,7 @@
             menuHamburguesa.style.display = 'none';
         }
 
+        // Menú
         menuHamburguesa.addEventListener('click', () => {
             menuHamburguesa.classList.toggle('activo');
             menuLateral.classList.toggle('abierto');
@@ -308,18 +327,13 @@
             menuLateral.classList.remove('abierto');
             overlay.classList.remove('activo');
         });
-
-        opcionMisTrabajos.addEventListener('click', () => {
-            window.location.href = 'chambing.html';
-        });
-
+        opcionMisTrabajos.addEventListener('click', () => window.location.href = 'chambing.html');
         opcionCerrarSesion.addEventListener('click', () => {
             modalConfirmacion.style.display = 'flex';
             menuHamburguesa.classList.remove('activo');
             menuLateral.classList.remove('abierto');
             overlay.classList.remove('activo');
         });
-
         btnCancelar.addEventListener('click', () => modalConfirmacion.style.display = 'none');
         btnConfirmarCerrar.addEventListener('click', () => {
             localStorage.removeItem('logueado');
@@ -327,58 +341,161 @@
             window.location.href = 'login.html';
         });
 
+        // === FORMULARIO ORIGINAL ===
+        const tipoServicio = document.getElementById('tipoServicio');
+        const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
+        const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
+        const subseccionPantalla = document.getElementById('subseccionPantalla');
+        const cuentaBloqueo = document.getElementById('cuentaBloqueo');
+        const modeloAndroid = document.getElementById('modeloAndroid');
+        const modeloIphone = document.getElementById('modeloIphone');
+        const descripcionOtro = document.getElementById('descripcionOtro');
+        const seccionGastos = document.getElementById('seccionGastos');
+        const gastosInput = document.getElementById('gastos');
+        const montoInput = document.getElementById('monto');
+        const precioInfo = document.getElementById('precioInfo');
+        const vistaGanancia = document.getElementById('vistaGanancia');
+        const btnRealizado = document.getElementById('btnRealizado');
+        const notificacion = document.getElementById('notificacion');
+
         // === SUBIDA DE FOTOS ===
         const inputFoto = document.getElementById('inputFoto');
         const btnSubirFoto = document.getElementById('btnSubirFoto');
         const vistaPreviaFotos = document.getElementById('vistaPreviaFotos');
-        let fotosBase64 = []; // Guardará las imágenes en Base64
+        let fotosBase64 = [];
 
-        btnSubirFoto.addEventListener('click', () => {
-            inputFoto.click();
-        });
-
+        btnSubirFoto.addEventListener('click', () => inputFoto.click());
         inputFoto.addEventListener('change', (e) => {
             if (e.target.files && e.target.files[0]) {
                 const file = e.target.files[0];
-                if (fotosBase64.length >= 4) {
-                    alert('Máximo 4 fotos permitidas.');
+                if (fotosBase64.length >= 6) {
+                    alert('Máximo 6 fotos permitidas.');
                     return;
                 }
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     const base64 = ev.target.result;
                     fotosBase64.push(base64);
-                    mostrarPrevia(base64);
+                    const contenedor = document.createElement('div');
+                    contenedor.className = 'foto-previa';
+                    const img = document.createElement('img');
+                    img.src = base64;
+                    const eliminar = document.createElement('div');
+                    eliminar.className = 'eliminar-foto';
+                    eliminar.innerHTML = '&times;';
+                    eliminar.onclick = () => {
+                        fotosBase64 = fotosBase64.filter(f => f !== base64);
+                        contenedor.remove();
+                    };
+                    contenedor.appendChild(img);
+                    contenedor.appendChild(eliminar);
+                    vistaPreviaFotos.appendChild(contenedor);
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        function mostrarPrevia(base64) {
-            const contenedor = document.createElement('div');
-            contenedor.className = 'foto-previa';
-
-            const img = document.createElement('img');
-            img.src = base64;
-
-            const eliminar = document.createElement('div');
-            eliminar.className = 'eliminar-foto';
-            eliminar.innerHTML = '&times;';
-            eliminar.onclick = () => {
-                const index = fotosBase64.indexOf(base64);
-                if (index > -1) fotosBase64.splice(index, 1);
-                contenedor.remove();
-            };
-
-            contenedor.appendChild(img);
-            contenedor.appendChild(eliminar);
-            vistaPreviaFotos.appendChild(contenedor);
+        // === CÁLCULO PRECIO ICLOUD ===
+        function getPrecioBase(modelo) {
+            if (["iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XR","iPhone XS","iPhone XS Max"].includes(modelo)) return 450;
+            if (modelo.startsWith("iPhone 11")) return 550;
+            if (modelo.match(/^iPhone (12|13|14)/)) return 750;
+            if (modelo.match(/^iPhone (15|16|17)/) || modelo.includes("16e") || modelo.includes("17 Air")) return 1000;
+            return 0;
         }
 
-        // === RESTO DEL FORMULARIO (sin cambios importantes) ===
-        // ... (todo el código anterior de tipoServicio, cálculos, validación, etc.)
+        function getExtraDia() {
+            const d = new Date().getDay();
+            if (d === 0 || d === 6) return d === 0 ? 200 : 100;
+            if ([1,3,5].includes(d)) return 0;
+            return 100;
+        }
 
-        // Al final, en el envío, agrega cliente y evidencias
+        function calcularPrecioIcloud() {
+            const modelo = document.getElementById('modeloIphoneSelect').value;
+            if (modelo && cuentaBloqueo.value === 'icloud') {
+                const base = getPrecioBase(modelo);
+                const extra = getExtraDia();
+                const total = base + extra;
+                montoInput.value = total;
+                const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+                precioInfo.textContent = `Base $${base} + $${extra} (${dias[new Date().getDay()]}) = $${total} MXN`;
+            } else {
+                precioInfo.textContent = '';
+            }
+            actualizarGanancia();
+        }
+
+        function actualizarGanancia() {
+            const cobrado = parseFloat(montoInput.value) || 0;
+            const gastos = parseFloat(gastosInput.value) || 0;
+            const ganancia = cobrado - gastos;
+            if (tipoServicio.value === 'desbloqueo' && cobrado > 0) {
+                vistaGanancia.style.display = 'block';
+                vistaGanancia.innerHTML = `GANANCIA NETA: <span style="color:#27ae60">$${ganancia.toFixed(2)} MXN</span>`;
+            } else {
+                vistaGanancia.style.display = 'none';
+            }
+        }
+
+        function mostrarCampos() {
+            seccionDesbloqueo.classList.add('hidden');
+            subseccionPantalla.classList.add('hidden');
+            modeloAndroid.classList.add('hidden');
+            modeloIphone.classList.add('hidden');
+            descripcionOtro.classList.add('hidden');
+            seccionGastos.classList.remove('hidden');
+
+            if (tipoServicio.value === 'desbloqueo') {
+                seccionDesbloqueo.classList.remove('hidden');
+                if (tipoDesbloqueo.value === 'pantalla') {
+                    subseccionPantalla.classList.remove('hidden');
+                    if (cuentaBloqueo.value === 'google') modeloAndroid.classList.remove('hidden');
+                    if (cuentaBloqueo.value === 'icloud') {
+                        modeloIphone.classList.remove('hidden');
+                        calcularPrecioIcloud();
+                    }
+                }
+            }
+            if (tipoServicio.value === 'reparacion' || tipoServicio.value === 'otro') {
+                descripcionOtro.classList.remove('hidden');
+            }
+            validarFormulario();
+        }
+
+        function validarFormulario() {
+            let valido = tipoServicio.value && montoInput.value > 0;
+            if (tipoServicio.value === 'desbloqueo') {
+                valido &&= tipoDesbloqueo.value;
+                if (tipoDesbloqueo.value === 'pantalla') {
+                    valido &&= cuentaBloqueo.value;
+                    if (cuentaBloqueo.value === 'google') valido &&= document.getElementById('modeloAndroidInput').value.trim();
+                    if (cuentaBloqueo.value === 'icloud') valido &&= document.getElementById('modeloIphoneSelect').value;
+                }
+            }
+            if ((tipoServicio.value === 'reparacion' || tipoServicio.value === 'otro') && !document.getElementById('descripcionTextarea').value.trim()) {
+                valido = false;
+            }
+            btnRealizado.classList.toggle('habilitado', valido);
+        }
+
+        // Eventos originales
+        tipoServicio.addEventListener('change', () => {
+            precioInfo.textContent = '';
+            vistaGanancia.style.display = 'none';
+            mostrarCampos();
+        });
+        tipoDesbloqueo.addEventListener('change', mostrarCampos);
+        cuentaBloqueo.addEventListener('change', mostrarCampos);
+        document.getElementById('modeloIphoneSelect').addEventListener('change', calcularPrecioIcloud);
+        montoInput.addEventListener('input', actualizarGanancia);
+        gastosInput.addEventListener('input', actualizarGanancia);
+        document.querySelectorAll('select, input, textarea').forEach(el => {
+            el.addEventListener('input', validarFormulario);
+            el.addEventListener('change', validarFormulario);
+        });
+
+        // === ENVÍO A FIREBASE CON TODOS LOS DATOS ===
         document.getElementById('formTrabajo').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!btnRealizado.classList.contains('habilitado')) return;
@@ -386,35 +503,65 @@
             const cobrado = parseFloat(montoInput.value);
             const gastos = parseFloat(gastosInput.value) || 0;
             const ganancia = cobrado - gastos;
-            const nombreParaGuardar = (logueado && nombreTecnico) ? nombreTecnico.trim() : 'Técnico desconocido';
 
             const datos = {
                 fecha: new Date().toLocaleString('es-MX'),
-                tecnico: `Tec. ${nombreParaGuardar}`,
+                tecnico: `Tec. ${nombreTecnico.trim()}`,
                 tipo: tipoServicio.options[tipoServicio.selectedIndex].text,
                 tipoDesbloqueo: tipoDesbloqueo.value === 'pago' ? 'FRP' : (tipoDesbloqueo.value === 'pantalla' ? 'Pantalla' : ''),
                 cuenta: cuentaBloqueo.value || '',
                 modelo: cuentaBloqueo.value === 'google' ? document.getElementById('modeloAndroidInput').value.trim() :
-                        cuentaBloqueo.value === 'icloud' ? document.getElementById('modeloIphoneSelect').value : '',
+                        cuentaBloqueo.value === 'icloud' ? document.getElementById('modeloIphoneSelect').value :
+                        document.getElementById('modeloDispositivo').value.trim(),
                 tiempo: document.getElementById('tiempo').value || 'No especificado',
                 cobrado: cobrado.toFixed(2),
                 gastos: gastos.toFixed(2),
                 ganancia: ganancia.toFixed(2),
                 descripcion: document.getElementById('descripcionTextarea')?.value.trim() || '',
+
+                // Dispositivo
+                marca: document.getElementById('marcaDispositivo').value.trim(),
+                modeloExacto: document.getElementById('modeloDispositivo').value.trim(),
+                imei: document.getElementById('imeiDispositivo').value.trim(),
+                color: document.getElementById('colorDispositivo').value.trim(),
+                capacidad: document.getElementById('capacidadDispositivo').value,
+                estadoFisico: document.getElementById('estadoDispositivo').value.trim(),
+
+                // Cliente
                 cliente: document.getElementById('nombreCliente').value.trim() || 'No registrado',
-                telefonoCliente: document.getElementById('telefonoCliente').value.trim() || '',
-                evidencias: fotosBase64 // Array de imágenes en Base64
+                telefonoCliente: document.getElementById('telefonoCliente').value.trim(),
+                emailCliente: document.getElementById('emailCliente').value.trim(),
+                notasCliente: document.getElementById('notasCliente').value.trim(),
+
+                // Evidencias
+                evidencias: fotosBase64
             };
 
-            // ... (el resto del envío a Firebase igual)
+            btnRealizado.textContent = 'ENVIANDO...';
+            btnRealizado.classList.add('enviando');
 
-            // Después del envío exitoso, limpiar también las fotos
-            fotosBase64 = [];
-            vistaPreviaFotos.innerHTML = '';
-            // ... resto del reset
+            try {
+                await push(ordenesRef, datos);
+                notificacion.classList.add('mostrar');
+                setTimeout(() => {
+                    notificacion.classList.remove('mostrar');
+                    document.getElementById('formTrabajo').reset();
+                    fotosBase64 = [];
+                    vistaPreviaFotos.innerHTML = '';
+                    btnRealizado.textContent = 'REALIZADO';
+                    btnRealizado.classList.remove('enviando', 'habilitado');
+                    precioInfo.textContent = '';
+                    vistaGanancia.style.display = 'none';
+                    tipoServicio.value = '';
+                    mostrarCampos();
+                }, 2200);
+            } catch (error) {
+                alert("Error al enviar: " + error.message);
+                btnRealizado.textContent = 'REALIZADO';
+                btnRealizado.classList.remove('enviando');
+            }
         });
 
-        // Inicializar campos
         mostrarCampos();
     </script>
 </body>
