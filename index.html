@@ -24,22 +24,39 @@
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
 
-        // Verificar autenticación
+        // Elementos de autenticación
+        const loadingAuth = document.getElementById('loadingAuth');
+        const mainContent = document.getElementById('mainContent');
+        const usuarioNombre = document.getElementById('usuarioNombre');
+
+        let userLoggedIn = false;
+
+        // Escuchar cambios de autenticación
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 // Usuario autenticado
+                userLoggedIn = true;
                 const nombre = user.displayName || user.email.split('@')[0] || 'Técnico';
-                document.getElementById('usuarioNombre').textContent = nombre;
-                document.getElementById('loadingAuth').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
+                usuarioNombre.textContent = nombre;
+                loadingAuth.style.display = 'none';
+                mainContent.style.display = 'block';
             } else {
-                // No autenticado → ir al login
-                window.location.href = 'login.html';
+                // Solo redirigir si ya terminó de cargar y no hay usuario
+                if (!auth.currentUser && !userLoggedIn) {
+                    window.location.href = 'login.html';
+                }
             }
         });
+
+        // Seguridad extra: si después de 5 segundos no hay usuario, redirigir
+        setTimeout(() => {
+            if (!userLoggedIn && !auth.currentUser) {
+                window.location.href = 'login.html';
+            }
+        }, 5000);
     </script>
     <style>
-        body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center;}
+        body {font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea, #764ba2); margin:0; padding:20px; min-height:100vh; display:flex; justify-content:center; align-items:center;}
         .container {background:white; padding:35px; border-radius:25px; box-shadow:0 20px 50px rgba(0,0,0,0.4); max-width:500px; width:100%;}
         h1 {text-align:center; color:#333; font-size:28px; margin-bottom:10px;}
         #usuarioNombre {text-align:center; color:#667eea; font-size:20px; margin-bottom:30px; font-weight:bold;}
@@ -58,22 +75,24 @@
         #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
         #terminosModal {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999; flex-direction:column;}
         #terminosContent {background:white; padding:30px; border-radius:20px; max-width:90%; max-height:90%; overflow-y:auto;}
-        #loadingAuth {text-align:center; color:white; font-size:24px; margin-top:50px;}
+        #loadingAuth {text-align:center; color:white; font-size:28px; font-weight:bold;}
     </style>
 </head>
 <body>
 
-    <!-- Mensaje mientras verifica autenticación -->
+    <!-- Pantalla de carga mientras verifica sesión -->
     <div id="loadingAuth">
-        <h1 style="color:white; text-align:center;">Verificando sesión...</h1>
+        <h1>Verificando sesión...</h1>
+        <p style="color:white; text-align:center;">Un momento por favor</p>
     </div>
 
-    <!-- Contenido principal (oculto hasta login) -->
+    <!-- Contenido principal -->
     <div id="mainContent" style="display:none;">
         <div class="container">
             <h1>COMPROPAGO</h1>
             <div id="usuarioNombre"></div>
 
+            <!-- TODO EL FORMULARIO SIGUE IGUAL -->
             <form id="formTrabajo">
                 <label>Tipo de servicio</label>
                 <select id="tipoServicio" required>
@@ -160,17 +179,17 @@
         <div id="notificacion">¡ENVIADO!</div>
     </div>
 
-    <!-- Modal Términos y Condiciones -->
+    <!-- Modal Términos -->
     <div id="terminosModal">
         <div id="terminosContent">
             <h2 style="text-align:center;">Términos y Condiciones</h2>
             <p>Al utilizar este servicio de registro técnico, usted declara y acepta lo siguiente:</p>
             <ul>
                 <li>El técnico actúa como independiente y no emite facturas con validez fiscal oficial.</li>
-                <li>Nos deslindamos expresamente de cualquier responsabilidad fiscal derivada de los servicios prestados. Toda responsabilidad en materia fiscal (declaración de ingresos, emisión de comprobantes fiscales, pago de impuestos, etc.) recae exclusivamente en el técnico, el cliente y/o el propietario del equipo.</li>
-                <li>El cliente confirma que el equipo entregado para reparación o desbloqueo le pertenece legítimamente o que cuenta con autorización del propietario.</li>
-                <li>No nos responsabilizamos por pérdida de datos, daños adicionales derivados de fallas preexistentes o manipulación posterior.</li>
-                <li>La garantía de los trabajos realizados es limitada y no cubre fallas por mal uso o intervención de terceros.</li>
+                <li>Nos deslindamos expresamente de cualquier responsabilidad fiscal derivada de los servicios prestados. Toda responsabilidad en materia fiscal recae exclusivamente en el técnico y/o cliente.</li>
+                <li>El cliente confirma que el equipo le pertenece legítimamente.</li>
+                <li>No nos responsabilizamos por pérdida de datos o daños adicionales.</li>
+                <li>La garantía es limitada.</li>
             </ul>
             <p style="text-align:center; margin-top:30px;">
                 <button onclick="document.getElementById('terminosModal').style.display='none';">Cerrar</button>
@@ -179,7 +198,7 @@
     </div>
 
     <script type="module">
-        // Elementos
+        // === TODO EL CÓDIGO DEL FORMULARIO (IGUAL QUE ANTES) ===
         const tipoServicio = document.getElementById('tipoServicio');
         const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
         const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
@@ -197,7 +216,6 @@
         const notificacion = document.getElementById('notificacion');
         const aceptoTerminos = document.getElementById('aceptoTerminos');
 
-        // Funciones cálculo precios
         function getPrecioBase(modelo) {
             if (["iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XR","iPhone XS","iPhone XS Max"].includes(modelo)) return 450;
             if (modelo.startsWith("iPhone 11")) return 550;
@@ -230,14 +248,12 @@
                 vistaGanancia.innerHTML = `GANANCIA NETA: <span style="color:#27ae60">$${ganancia.toFixed(2)} MXN</span>`;
             } else vistaGanancia.style.display = 'none';
         }
-
         function mostrarCampos() {
             seccionDesbloqueo.classList.add('hidden'); subseccionPantalla.classList.add('hidden');
             modeloAndroid.classList.add('hidden'); modeloIphone.classList.add('hidden');
             seccionGastos.classList.add('hidden'); descripcionOtro.classList.add('hidden');
             if (tipoServicio.value === 'desbloqueo') {
-                seccionDesbloqueo.classList.remove('hidden');
-                seccionGastos.classList.remove('hidden');
+                seccionDesbloqueo.classList.remove('hidden'); seccionGastos.classList.remove('hidden');
                 if (tipoDesbloqueo.value === 'pantalla') {
                     subseccionPantalla.classList.remove('hidden');
                     if (cuentaBloqueo.value === 'google') { modeloAndroid.classList.remove('hidden'); modeloIphone.classList.add('hidden'); }
@@ -247,7 +263,6 @@
             if (tipoServicio.value === 'reparacion' || tipoServicio.value === 'otro') descripcionOtro.classList.remove('hidden');
             validarFormulario();
         }
-
         function validarFormulario() {
             let valido = tipoServicio.value && montoInput.value > 0 && aceptoTerminos.checked;
             if (tipoServicio.value === 'desbloqueo') {
@@ -262,7 +277,6 @@
             btnRealizado.classList.toggle('habilitado', valido);
         }
 
-        // Eventos
         tipoServicio.addEventListener('change', () => { precioInfo.textContent = ''; vistaGanancia.style.display = 'none'; mostrarCampos(); });
         tipoDesbloqueo.addEventListener('change', mostrarCampos);
         cuentaBloqueo.addEventListener('change', mostrarCampos);
@@ -273,20 +287,18 @@
             el.addEventListener('input', validarFormulario);
             el.addEventListener('change', validarFormulario);
         });
-
         document.getElementById('verTerminos').addEventListener('click', (e) => {
             e.preventDefault();
             document.getElementById('terminosModal').style.display = 'flex';
         });
 
-        // Enviar formulario
         document.getElementById('formTrabajo').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!btnRealizado.classList.contains('habilitado')) return;
 
             const user = auth.currentUser;
             if (!user) {
-                alert("Sesión expirada. Vuelve a iniciar sesión.");
+                alert("Sesión expirada. Redirigiendo al login...");
                 window.location.href = 'login.html';
                 return;
             }
@@ -335,7 +347,6 @@
             }
         });
 
-        // Inicializar campos
         mostrarCampos();
     </script>
 </body>
