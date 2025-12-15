@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso - COMPROPAGO</title>
-    <!-- Firebase App + Firestore -->
+    <!-- Firebase App + Realtime Database -->
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-database-compat.js"></script>
     <style>
         body {font-family: 'Segoe UI', sans-serif;background: linear-gradient(135deg, #667eea, #764ba2);margin:0;height:100vh;display:flex;justify-content:center;align-items:center;}
         .box {background:white;padding:50px 40px;border-radius:25px;box-shadow:0 20px 50px rgba(0,0,0,0.4);width:90%;max-width:420px;text-align:center;}
@@ -67,7 +67,7 @@
             appId: "1:390391998056:web:23e22073d88bc247d43ddd"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const db = firebase.database();  // Realtime Database
 
         // Elementos
         const loginContainer = document.getElementById('loginContainer');
@@ -104,7 +104,7 @@
         }
 
         // LOGIN
-        loginForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorLogin.textContent = '';
             loadingLogin.style.display = 'block';
@@ -112,37 +112,39 @@
             const usuario = document.getElementById('usuarioLogin').value.trim().toLowerCase();
             const password = document.getElementById('passwordLogin').value;
 
-            try {
-                const docRef = db.collection('cuentas').doc(usuario);
-                const doc = await docRef.get();
+            const ref = db.ref('cuentas/' + usuario);
 
-                if (!doc.exists) {
-                    errorLogin.textContent = "Usuario incorrecto";
-                } else {
-                    const data = doc.data();
-                    if (data.password !== password) {
-                        errorLogin.textContent = "Contraseña incorrecta";
-                    } else if (data.activo === false) {
-                        errorLogin.textContent = "Cuenta desactivada";
+            ref.once('value')
+                .then((snapshot) => {
+                    if (!snapshot.exists()) {
+                        errorLogin.textContent = "Usuario incorrecto";
                     } else {
-                        // Login exitoso
-                        localStorage.setItem('logueado', 'true');
-                        localStorage.setItem('usuario', usuario);
-                        localStorage.setItem('nombre', data.nombre || usuario);
-                        localStorage.setItem('loginTime', Date.now());
-                        window.location.href = 'index.html';
+                        const data = snapshot.val();
+                        if (data.password !== password) {
+                            errorLogin.textContent = "Contraseña incorrecta";
+                        } else if (data.activo === false) {
+                            errorLogin.textContent = "Cuenta desactivada";
+                        } else {
+                            // Login exitoso
+                            localStorage.setItem('logueado', 'true');
+                            localStorage.setItem('usuario', usuario);
+                            localStorage.setItem('nombre', data.nombre || usuario);
+                            localStorage.setItem('loginTime', Date.now());
+                            window.location.href = 'index.html';
+                        }
                     }
-                }
-            } catch (err) {
-                errorLogin.textContent = "Error de conexión";
-                console.error(err);
-            } finally {
-                loadingLogin.style.display = 'none';
-            }
+                })
+                .catch((err) => {
+                    errorLogin.textContent = "Error de conexión";
+                    console.error(err);
+                })
+                .finally(() => {
+                    loadingLogin.style.display = 'none';
+                });
         });
 
         // REGISTRO
-        registroForm.addEventListener('submit', async (e) => {
+        registroForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorRegistro.textContent = '';
             loadingRegistro.style.display = 'block';
@@ -164,39 +166,40 @@
                 return;
             }
 
-            try {
-                // Verificar si el usuario ya existe
-                const docRef = db.collection('cuentas').doc(usuario);
-                const doc = await docRef.get();
-                if (doc.exists) {
-                    errorRegistro.textContent = "Este usuario ya está registrado";
+            const ref = db.ref('cuentas/' + usuario);
+
+            ref.once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        errorRegistro.textContent = "Este usuario ya está registrado";
+                        loadingRegistro.style.display = 'none';
+                        return;
+                    }
+
+                    // Crear cuenta
+                    return ref.set({
+                        nombre: nombre,
+                        email: email,
+                        password: password,  // En producción: nunca en texto plano
+                        activo: true,
+                        creadoEn: firebase.database.ServerValue.TIMESTAMP
+                    });
+                })
+                .then(() => {
+                    // Login automático
+                    localStorage.setItem('logueado', 'true');
+                    localStorage.setItem('usuario', usuario);
+                    localStorage.setItem('nombre', nombre);
+                    localStorage.setItem('loginTime', Date.now());
+                    window.location.href = 'index.html';
+                })
+                .catch((err) => {
+                    errorRegistro.textContent = "Error al crear la cuenta";
+                    console.error(err);
+                })
+                .finally(() => {
                     loadingRegistro.style.display = 'none';
-                    return;
-                }
-
-                // Crear cuenta en Firestore
-                await docRef.set({
-                    nombre: nombre,
-                    email: email,
-                    password: password, // En producción: nunca guardar en plano
-                    activo: true,
-                    creadoEn: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
-                // Login automático tras registro
-                localStorage.setItem('logueado', 'true');
-                localStorage.setItem('usuario', usuario);
-                localStorage.setItem('nombre', nombre);
-                localStorage.setItem('loginTime', Date.now());
-
-                window.location.href = 'index.html';
-
-            } catch (err) {
-                errorRegistro.textContent = "Error al crear la cuenta";
-                console.error(err);
-            } finally {
-                loadingRegistro.style.display = 'none';
-            }
         });
     </script>
 </body>
