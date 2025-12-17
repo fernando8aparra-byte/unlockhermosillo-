@@ -173,7 +173,7 @@
             align-items: center;
             justify-content: center;
             gap: 20px;
-            font-size: clamp(36px, 8vw, 48px); /* Responsive pero mantiene buen tamaño */
+            font-size: clamp(36px, 8vw, 48px);
             font-weight: 700;
             opacity: 0;
             transform: translateY(100%);
@@ -212,7 +212,6 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
-        /* Resto del código igual */
         .recent-works-header {
             display: flex;
             justify-content: flex-start;
@@ -416,6 +415,15 @@
             background: #000000;
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        /* Ajustes específicos para móviles */
+        @media (max-width: 767px) {
+            .cta-button {
+                padding: 16px 40px;     /* Menos padding vertical y horizontal */
+                font-size: 22px;        /* Texto un poco más pequeño */
+                width: 100%;            /* Ocupa todo el ancho disponible */
+                max-width: 400px;       /* Limita el ancho máximo para que no sea enorme */
+            }
         }
         #terms-screen {
             position: fixed;
@@ -628,7 +636,6 @@
         const mainContent = document.getElementById('main-content');
         const checkbox = document.getElementById('accept-checkbox');
         const acceptBtn = document.getElementById('accept-btn');
-
         if (localStorage.getItem('termsAccepted') === 'true') {
             termsScreen.classList.add('hidden');
             titleContainer.classList.add('visible');
@@ -647,7 +654,6 @@
                 setTimeout(() => mainContent.classList.add('visible'), 600);
             }
         });
-
         const rows = document.querySelectorAll('.title-row');
         let currentIndex = 0;
         function rotateTitle() {
@@ -665,7 +671,7 @@
         const startRotation = () => {
             setTimeout(() => {
                 setInterval(rotateTitle, 5000);
-                rotateTitle(); // Inicia la primera rotación inmediatamente después del delay
+                rotateTitle();
             }, 5000);
         };
         if (titleContainer.classList.contains('visible')) {
@@ -678,7 +684,6 @@
                 }
             }, 100);
         }
-
         document.getElementById('hero-header').addEventListener('click', () => {
             document.querySelector('.recent-works-header').scrollIntoView({ behavior: 'smooth' });
         });
