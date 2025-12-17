@@ -173,7 +173,7 @@
             align-items: center;
             justify-content: center;
             gap: 20px;
-            font-size: 48px;
+            font-size: clamp(36px, 8vw, 48px); /* Responsive pero mantiene buen tamaño */
             font-weight: 700;
             opacity: 0;
             transform: translateY(100%);
@@ -198,74 +198,6 @@
             object-fit: contain;
             vertical-align: middle;
             display: none;
-        }
-        /* Teléfono más pequeño y centrado entre título y flecha */
-        .phone-animation {
-            margin-top: 80px;
-            margin-bottom: 100px; /* Más espacio hacia la flecha */
-            width: 100px;
-            height: 200px;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 3;
-        }
-        .phone-animation.visible {
-            opacity: 1;
-            animation: phoneUnlock 5s ease-in-out forwards;
-        }
-        @keyframes phoneUnlock {
-            0% { opacity: 0; transform: scale(0.9); }
-            10% { opacity: 1; transform: scale(1); }
-            30% { transform: scale(1); }
-            40% { transform: rotate(-15deg); }
-            45% { transform: rotate(15deg); }
-            50% { transform: rotate(-10deg); }
-            55% { transform: rotate(0); }
-            100% { opacity: 0; }
-        }
-        .phone-frame {
-            width: 100px;
-            height: 200px;
-            background: #1d1d1f;
-            border-radius: 30px;
-            border: 4px solid #333;
-            position: relative;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        .phone-notch {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 20px;
-            background: #1d1d1f;
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
-        }
-        .phone-screen {
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .phone-lock {
-            font-size: 60px;
-            color: #1d1d1f;
-        }
-        .phone-lock.pulse {
-            animation: lockPulse 0.3s ease-in-out;
-        }
-        @keyframes lockPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-        .phone-lock.open {
-            animation: none;
         }
         .scroll-indicator {
             position: absolute;
@@ -574,18 +506,7 @@
                     <img id="att-logo" src="" alt="AT&T" class="title-logo">
                 </div>
             </div>
-
-            <!-- Teléfono pequeño, centrado entre título y flecha -->
-            <div class="phone-animation" id="phone-animation">
-                <div class="phone-frame">
-                    <div class="phone-notch"></div>
-                    <div class="phone-screen">
-                        <i class="fas fa-lock phone-lock" id="phone-lock"></i>
-                    </div>
-                </div>
-            </div>
         </div>
-
         <div class="scroll-indicator">
             <i class="fas fa-chevron-down"></i>
         </div>
@@ -644,7 +565,6 @@
                 </div>
             </div>
         </div>
-
         <div class="accordion">
             <div class="accordion-item">
                 <div class="accordion-header">¿Cómo funcionan las citas?<i class="fas fa-chevron-down"></i></div>
@@ -672,7 +592,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="accordion-item">
                 <div class="accordion-header">¿Cómo queda el teléfono después de desbloquearlo por iCloud?<i class="fas fa-chevron-down"></i></div>
                 <div class="accordion-content">
@@ -680,14 +599,12 @@
                     <p>A excepción de los modelos recientes a partir del iPhone XR en adelante, que quedarán sin señal. Esto quiere decir que no detectarán el chip. Esto pasa porque internamente aún sigue estando bloqueado por IMEI. Para esto no tenemos solución, pero el teléfono se puede utilizar con normalidad: poner tu cuenta de iCloud, descargar apps, tomar fotos, grabar audios, descargar WhatsApp, etc.</p>
                 </div>
             </div>
-
             <div class="accordion-item">
                 <div class="accordion-header">Preguntas frecuentes<i class="fas fa-chevron-down"></i></div>
                 <div class="accordion-content">
                     <p>Puedes agregar aquí las preguntas más comunes de tus clientes.</p>
                 </div>
             </div>
-
             <div class="accordion-item">
                 <div class="accordion-header">Sobre nosotros<i class="fas fa-chevron-down"></i></div>
                 <div class="accordion-content">
@@ -695,7 +612,6 @@
                 </div>
             </div>
         </div>
-
         <div class="cta-container">
             <button class="cta-button" onclick="window.location.href='crea-cita.html'">¡Agenda ahora tu desbloqueo!</button>
         </div>
@@ -709,32 +625,13 @@
     <script>
         const termsScreen = document.getElementById('terms-screen');
         const titleContainer = document.getElementById('title-container');
-        const phoneAnimation = document.getElementById('phone-animation');
-        const phoneLock = document.getElementById('phone-lock');
         const mainContent = document.getElementById('main-content');
         const checkbox = document.getElementById('accept-checkbox');
         const acceptBtn = document.getElementById('accept-btn');
 
-        function runPhoneAnimation() {
-            phoneAnimation.style.opacity = '0';
-            phoneLock.classList.remove('pulse', 'open');
-            phoneLock.classList.replace('fa-lock-open', 'fa-lock');
-
-            setTimeout(() => {
-                phoneAnimation.classList.add('visible');
-                setTimeout(() => {
-                    phoneLock.classList.add('pulse');
-                }, 800);
-                setTimeout(() => {
-                    phoneLock.classList.replace('fa-lock', 'fa-lock-open');
-                }, 2500);
-            }, 1000);
-        }
-
         if (localStorage.getItem('termsAccepted') === 'true') {
             termsScreen.classList.add('hidden');
             titleContainer.classList.add('visible');
-            runPhoneAnimation();
             mainContent.classList.add('visible');
         }
         checkbox.addEventListener('change', () => {
@@ -746,7 +643,6 @@
                 termsScreen.classList.add('hidden');
                 setTimeout(() => {
                     titleContainer.classList.add('visible');
-                    runPhoneAnimation();
                 }, 300);
                 setTimeout(() => mainContent.classList.add('visible'), 600);
             }
@@ -765,14 +661,11 @@
                 current.classList.remove('prev');
             }, 800);
             currentIndex = nextIndex;
-
-            if (nextIndex === 0) {
-                setTimeout(runPhoneAnimation, 1000);
-            }
         }
         const startRotation = () => {
             setTimeout(() => {
                 setInterval(rotateTitle, 5000);
+                rotateTitle(); // Inicia la primera rotación inmediatamente después del delay
             }, 5000);
         };
         if (titleContainer.classList.contains('visible')) {
@@ -799,7 +692,6 @@
                 document.querySelector('.recent-works-header').scrollIntoView({ behavior: 'smooth' });
             }
         });
-
         document.querySelectorAll('.accordion-header').forEach(h => {
             h.addEventListener('click', () => {
                 const content = h.nextElementSibling;
