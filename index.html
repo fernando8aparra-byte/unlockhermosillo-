@@ -3,17 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desbloqueo tu iPhone</title>
-    <!-- Fuente formal y nítida: Inter -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-    <!-- Fuente oficial de Apple como fallback -->
-    <link rel="stylesheet" href="https://sf.abarba.me/SF.css">
-    <!-- Iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <!-- Firebase SDK -->
+    <title>COMPROPAGO - Registro Técnico</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            background: white;
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            max-width: 550px;
+            width: 100%;
+            position: relative;
+            margin-top: 40px;
+        }
+        h1 {text-align: center; color: #333; font-size: 28px; margin-bottom: 10px;}
+
+        /* Menú hamburguesa */
+        .menu-hamburguesa {position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: 0.3s; z-index: 100;}
+        .menu-hamburguesa:hover {background: white; transform: scale(1.05);}
+        .barra {width: 24px; height: 3px; background: #333; margin: 3px 0; border-radius: 2px; transition: 0.3s;}
+        .menu-hamburguesa.activo .barra:nth-child(1) {transform: rotate(45deg) translate(6px, 6px);}
+        .menu-hamburguesa.activo .barra:nth-child(2) {opacity: 0;}
+        .menu-hamburguesa.activo .barra:nth-child(3) {transform: rotate(-45deg) translate(6px, -6px);}
+
+        .menu-lateral {position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #2c3e50; box-shadow: 5px 0 20px rgba(0,0,0,0.4); transition: left 0.4s ease; z-index: 999; padding-top: 80px;}
+        .menu-lateral.abierto {left: 0;}
+        .menu-lateral .usuario-info {text-align: center; color: white; padding: 20px; background: #34495e;}
+        .menu-lateral .usuario-info h3 {margin: 0; font-size: 20px;}
+        .menu-lateral ul {list-style: none; padding: 0; margin: 30px 0 0;}
+        .menu-lateral ul li {padding: 18px 25px; color: #ecf0f1; font-size: 18px; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent;}
+        .menu-lateral ul li:hover {background: #34495e; border-left: 4px solid #667eea;}
+        .menu-lateral ul li.cerrar-sesion {color: #e74c3c; margin-top: 40px;}
+        .menu-lateral ul li.cerrar-sesion:hover {border-left: 4px solid #e74c3c;}
+
+        .overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: 0.4s; z-index: 998;}
+        .overlay.activo {opacity: 1; visibility: visible;}
+
+        #usuarioNombre {text-align: center; color: #667eea; font-size: 20px; margin: 20px 0 30px; font-weight: bold; padding: 12px; border-radius: 12px; background: #f0f4ff;}
+
+        label {display:block; margin-top:20px; font-weight:bold; color:#444;}
+        select, input, textarea {width:100%; padding:14px; margin-top:8px; border:2px solid #ddd; border-radius:12px; font-size:16px; box-sizing:border-box;}
+        select:focus, input:focus, textarea:focus {border-color:#667eea; outline:none;}
+        .hidden {display:none !important;}
+
+        /* Secciones especiales */
+        .seccion-especial {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 18px;
+            border: 2px dashed #667eea;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.1);
+        }
+        .seccion-especial h3 {
+            text-align: center;
+            color: #667eea;
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        /* Subida de fotos */
+        .evidencia-fotos {margin-top: 25px;}
+        #btnSubirFoto {
+            display: block; margin: 20px auto; padding: 16px 32px; background: #667eea; color: white;
+            border: none; border-radius: 18px; font-size: 18px; cursor: pointer; box-shadow: 0 8px 25px rgba(102,126,234,0.3);
+            transition: 0.3s;
+        }
+        #btnSubirFoto:hover {background: #5a6fd8; transform: translateY(-4px);}
+        .vista-previa {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-top: 15px;
+        }
+        .foto-previa {
+            position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .foto-previa img {width: 100%; height: 140px; object-fit: cover;}
+        .eliminar-foto {
+            position: absolute; top: 6px; right: 6px; background: rgba(231,76,60,0.95); color: white;
+            width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 16px; font-weight: bold;
+        }
+
+        #btnRealizado {margin-top:50px; padding:20px; font-size:24px; font-weight:bold; color:white; background:#95a5a6; border:none; border-radius:18px; cursor:not-allowed; width:100%; transition:0.4s;}
+        #btnRealizado.habilitado {background:#e74c3c; cursor:pointer; animation:pulsar 2s infinite;}
+        #btnRealizado.enviando {background:#27ae60 !important; animation:pulseGreen 1.5s infinite; cursor:not-allowed;}
+        @keyframes pulsar {0%,100%{background:#e74c3c} 50%{background:#c0392b}}
+        @keyframes pulseGreen {0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)}}
+        .precio-info {font-size:14px; color:#27ae60; font-weight:bold; text-align:center; margin-top:8px;}
+        .ganancia {font-size:22px; font-weight:bold; text-align:center; margin:25px 0; padding:18px; background:#f8f9fa; border-radius:15px; border:3px solid #27ae60;}
+        #notificacion {position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#27ae60; color:white; padding:50px 100px; border-radius:30px; font-size:48px; font-weight:bold; box-shadow:0 30px 70px rgba(0,0,0,0.6); z-index:9999; opacity:0; pointer-events:none; transition:0.6s;}
+        #notificacion.mostrar {opacity:1; transform:translate(-50%,-50%) scale(1.1);}
+    </style>
+</head>
+<body>
+
+    <!-- Menú hamburguesa -->
+    <div class="menu-hamburguesa" id="menuHamburguesa">
+        <div class="barra"></div>
+        <div class="barra"></div>
+        <div class="barra"></div>
+    </div>
+
+    <!-- Menú lateral -->
+    <div class="menu-lateral" id="menuLateral">
+        <div class="usuario-info">
+            <h3 id="nombreMenu">Tec. Cargando...</h3>
+        </div>
+        <ul>
+            <li id="opcionMisTrabajos">Mis trabajos</li>
+            <li class="cerrar-sesion" id="opcionCerrarSesion">Cerrar sesión</li>
+        </ul>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <div class="container">
+        <h1>COMPROPAGO</h1>
+        <div id="usuarioNombre">Cargando sesión...</div>
+
+        <form id="formTrabajo">
+            <label>Tipo de servicio</label>
+            <select id="tipoServicio" required>
+                <option value="">Seleccionar...</option>
+                <option value="reparacion">Reparación</option>
+                <option value="desbloqueo">Desbloqueo</option>
+                <option value="otro">Otro</option>
+            </select>
+
+            <div id="seccionDesbloqueo" class="hidden">
+                <label>Tipo de desbloqueo</label>
+                <select id="tipoDesbloqueo">
+                    <option value="">Seleccionar...</option>
+                    <option value="pantalla">Desbloqueo de pantalla</option>
+                    <option value="pago">Pantalla de pago / FRP</option>
+                </select>
+                <div id="subseccionPantalla" class="hidden">
+                    <label>Cuenta bloqueada</label>
+                    <select id="cuentaBloqueo">
+                        <option value="">Seleccionar...</option>
+                        <option value="google">Google (Android)</option>
+                        <option value="icloud">iCloud (iPhone)</option>
+                    </select>
+                    <div id="modeloAndroid" class="hidden">
+                        <label>Modelo Android</label>
+                        <input type="text" id="modeloAndroidInput" placeholder="Ej: Samsung A54">
+                    </div>
+                    <div id="modeloIphone" class="hidden">
+                        <label>Modelo de iPhone</label>
+                        <select id="modeloIphoneSelect">
+                            <option value="">Seleccionar modelo...</option>
+                            <optgroup label="7 al XS">
+                                <option>iPhone 7</option><option>iPhone 7 Plus</option><option>iPhone 8</option><option>iPhone 8 Plus</option>
+                                <option>iPhone X</option><option>iPhone XR</option><option>iPhone XS</option><option>iPhone XS Max</option>
+                            </optgroup>
+                            <optgroup label="11 Series">
+                                <option>iPhone 11</option><option>iPhone 11 Pro</option><option>iPhone 11 Pro Max</option>
+                            </optgroup>
+                            <optgroup label="12-14">
+                                <option>iPhone 12 mini</option><option>iPhone 12</option><option>iPhone 12 Pro</option><option>iPhone 12 Pro Max</option>
+                                <option>iPhone 13 mini</option><option>iPhone 13</option><option>iPhone 13 Pro</option><option>iPhone 13 Pro Max</option>
+                                <option>iPhone 14</option><option>iPhone 14 Plus</option><option>iPhone 14 Pro</option><option>iPhone 14 Pro Max</option>
+                            </optgroup>
+                            <optgroup label="15-17">
+                                <option>iPhone 15</option><option>iPhone 15 Plus</option><option>iPhone 15 Pro</option><option>iPhone 15 Pro Max</option>
+                                <option>iPhone 16e</option><option>iPhone 16</option><option>iPhone 16 Plus</option><option>iPhone 16 Pro</option><option>iPhone 16 Pro Max</option>
+                                <option>iPhone 17 Air</option><option>iPhone 17</option><option>iPhone 17 Pro</option><option>iPhone 17 Pro Max</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="descripcionOtro" class="hidden">
+                <label>Descripción del trabajo</label>
+                <textarea id="descripcionTextarea" rows="3" placeholder="Cambio de pantalla, batería, etc..."></textarea>
+            </div>
+
+            <div id="seccionGastos" class="hidden">
+                <label>Gastos (transporte, piezas, etc.)</label>
+                <input type="number" id="gastos" min="0" step="0.01" placeholder="0.00">
+            </div>
+
+            <label>Tiempo empleado (opcional)</label>
+            <input type="text" id="tiempo" placeholder="Ej: 45 min">
+
+            <label>A COBRAR (MXN)</label>
+            <input type="number" id="monto" min="0" step="0.01" required placeholder="0.00">
+
+            <div id="precioInfo" class="precio-info"></div>
+            <div id="vistaGanancia" class="ganancia" style="display:none;"></div>
+
+            <!-- INFORMACIÓN DEL DISPOSITIVO -->
+            <div class="seccion-especial">
+                <h3>📱 Información del dispositivo</h3>
+                <label>Marca</label>
+                <input type="text" id="marcaDispositivo" placeholder="Ej: Apple, Samsung, Xiaomi">
+
+                <label>Modelo exacto</label>
+                <input type="text" id="modeloDispositivo" placeholder="Ej: iPhone 13 Pro, Galaxy S23">
+
+                <label>IMEI (opcional)</label>
+                <input type="text" id="imeiDispositivo" placeholder="15 dígitos">
+
+                <label>Color</label>
+                <input type="text" id="colorDispositivo" placeholder="Ej: Negro medianoche, Azul">
+
+                <label>Capacidad de almacenamiento</label>
+                <select id="capacidadDispositivo">
+                    <option value="">Seleccionar...</option>
+                    <option>16 GB</option><option>32 GB</option><option>64 GB</option><option>128 GB</option>
+                    <option>256 GB</option><option>512 GB</option><option>1 TB</option>
+                </select>
+
+                <label>Estado físico (opcional)</label>
+                <textarea id="estadoDispositivo" rows="2" placeholder="Rayones, golpes, pantalla rota, etc..."></textarea>
+            </div>
+
+            <!-- INFORMACIÓN DEL CLIENTE -->
+            <div class="seccion-especial">
+                <h3>👤 Información del cliente</h3>
+                <label>Nombre completo</label>
+                <input type="text" id="nombreCliente" placeholder="Ej: Juan Pérez Gómez">
+
+                <label>Teléfono</label>
+                <input type="tel" id="telefonoCliente" placeholder="Ej: 55 1234 5678">
+
+                <label>Correo electrónico (opcional)</label>
+                <input type="email" id="emailCliente" placeholder="Ej: juan@example.com">
+
+                <label>Notas adicionales (opcional)</label>
+                <textarea id="notasCliente" rows="2" placeholder="Prefiere WhatsApp, horario de entrega, etc..."></textarea>
+            </div>
+
+            <!-- EVIDENCIA FOTOGRÁFICA -->
+            <div class="seccion-especial">
+                <h3>📸 Evidencia fotográfica (recomendado)</h3>
+                <p style="text-align:center; color:#666; font-size:14px; margin:10px 0;">Antes/después, daño, IMEI, dispositivo completo, etc.</p>
+                <button type="button" id="btnSubirFoto">📷 Tomar o subir foto</button>
+                <div class="vista-previa" id="vistaPreviaFotos"></div>
+            </div>
+
+            <button type="submit" id="btnRealizado">REALIZADO</button>
+        </form>
+    </div>
+
+    <div id="notificacion">¡ENVIADO!</div>
+
+    <!-- Input oculto para fotos -->
+    <input type="file" id="inputFoto" accept="image/*" capture="environment" style="display:none;">
+
+    <!-- Modal confirmación cerrar sesión -->
+    <div id="modalConfirmacion">
+        <div class="modal-contenido">
+            <h3>¿Estás seguro de cerrar sesión?</h3>
+            <div class="modal-botones">
+                <button id="btnCancelar">No</button>
+                <button id="btnConfirmarCerrar">Sí, cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-        import { getStorage, ref, listAll, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
             authDomain: "comprobantes-363c9.firebaseapp.com",
@@ -21,719 +283,286 @@
             projectId: "comprobantes-363c9",
             storageBucket: "comprobantes-363c9.firebasestorage.app",
             messagingSenderId: "390391998056",
-            appId: "1:390391998056:web:23e22073d88bc247d43ddd",
-            measurementId: "G-8W03RJD0TZ"
+            appId: "1:390391998056:web:23e22073d88bc247d43ddd"
         };
+
         const app = initializeApp(firebaseConfig);
-        const storage = getStorage(app);
-        async function getLogoUrl(folder) {
-            try {
-                const folderRef = ref(storage, folder);
-                const listResult = await listAll(folderRef);
-                if (listResult.items.length > 0) {
-                    return await getDownloadURL(listResult.items[0]);
-                }
-            } catch (error) {
-                console.error(`Error cargando logo de ${folder}:`, error);
-            }
-            return null;
+        const db = getDatabase(app);
+        const ordenesRef = ref(db, 'ordenes');
+
+        // === ELEMENTOS ===
+        const menuHamburguesa = document.getElementById('menuHamburguesa');
+        const menuLateral = document.getElementById('menuLateral');
+        const overlay = document.getElementById('overlay');
+        const nombreMenu = document.getElementById('nombreMenu');
+        const opcionMisTrabajos = document.getElementById('opcionMisTrabajos');
+        const opcionCerrarSesion = document.getElementById('opcionCerrarSesion');
+        const modalConfirmacion = document.getElementById('modalConfirmacion');
+        const btnCancelar = document.getElementById('btnCancelar');
+        const btnConfirmarCerrar = document.getElementById('btnConfirmarCerrar');
+
+        const usuarioNombre = document.getElementById('usuarioNombre');
+        const logueado = localStorage.getItem('logueado') === 'true';
+        let nombreTecnico = localStorage.getItem('nombreTecnico');
+
+        if (logueado && nombreTecnico && nombreTecnico.trim() !== '') {
+            const nombre = `Tec. ${nombreTecnico.trim()}`;
+            usuarioNombre.textContent = nombre;
+            nombreMenu.textContent = nombre;
+            menuHamburguesa.style.display = 'flex';
+        } else {
+            usuarioNombre.textContent = 'Iniciar sesión';
+            usuarioNombre.onclick = () => { window.location.href = 'login.html'; };
+            menuHamburguesa.style.display = 'none';
         }
-        async function loadLogos() {
-            const icloudImg = document.getElementById('icloud-logo');
-            const googleImg = document.getElementById('google-logo');
-            const attImg = document.getElementById('att-logo');
-            const icloudUrl = await getLogoUrl('iCloud');
-            const googleUrl = await getLogoUrl('Drive');
-            const attUrl = await getLogoUrl('at&t');
-            if (icloudUrl) {
-                icloudImg.src = icloudUrl;
-                icloudImg.style.display = 'inline';
-            }
-            if (googleUrl) {
-                googleImg.src = googleUrl;
-                googleImg.style.display = 'inline';
-            }
-            if (attUrl) {
-                attImg.src = attUrl;
-                attImg.style.display = 'inline';
-            }
-        }
-        async function loadCarousel(folder, carouselId) {
-            const folderRef = ref(storage, folder);
-            const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
-            carouselInner.innerHTML = '';
-            try {
-                const listResult = await listAll(folderRef);
-                if (listResult.items.length === 0) {
-                    carouselInner.innerHTML = '<div class="carousel-item active"><div class="fb-image-placeholder">No hay imágenes disponibles</div></div>';
+
+        // Menú
+        menuHamburguesa.addEventListener('click', () => {
+            menuHamburguesa.classList.toggle('activo');
+            menuLateral.classList.toggle('abierto');
+            overlay.classList.toggle('activo');
+        });
+        overlay.addEventListener('click', () => {
+            menuHamburguesa.classList.remove('activo');
+            menuLateral.classList.remove('abierto');
+            overlay.classList.remove('activo');
+        });
+        opcionMisTrabajos.addEventListener('click', () => window.location.href = 'chambing.html');
+        opcionCerrarSesion.addEventListener('click', () => {
+            modalConfirmacion.style.display = 'flex';
+            menuHamburguesa.classList.remove('activo');
+            menuLateral.classList.remove('abierto');
+            overlay.classList.remove('activo');
+        });
+        btnCancelar.addEventListener('click', () => modalConfirmacion.style.display = 'none');
+        btnConfirmarCerrar.addEventListener('click', () => {
+            localStorage.removeItem('logueado');
+            localStorage.removeItem('nombreTecnico');
+            window.location.href = 'login.html';
+        });
+
+        // === FORMULARIO ORIGINAL ===
+        const tipoServicio = document.getElementById('tipoServicio');
+        const seccionDesbloqueo = document.getElementById('seccionDesbloqueo');
+        const tipoDesbloqueo = document.getElementById('tipoDesbloqueo');
+        const subseccionPantalla = document.getElementById('subseccionPantalla');
+        const cuentaBloqueo = document.getElementById('cuentaBloqueo');
+        const modeloAndroid = document.getElementById('modeloAndroid');
+        const modeloIphone = document.getElementById('modeloIphone');
+        const descripcionOtro = document.getElementById('descripcionOtro');
+        const seccionGastos = document.getElementById('seccionGastos');
+        const gastosInput = document.getElementById('gastos');
+        const montoInput = document.getElementById('monto');
+        const precioInfo = document.getElementById('precioInfo');
+        const vistaGanancia = document.getElementById('vistaGanancia');
+        const btnRealizado = document.getElementById('btnRealizado');
+        const notificacion = document.getElementById('notificacion');
+
+        // === SUBIDA DE FOTOS ===
+        const inputFoto = document.getElementById('inputFoto');
+        const btnSubirFoto = document.getElementById('btnSubirFoto');
+        const vistaPreviaFotos = document.getElementById('vistaPreviaFotos');
+        let fotosBase64 = [];
+
+        btnSubirFoto.addEventListener('click', () => inputFoto.click());
+        inputFoto.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const file = e.target.files[0];
+                if (fotosBase64.length >= 6) {
+                    alert('Máximo 6 fotos permitidas.');
                     return;
                 }
-                listResult.items.forEach((itemRef, index) => {
-                    getDownloadURL(itemRef).then(url => {
-                        const div = document.createElement('div');
-                        div.className = 'carousel-item' + (index === 0 ? ' active' : '');
-                        div.innerHTML = `<img src="${url}" alt="Trabajo reciente" onerror="this.style.display='none'; this.parentElement.querySelector('.fb-image-placeholder')?.style.display='flex';">`;
-                        const placeholder = document.createElement('div');
-                        placeholder.className = 'fb-image-placeholder';
-                        placeholder.textContent = 'Imagen no disponible';
-                        placeholder.style.display = 'none';
-                        div.appendChild(placeholder);
-                        carouselInner.appendChild(div);
-                    }).catch(err => {
-                        console.error('Error al obtener URL:', err);
-                    });
-                });
-            } catch (error) {
-                console.error("Error cargando carrusel de " + folder + ":", error);
-                carouselInner.innerHTML = '<div class="carousel-item active"><div class="fb-image-placeholder">Error al cargar imágenes</div></div>';
-            }
-        }
-        document.addEventListener('DOMContentLoaded', () => {
-            const mainContent = document.getElementById('main-content');
-            const titleContainer = document.getElementById('title-container');
-            const checkVisibility = setInterval(() => {
-                if (titleContainer.classList.contains('visible')) {
-                    loadLogos();
-                    clearInterval(checkVisibility);
-                }
-            }, 100);
-            const observer = new MutationObserver(() => {
-                if (mainContent.classList.contains('visible')) {
-                    loadCarousel('ads-1', 'carousel-1');
-                    loadCarousel('ads-2', 'carousel-2');
-                    observer.disconnect();
-                }
-            });
-            observer.observe(mainContent, { attributes: true, attributeFilter: ['class'] });
-            if (mainContent.classList.contains('visible')) {
-                loadCarousel('ads-1', 'carousel-1');
-                loadCarousel('ads-2', 'carousel-2');
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const base64 = ev.target.result;
+                    fotosBase64.push(base64);
+                    const contenedor = document.createElement('div');
+                    contenedor.className = 'foto-previa';
+                    const img = document.createElement('img');
+                    img.src = base64;
+                    const eliminar = document.createElement('div');
+                    eliminar.className = 'eliminar-foto';
+                    eliminar.innerHTML = '&times;';
+                    eliminar.onclick = () => {
+                        fotosBase64 = fotosBase64.filter(f => f !== base64);
+                        contenedor.remove();
+                    };
+                    contenedor.appendChild(img);
+                    contenedor.appendChild(eliminar);
+                    vistaPreviaFotos.appendChild(contenedor);
+                };
+                reader.readAsDataURL(file);
             }
         });
-    </script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #f5f5f7;
-            color: #1d1d1f;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
+
+        // === CÁLCULO PRECIO ICLOUD ===
+        function getPrecioBase(modelo) {
+            if (["iPhone 7","iPhone 7 Plus","iPhone 8","iPhone 8 Plus","iPhone X","iPhone XR","iPhone XS","iPhone XS Max"].includes(modelo)) return 450;
+            if (modelo.startsWith("iPhone 11")) return 550;
+            if (modelo.match(/^iPhone (12|13|14)/)) return 750;
+            if (modelo.match(/^iPhone (15|16|17)/) || modelo.includes("16e") || modelo.includes("17 Air")) return 1000;
+            return 0;
         }
-        #hero-header {
-            height: 100vh;
-            background: linear-gradient(to bottom, #ffffff 0%, #f0f0f2 70%, #e5e5e7 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
+
+        function getExtraDia() {
+            const d = new Date().getDay();
+            if (d === 0 || d === 6) return d === 0 ? 200 : 100;
+            if ([1,3,5].includes(d)) return 0;
+            return 100;
         }
-        #hero-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.8) 0%, transparent 100%);
-            pointer-events: none;
+
+        function calcularPrecioIcloud() {
+            const modelo = document.getElementById('modeloIphoneSelect').value;
+            if (modelo && cuentaBloqueo.value === 'icloud') {
+                const base = getPrecioBase(modelo);
+                const extra = getExtraDia();
+                const total = base + extra;
+                montoInput.value = total;
+                const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+                precioInfo.textContent = `Base $${base} + $${extra} (${dias[new Date().getDay()]}) = $${total} MXN`;
+            } else {
+                precioInfo.textContent = '';
+            }
+            actualizarGanancia();
         }
-        .hero-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-        }
-        .title-container {
-            position: relative;
-            height: 120px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transform: translateX(-100px);
-            transition: opacity 1.2s cubic-bezier(0.22, 0.61, 0.36, 1), transform 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
-            z-index: 2;
-        }
-        .title-container.visible {
-            opacity: 1;
-            transform: translateX(0);
-        }
-        .title-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            font-size: clamp(36px, 8vw, 48px);
-            font-weight: 700;
-            opacity: 0;
-            transform: translateY(100%);
-            transition: transform 0.8s ease, opacity 0.8s ease;
-            position: absolute;
-            width: auto;
-        }
-        .title-row.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .title-row.prev {
-            transform: translateY(-100%);
-        }
-        .title-text {
-            white-space: nowrap;
-            color: #1d1d1f;
-        }
-        .title-logo {
-            height: 1em;
-            width: auto;
-            object-fit: contain;
-            vertical-align: middle;
-            display: none;
-        }
-        .scroll-indicator {
-            position: absolute;
-            bottom: 40px;
-            font-size: 40px;
-            color: #1d1d1f;
-            opacity: 0.6;
-            animation: bounce 1.5s infinite;
-            z-index: 2;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .recent-works-header {
-            display: flex;
-            justify-content: flex-start;
-            padding: 0 20px;
-            max-width: 1200px;
-            width: 100%;
-            margin: 60px 0 20px;
-        }
-        .recent-works-header h2 {
-            font-size: 32px;
-            font-weight: 600;
-            margin: 0;
-        }
-        .posts-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            max-width: 1200px;
-            width: 100%;
-            padding: 0 20px;
-            margin-bottom: 60px;
-        }
-        @media (min-width: 768px) {
-            .posts-grid {
-                flex-direction: row;
+
+        function actualizarGanancia() {
+            const cobrado = parseFloat(montoInput.value) || 0;
+            const gastos = parseFloat(gastosInput.value) || 0;
+            const ganancia = cobrado - gastos;
+            if (tipoServicio.value === 'desbloqueo' && cobrado > 0) {
+                vistaGanancia.style.display = 'block';
+                vistaGanancia.innerHTML = `GANANCIA NETA: <span style="color:#27ae60">$${ganancia.toFixed(2)} MXN</span>`;
+            } else {
+                vistaGanancia.style.display = 'none';
             }
         }
-        .fb-carousel-container {
-            flex: 1;
-            background: white;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .fb-carousel-container:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 40px rgba(0,0,0,0.15);
-        }
-        .fb-header {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            cursor: pointer;
-        }
-        .fb-profile-pic, .fb-name {
-            cursor: pointer;
-        }
-        .fb-profile-pic {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #e4e6eb;
-            margin-right: 12px;
-        }
-        .fb-name-time {
-            flex: 1;
-        }
-        .fb-name {
-            font-weight: 600;
-            font-size: 15px;
-            color: #1c1e21;
-        }
-        .fb-time {
-            font-size: 13px;
-            color: #65676b;
-        }
-        .fb-content {
-            padding: 0 16px 12px;
-            font-size: 15px;
-            color: #1c1e21;
-        }
-        .carousel-container {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            background: #000;
-            overflow: hidden;
-        }
-        .carousel-inner {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.5s ease;
-        }
-        .carousel-item {
-            min-width: 100%;
-            height: 100%;
-            position: relative;
-        }
-        .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        .fb-image-placeholder {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #aaa;
-            font-size: 18px;
-        }
-        .accordion {
-            max-width: 800px;
-            width: 90%;
-            margin: 40px auto;
-        }
-        .accordion-item {
-            background: white;
-            border-radius: 14px;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-        .accordion-header {
-            padding: 20px;
-            font-size: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .accordion-header i {
-            transition: transform 0.3s ease;
-        }
-        .accordion-header.active i {
-            transform: rotate(180deg);
-        }
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease;
-            padding: 0 20px;
-        }
-        .accordion-content.open {
-            max-height: 800px;
-            padding: 20px;
-        }
-        .steps {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .step {
-            display: flex;
-            align-items: center;
-            font-size: 18px;
-        }
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background: #1d1d1f;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 20px;
-            flex-shrink: 0;
-        }
-        .arrow {
-            margin: 0 20px;
-            font-size: 24px;
-            color: #1d1d1f;
-            animation: bounce 1.5s infinite;
-        }
-        .cta-container {
-            width: 100%;
-            max-width: 1200px;
-            padding: 0 20px;
-            display: flex;
-            justify-content: center;
-            margin: 40px 0 60px;
-        }
-        .cta-button {
-            background: #1d1d1f;
-            color: #ffffff;
-            border: none;
-            padding: 20px 56px;
-            font-size: 26px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-        }
-        .cta-button:hover {
-            background: #000000;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-        /* Ajustes específicos para móviles */
-        @media (max-width: 767px) {
-            .cta-button {
-                padding: 16px 40px;     /* Menos padding vertical y horizontal */
-                font-size: 22px;        /* Texto un poco más pequeño */
-                width: 100%;            /* Ocupa todo el ancho disponible */
-                max-width: 400px;       /* Limita el ancho máximo para que no sea enorme */
-            }
-        }
-        #terms-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.8s ease;
-        }
-        #terms-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .terms-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: 18px;
-            padding: 40px;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-            text-align: center;
-        }
-        .checkbox-container {
-            margin: 20px 0;
-        }
-        #accept-btn {
-            padding: 12px 32px;
-            font-size: 18px;
-            background: #1d1d1f;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 1s ease 0.6s;
-        }
-        main.visible {
-            opacity: 1;
-        }
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            font-size: 14px;
-            color: #86868b;
-        }
-        .instagram-link {
-            margin-top: 12px;
-            font-size: 28px;
-            color: #1d1d1f;
-            transition: color 0.3s ease;
-        }
-        .instagram-link:hover {
-            color: #e1306c;
-        }
-    </style>
-</head>
-<body>
-    <section id="hero-header">
-        <div class="hero-content">
-            <div class="title-container" id="title-container">
-                <div class="title-row active">
-                    <span class="title-text">Desbloqueo tu iPhone</span>
-                </div>
-                <div class="title-row">
-                    <span class="title-text">Cuenta de iCloud</span>
-                    <img id="icloud-logo" src="" alt="iCloud" class="title-logo">
-                </div>
-                <div class="title-row">
-                    <span class="title-text">Cuenta de Google</span>
-                    <img id="google-logo" src="" alt="Google" class="title-logo">
-                </div>
-                <div class="title-row">
-                    <span class="title-text">Liberación de compañía</span>
-                    <img id="att-logo" src="" alt="AT&T" class="title-logo">
-                </div>
-            </div>
-        </div>
-        <div class="scroll-indicator">
-            <i class="fas fa-chevron-down"></i>
-        </div>
-    </section>
-    <div id="terms-screen">
-        <div class="terms-card">
-            <h2>Términos y Condiciones</h2>
-            <p>Al utilizar este servicio, usted declara que:</p>
-            <ul>
-                <li>El teléfono iPhone es de su propiedad exclusiva.</li>
-                <li>Entiende que cualquier procedimiento de desbloqueo o reparación conlleva riesgos inherentes.</li>
-                <li>El técnico se deslinda de toda responsabilidad por daños, pérdida de datos o cualquier consecuencia posterior al servicio.</li>
-                <li>Usted asume completa responsabilidad por el dispositivo y su contenido.</li>
-            </ul>
-            <p>Al aceptar, confirma que ha leído y acepta estos términos.</p>
-            <div class="checkbox-container">
-                <input type="checkbox" id="accept-checkbox">
-                <label for="accept-checkbox">Acepto los términos y condiciones</label>
-            </div>
-            <button id="accept-btn" disabled>Aceptar y continuar</button>
-        </div>
-    </div>
-    <main id="main-content">
-        <div class="recent-works-header">
-            <h2>Trabajos recientes</h2>
-        </div>
-        <div class="posts-grid">
-            <div class="fb-carousel-container">
-                <div class="fb-header" onclick="window.open('https://www.instagram.com/ferv_hs', '_blank')">
-                    <div class="fb-profile-pic"></div>
-                    <div class="fb-name-time">
-                        <div class="fb-name">ferv_hs</div>
-                        <div class="fb-time">Trabajo reciente</div>
-                    </div>
-                </div>
-                <div class="fb-content">
-                    ¡Otro iPhone desbloqueado con éxito! Cliente feliz y listo para usar su dispositivo 🚀
-                </div>
-                <div class="carousel-container" id="carousel-1">
-                    <div class="carousel-inner"></div>
-                </div>
-            </div>
-            <div class="fb-carousel-container">
-                <div class="fb-header" onclick="window.open('https://www.instagram.com/ferv_hs', '_blank')">
-                    <div class="fb-profile-pic"></div>
-                    <div class="fb-name-time">
-                        <div class="fb-name">ferv_hs</div>
-                        <div class="fb-time">Trabajo reciente</div>
-                    </div>
-                </div>
-                <div class="fb-content">
-                    ¡Otro iPhone desbloqueado con éxito! Cliente feliz y listo para usar su dispositivo 🚀
-                </div>
-                <div class="carousel-container" id="carousel-2">
-                    <div class="carousel-inner"></div>
-                </div>
-            </div>
-        </div>
-        <div class="accordion">
-            <div class="accordion-item">
-                <div class="accordion-header">¿Cómo funcionan las citas?<i class="fas fa-chevron-down"></i></div>
-                <div class="accordion-content">
-                    <div class="steps">
-                        <div class="step">
-                            <div class="step-number">1</div>
-                            <div>Agendas tu cita a través del formulario</div>
-                        </div>
-                        <div class="arrow"><i class="fas fa-arrow-down"></i></div>
-                        <div class="step">
-                            <div class="step-number">2</div>
-                            <div>Te enviamos un mensaje para confirmar tus datos</div>
-                        </div>
-                        <div class="arrow"><i class="fas fa-arrow-down"></i></div>
-                        <div class="step">
-                            <div class="step-number">3</div>
-                            <div>Realizamos el servicio el mismo día de la cita</div>
-                        </div>
-                        <div class="arrow"><i class="fas fa-arrow-down"></i></div>
-                        <div class="step">
-                            <div class="step-number">4</div>
-                            <div>Pagas al finalizar el servicio</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header">¿Cómo queda el teléfono después de desbloquearlo por iCloud?<i class="fas fa-chevron-down"></i></div>
-                <div class="accordion-content">
-                    <p>Los teléfonos quedan totalmente funcionales, como de fábrica.</p>
-                    <p>A excepción de los modelos recientes a partir del iPhone XR en adelante, que quedarán sin señal. Esto quiere decir que no detectarán el chip. Esto pasa porque internamente aún sigue estando bloqueado por IMEI. Para esto no tenemos solución, pero el teléfono se puede utilizar con normalidad: poner tu cuenta de iCloud, descargar apps, tomar fotos, grabar audios, descargar WhatsApp, etc.</p>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header">Preguntas frecuentes<i class="fas fa-chevron-down"></i></div>
-                <div class="accordion-content">
-                    <p>Puedes agregar aquí las preguntas más comunes de tus clientes.</p>
-                </div>
-            </div>
-            <div class="accordion-item">
-                <div class="accordion-header">Sobre nosotros<i class="fas fa-chevron-down"></i></div>
-                <div class="accordion-content">
-                    <p>Somos especialistas en desbloqueo y reparación de iPhones con años de experiencia. Servicio rápido, seguro y garantizado.</p>
-                </div>
-            </div>
-        </div>
-        <div class="cta-container">
-            <button class="cta-button" onclick="window.location.href='crea-cita.html'">¡Agenda ahora tu desbloqueo!</button>
-        </div>
-    </main>
-    <footer>
-        <p>© 2025 Todos los derechos reservados.</p>
-        <a href="https://www.instagram.com/ferv_hs" target="_blank" class="instagram-link">
-            <i class="fab fa-instagram"></i>
-        </a>
-    </footer>
-    <script>
-        const termsScreen = document.getElementById('terms-screen');
-        const titleContainer = document.getElementById('title-container');
-        const mainContent = document.getElementById('main-content');
-        const checkbox = document.getElementById('accept-checkbox');
-        const acceptBtn = document.getElementById('accept-btn');
-        if (localStorage.getItem('termsAccepted') === 'true') {
-            termsScreen.classList.add('hidden');
-            titleContainer.classList.add('visible');
-            mainContent.classList.add('visible');
-        }
-        checkbox.addEventListener('change', () => {
-            acceptBtn.disabled = !checkbox.checked;
-        });
-        acceptBtn.addEventListener('click', () => {
-            if (checkbox.checked) {
-                localStorage.setItem('termsAccepted', 'true');
-                termsScreen.classList.add('hidden');
-                setTimeout(() => {
-                    titleContainer.classList.add('visible');
-                }, 300);
-                setTimeout(() => mainContent.classList.add('visible'), 600);
-            }
-        });
-        const rows = document.querySelectorAll('.title-row');
-        let currentIndex = 0;
-        function rotateTitle() {
-            const current = rows[currentIndex];
-            const nextIndex = (currentIndex + 1) % rows.length;
-            const next = rows[nextIndex];
-            current.classList.remove('active');
-            current.classList.add('prev');
-            next.classList.add('active');
-            setTimeout(() => {
-                current.classList.remove('prev');
-            }, 800);
-            currentIndex = nextIndex;
-        }
-        const startRotation = () => {
-            setTimeout(() => {
-                setInterval(rotateTitle, 5000);
-                rotateTitle();
-            }, 5000);
-        };
-        if (titleContainer.classList.contains('visible')) {
-            startRotation();
-        } else {
-            const check = setInterval(() => {
-                if (titleContainer.classList.contains('visible')) {
-                    startRotation();
-                    clearInterval(check);
-                }
-            }, 100);
-        }
-        document.getElementById('hero-header').addEventListener('click', () => {
-            document.querySelector('.recent-works-header').scrollIntoView({ behavior: 'smooth' });
-        });
-        let touchStartY = 0;
-        document.getElementById('hero-header').addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
-        });
-        document.getElementById('hero-header').addEventListener('touchmove', (e) => {
-            const touchY = e.touches[0].clientY;
-            if (touchY > touchStartY + 50) {
-                document.querySelector('.recent-works-header').scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-        document.querySelectorAll('.accordion-header').forEach(h => {
-            h.addEventListener('click', () => {
-                const content = h.nextElementSibling;
-                const icon = h.querySelector('i');
-                h.classList.toggle('active');
-                content.classList.toggle('open');
-                if (content.classList.contains('open')) {
-                    icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-                } else {
-                    icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-                }
-            });
-        });
-        document.querySelectorAll('.carousel-container').forEach(container => {
-            let touchStartX = 0;
-            let currentIndex = 0;
-            const inner = container.querySelector('.carousel-inner');
-            const getItems = () => inner.querySelectorAll('.carousel-item');
-            const updateTransform = () => {
-                inner.style.transform = `translateX(-${currentIndex * 100}%)`;
-            };
-            container.addEventListener('touchstart', e => {
-                touchStartX = e.touches[0].screenX;
-            }, { passive: true });
-            container.addEventListener('touchend', e => {
-                const touchEndX = e.changedTouches[0].screenX;
-                const diff = touchStartX - touchEndX;
-                if (Math.abs(diff) > 50 && getItems().length > 1) {
-                    if (diff > 0) {
-                        currentIndex = (currentIndex + 1) % getItems().length;
-                    } else {
-                        currentIndex = (currentIndex - 1 + getItems().length) % getItems().length;
+
+        function mostrarCampos() {
+            seccionDesbloqueo.classList.add('hidden');
+            subseccionPantalla.classList.add('hidden');
+            modeloAndroid.classList.add('hidden');
+            modeloIphone.classList.add('hidden');
+            descripcionOtro.classList.add('hidden');
+            seccionGastos.classList.remove('hidden');
+
+            if (tipoServicio.value === 'desbloqueo') {
+                seccionDesbloqueo.classList.remove('hidden');
+                if (tipoDesbloqueo.value === 'pantalla') {
+                    subseccionPantalla.classList.remove('hidden');
+                    if (cuentaBloqueo.value === 'google') modeloAndroid.classList.remove('hidden');
+                    if (cuentaBloqueo.value === 'icloud') {
+                        modeloIphone.classList.remove('hidden');
+                        calcularPrecioIcloud();
                     }
-                    updateTransform();
                 }
-            }, { passive: true });
+            }
+            if (tipoServicio.value === 'reparacion' || tipoServicio.value === 'otro') {
+                descripcionOtro.classList.remove('hidden');
+            }
+            validarFormulario();
+        }
+
+        function validarFormulario() {
+            let valido = tipoServicio.value && montoInput.value > 0;
+            if (tipoServicio.value === 'desbloqueo') {
+                valido &&= tipoDesbloqueo.value;
+                if (tipoDesbloqueo.value === 'pantalla') {
+                    valido &&= cuentaBloqueo.value;
+                    if (cuentaBloqueo.value === 'google') valido &&= document.getElementById('modeloAndroidInput').value.trim();
+                    if (cuentaBloqueo.value === 'icloud') valido &&= document.getElementById('modeloIphoneSelect').value;
+                }
+            }
+            if ((tipoServicio.value === 'reparacion' || tipoServicio.value === 'otro') && !document.getElementById('descripcionTextarea').value.trim()) {
+                valido = false;
+            }
+            btnRealizado.classList.toggle('habilitado', valido);
+        }
+
+        // Eventos originales
+        tipoServicio.addEventListener('change', () => {
+            precioInfo.textContent = '';
+            vistaGanancia.style.display = 'none';
+            mostrarCampos();
         });
+        tipoDesbloqueo.addEventListener('change', mostrarCampos);
+        cuentaBloqueo.addEventListener('change', mostrarCampos);
+        document.getElementById('modeloIphoneSelect').addEventListener('change', calcularPrecioIcloud);
+        montoInput.addEventListener('input', actualizarGanancia);
+        gastosInput.addEventListener('input', actualizarGanancia);
+        document.querySelectorAll('select, input, textarea').forEach(el => {
+            el.addEventListener('input', validarFormulario);
+            el.addEventListener('change', validarFormulario);
+        });
+
+        // === ENVÍO A FIREBASE CON TODOS LOS DATOS ===
+        document.getElementById('formTrabajo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!btnRealizado.classList.contains('habilitado')) return;
+
+            const cobrado = parseFloat(montoInput.value);
+            const gastos = parseFloat(gastosInput.value) || 0;
+            const ganancia = cobrado - gastos;
+
+            const datos = {
+                fecha: new Date().toLocaleString('es-MX'),
+                tecnico: `Tec. ${nombreTecnico.trim()}`,
+                tipo: tipoServicio.options[tipoServicio.selectedIndex].text,
+                tipoDesbloqueo: tipoDesbloqueo.value === 'pago' ? 'FRP' : (tipoDesbloqueo.value === 'pantalla' ? 'Pantalla' : ''),
+                cuenta: cuentaBloqueo.value || '',
+                modelo: cuentaBloqueo.value === 'google' ? document.getElementById('modeloAndroidInput').value.trim() :
+                        cuentaBloqueo.value === 'icloud' ? document.getElementById('modeloIphoneSelect').value :
+                        document.getElementById('modeloDispositivo').value.trim(),
+                tiempo: document.getElementById('tiempo').value || 'No especificado',
+                cobrado: cobrado.toFixed(2),
+                gastos: gastos.toFixed(2),
+                ganancia: ganancia.toFixed(2),
+                descripcion: document.getElementById('descripcionTextarea')?.value.trim() || '',
+
+                // Dispositivo
+                marca: document.getElementById('marcaDispositivo').value.trim(),
+                modeloExacto: document.getElementById('modeloDispositivo').value.trim(),
+                imei: document.getElementById('imeiDispositivo').value.trim(),
+                color: document.getElementById('colorDispositivo').value.trim(),
+                capacidad: document.getElementById('capacidadDispositivo').value,
+                estadoFisico: document.getElementById('estadoDispositivo').value.trim(),
+
+                // Cliente
+                cliente: document.getElementById('nombreCliente').value.trim() || 'No registrado',
+                telefonoCliente: document.getElementById('telefonoCliente').value.trim(),
+                emailCliente: document.getElementById('emailCliente').value.trim(),
+                notasCliente: document.getElementById('notasCliente').value.trim(),
+
+                // Evidencias
+                evidencias: fotosBase64
+            };
+
+            btnRealizado.textContent = 'ENVIANDO...';
+            btnRealizado.classList.add('enviando');
+
+            try {
+                await push(ordenesRef, datos);
+                notificacion.classList.add('mostrar');
+                setTimeout(() => {
+                    notificacion.classList.remove('mostrar');
+                    document.getElementById('formTrabajo').reset();
+                    fotosBase64 = [];
+                    vistaPreviaFotos.innerHTML = '';
+                    btnRealizado.textContent = 'REALIZADO';
+                    btnRealizado.classList.remove('enviando', 'habilitado');
+                    precioInfo.textContent = '';
+                    vistaGanancia.style.display = 'none';
+                    tipoServicio.value = '';
+                    mostrarCampos();
+                }, 2200);
+            } catch (error) {
+                alert("Error al enviar: " + error.message);
+                btnRealizado.textContent = 'REALIZADO';
+                btnRealizado.classList.remove('enviando');
+            }
+        });
+
+        mostrarCampos();
     </script>
 </body>
 </html>
