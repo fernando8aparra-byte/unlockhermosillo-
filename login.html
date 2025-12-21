@@ -120,14 +120,12 @@
 <body>
     <div class="box">
         <h2>COMPROPAGO</h2>
-
         <!-- Mensaje de sesión activa -->
         <div id="sesionActiva" style="display:none;">
             <div class="sesion-activa" id="mensajeSesion"></div>
             <button type="button" class="cerrar-sesion" id="btnCerrarSesion">Cerrar sesión actual</button>
             <hr style="margin: 30px 0;">
         </div>
-
         <!-- Login -->
         <div id="loginContainer" class="form-container">
             <h3>Iniciar Sesión</h3>
@@ -140,7 +138,6 @@
             <div class="error" id="errorLogin"></div>
             <a id="showRegister">¿No tienes cuenta? Regístrate aquí</a>
         </div>
-
         <!-- Registro -->
         <div id="registerContainer" class="form-container hidden">
             <h3>Crear Cuenta</h3>
@@ -157,7 +154,6 @@
             <a id="showLogin">¿Ya tienes cuenta? Iniciar sesión</a>
         </div>
     </div>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
@@ -168,7 +164,6 @@
             messagingSenderId: "390391998056",
             appId: "1:390391998056:web:23e22073d88bc247d43ddd"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -190,7 +185,6 @@
         // === MOSTRAR SI HAY SESIÓN ACTIVA ===
         const logueado = localStorage.getItem('logueado') === 'true';
         const nombreTecnico = localStorage.getItem('nombreTecnico');
-
         if (logueado && nombreTecnico && nombreTecnico.trim() !== '') {
             mensajeSesion.textContent = `Sesión activa: Tec. ${nombreTecnico.trim()}`;
             sesionActivaDiv.style.display = 'block';
@@ -213,7 +207,6 @@
             errorLogin.textContent = '';
             errorRegistro.textContent = '';
         });
-
         showLogin.addEventListener('click', (e) => {
             e.preventDefault();
             registerContainer.classList.add('hidden');
@@ -227,26 +220,24 @@
             e.preventDefault();
             errorLogin.textContent = '';
             loadingLogin.style.display = 'block';
-
             const entrada = document.getElementById('usuarioLogin').value.trim().toLowerCase();
             const password = document.getElementById('passwordLogin').value;
-
             const cuentasRef = db.ref('cuentas');
-
             cuentasRef.once('value')
                 .then((snapshot) => {
                     let encontrado = null;
                     let usuarioKey = null;
                     let nombreTecnico = null;
+                    let emailUsuario = null;  // Para verificar el correo especial
 
                     snapshot.forEach((child) => {
                         const data = child.val();
                         const key = child.key;
-
                         if (key === entrada || (data.email && data.email.toLowerCase() === entrada)) {
                             encontrado = data;
                             usuarioKey = key;
                             nombreTecnico = (data.nombre && data.nombre.trim() !== '') ? data.nombre.trim() : key;
+                            emailUsuario = data.email ? data.email.toLowerCase() : null;
                             return true;
                         }
                     });
@@ -255,24 +246,27 @@
                         errorLogin.textContent = "Usuario o correo no encontrado";
                         return;
                     }
-
                     if (encontrado.password !== password) {
                         errorLogin.textContent = "Contraseña incorrecta";
                         return;
                     }
-
                     if (encontrado.activo === false) {
                         errorLogin.textContent = "Cuenta desactivada";
                         return;
                     }
 
-                    // Guardar nueva sesión (sobrescribe la anterior)
+                    // Guardar sesión
                     localStorage.setItem('logueado', 'true');
                     localStorage.setItem('usuario', usuarioKey);
                     localStorage.setItem('nombreTecnico', nombreTecnico);
                     localStorage.setItem('loginTime', Date.now());
 
-                    window.location.href = 'index.html';
+                    // REDIRECCIÓN ESPECIAL PARA EL CORREO ESPECÍFICO
+                    if (emailUsuario === 'alejandroatondo4@gmail.com') {
+                        window.location.href = 'indextec.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
                 })
                 .catch((err) => {
                     errorLogin.textContent = "Error de conexión";
@@ -283,12 +277,11 @@
                 });
         });
 
-        // === REGISTRO ===
+        // === REGISTRO (sin cambios, siempre va a index.html) ===
         registroForm.addEventListener('submit', (e) => {
             e.preventDefault();
             errorRegistro.textContent = '';
             loadingRegistro.style.display = 'block';
-
             const nombre = document.getElementById('nombre').value.trim();
             const usuario = document.getElementById('usuarioRegistro').value.trim().toLowerCase();
             const email = document.getElementById('email').value.trim().toLowerCase();
@@ -312,14 +305,12 @@
             }
 
             const refUsuario = db.ref('cuentas/' + usuario);
-
             refUsuario.once('value')
                 .then((snapshot) => {
                     if (snapshot.exists()) {
                         errorRegistro.textContent = "Este usuario ya está registrado";
                         return;
                     }
-
                     return refUsuario.set({
                         nombre: nombre,
                         email: email,
@@ -333,7 +324,6 @@
                     localStorage.setItem('usuario', usuario);
                     localStorage.setItem('nombreTecnico', nombre);
                     localStorage.setItem('loginTime', Date.now());
-
                     window.location.href = 'index.html';
                 })
                 .catch((err) => {
