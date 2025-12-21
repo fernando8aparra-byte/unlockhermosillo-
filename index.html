@@ -25,7 +25,6 @@
         };
         const app = initializeApp(firebaseConfig);
         const storage = getStorage(app);
-
         // Cargar slider principal
         async function loadMainSlider() {
             const folderRef = ref(storage, 'slider');
@@ -53,7 +52,6 @@
                 console.error("Error cargando slider:", error);
             }
         }
-
         // Cargar carruseles de trabajos recientes
         async function loadCarousel(folder, carouselId) {
             const folderRef = ref(storage, folder);
@@ -83,11 +81,56 @@
                 console.error("Error listando carpeta:", error);
             }
         }
-
+        // Cargar imagen de perfil desde Firebase
+        async function loadProfileImage() {
+            const folderRef = ref(storage, 'perfil-fer');
+            try {
+                const listResult = await listAll(folderRef);
+                if (listResult.items.length > 0) {
+                    const firstItem = listResult.items[0];
+                    const url = await getDownloadURL(firstItem);
+                    document.querySelectorAll('.fb-post-profile-pic').forEach(pic => {
+                        pic.style.backgroundImage = `url('${url}')`;
+                    });
+                }
+            } catch (error) {
+                console.error("Error cargando imagen de perfil:", error);
+            }
+        }
+        // Cargar imagen iCloud para el botón
+        async function loadICloudIcon() {
+            const folderRef = ref(storage, 'iCloud');
+            try {
+                const listResult = await listAll(folderRef);
+                if (listResult.items.length > 0) {
+                    const firstItem = listResult.items[0];
+                    const url = await getDownloadURL(firstItem);
+                    document.getElementById('icloud-icon').src = url;
+                }
+            } catch (error) {
+                console.error("Error cargando icono iCloud:", error);
+            }
+        }
+        // Cargar imagen Paijoi para el botón
+        async function loadPaijoiIcon() {
+            const folderRef = ref(storage, 'payjoi');
+            try {
+                const listResult = await listAll(folderRef);
+                if (listResult.items.length > 0) {
+                    const firstItem = listResult.items[0];
+                    const url = await getDownloadURL(firstItem);
+                    document.getElementById('paijoi-icon').src = url;
+                }
+            } catch (error) {
+                console.error("Error cargando icono Paijoi:", error);
+            }
+        }
         document.addEventListener('DOMContentLoaded', () => {
             const mainContent = document.getElementById('main-content');
             loadMainSlider();
-
+            loadProfileImage();
+            loadICloudIcon();
+            loadPaijoiIcon();
             const observer = new MutationObserver(() => {
                 if (mainContent.classList.contains('visible')) {
                     loadCarousel('ads-1', 'carousel-1');
@@ -100,7 +143,6 @@
                 loadCarousel('ads-1', 'carousel-1');
                 loadCarousel('ads-2', 'carousel-2');
             }
-
             // Flechita guía primera vez
             if (!localStorage.getItem('guiaVista')) {
                 document.getElementById('guia-flecha').classList.add('visible');
@@ -126,7 +168,6 @@
             color: #1d1d1f;
             overflow-x: hidden;
         }
-
         /* Header fijo */
         header {
             position: fixed;
@@ -136,7 +177,7 @@
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
             z-index: 1000;
-            padding: 15px 20px;
+            padding: 20px 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
@@ -154,7 +195,6 @@
             font-weight: 700;
             color: #1d1d1f;
         }
-
         /* Menú lateral */
         #side-menu {
             position: fixed;
@@ -194,7 +234,6 @@
         .menu-item:last-child {
             border-bottom: none;
         }
-
         /* Navegación ovalada */
         .nav-oval {
             display: flex;
@@ -218,7 +257,61 @@
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
-
+        /* Iconos arriba de las islas */
+        .service-island {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 12px;
+        }
+        /* Para Paijoi específicamente: asegurar que se vea completa */
+        #paijoi-icon {
+            object-fit: contain;
+        }
+        .fa-users-service {
+            font-size: 80px;
+            color: #1d1d1f;
+            margin-bottom: 12px;
+        }
+        /* FAQ accordion - disposición en ladrillo (una debajo de otra) */
+        .faq-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .faq-item {
+            background: white;
+            padding: 16px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+        }
+        .faq-item.active {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            margin-bottom: 0;
+        }
+        .faq-answer {
+            background: white;
+            padding: 20px 24px;
+            border-radius: 0 0 18px 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-top: -10px;
+            display: none;
+        }
+        .faq-answer.visible {
+            display: block;
+        }
         /* Slider principal */
         #main-slider {
             width: 100%;
@@ -246,8 +339,7 @@
                 max-height: 60vh;
             }
         }
-
-        /* Trabajos recientes - IMÁGENES ABARCAN TODO EL CONTENEDOR CENTRAL */
+        /* Trabajos recientes */
         #preview .posts-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -282,7 +374,6 @@
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background-image: url('https://instagram.fcul3-1.fna.fbcdn.net/v/t51.2885-19/357965323_804282287649975_8599923083864748940_n.jpg?stp=dst-jpg_s150x150&_nc_ht=instagram.fcul3-1.fna.fbcdn.net&_nc_cat=1&_nc_ohc=0o9j9X5v5vYAX8vK4hZ&edm=APOEnuQBAAAA&ccb=7-5&oh=00_AfD8r2Z3oX7r6pY9jM7l0zJ6i6jZ6jZ6jZ6jZ6jZ6jZ6j&oe=658F8E8E&_nc_sid=7a9f4b');
             background-size: cover;
             background-position: center;
             margin-right: 12px;
@@ -309,13 +400,13 @@
             position: relative;
             width: 100%;
             height: 0;
-            padding-top: 100%; /* Cuadrado en móviles */
+            padding-top: 100%;
             background: black;
             overflow: hidden;
         }
         @media (min-width: 768px) {
             .carousel-container {
-                padding-top: 80%; /* Más rectangular en escritorio */
+                padding-top: 80%;
             }
         }
         .carousel-inner {
@@ -338,10 +429,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ahora cubre todo el contenedor central */
+            object-fit: cover;
             display: block;
         }
-
         /* Flechita guía */
         #guia-flecha {
             position: absolute;
@@ -371,10 +461,9 @@
         #guia-flecha.visible {
             opacity: 1;
         }
-
         section { padding: 60px 20px; max-width: 1200px; margin: 0 auto; }
         h2 { text-align: center; font-size: 32px; margin-bottom: 40px; }
-        #nosotros, #servicios, #resenas, #faq, #info-dispositivos {
+        #servicios, #faq {
             background: white;
             padding: 40px;
             border-radius: 18px;
@@ -395,7 +484,6 @@
             transition: all 0.3s ease;
         }
         .cta-button:hover { background: #000; transform: translateY(-3px); }
-
         /* Términos */
         #terms-screen {
             position: fixed;
@@ -418,7 +506,43 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.12);
             text-align: center;
         }
-
+        /* Modales de servicios */
+        .service-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1200;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .service-modal.active {
+            display: flex;
+        }
+        .service-content {
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            position: relative;
+            text-align: center;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            color: #1d1d1f;
+            cursor: pointer;
+        }
         main { margin-top: 80px; }
     </style>
 </head>
@@ -428,19 +552,17 @@
         <div class="hamburger" id="hamburger">☰</div>
         <div class="header-title">Desbloqueo tu iPhone</div>
     </header>
-
     <!-- Menú lateral -->
     <nav id="side-menu">
         <div class="menu-close" id="menu-close">×</div>
         <div class="menu-items">
-            <a href="#nosotros" class="menu-item">Nosotros</a>
+            <a href="nosotros.html" class="menu-item">Nosotros</a>
             <a href="#servicios" class="menu-item">Servicios</a>
             <a href="#preview" class="menu-item">Reseñas</a>
             <a href="#faq" class="menu-item">Preguntas frecuentes</a>
             <a href="login.html" class="menu-item">Iniciar sesión</a>
         </div>
     </nav>
-
     <!-- Términos primera vez -->
     <div id="terms-screen">
         <div class="terms-card">
@@ -459,20 +581,17 @@
             <button id="accept-btn" disabled>Aceptar y continuar</button>
         </div>
     </div>
-
-    <!-- Navegación ovalada -->
+    <!-- Navegación ovalada superior -->
     <div class="nav-oval">
-        <div class="nav-item" onclick="document.getElementById('nosotros').scrollIntoView({behavior:'smooth'})">Nosotros</div>
+        <div class="nav-item" onclick="window.location.href='nosotros.html'">Nosotros</div>
         <div class="nav-item" onclick="document.getElementById('servicios').scrollIntoView({behavior:'smooth'})">Servicios</div>
         <div class="nav-item" onclick="document.getElementById('preview').scrollIntoView({behavior:'smooth'})">Reseñas</div>
         <div class="nav-item" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Preguntas frecuentes</div>
     </div>
-
     <!-- Slider principal -->
     <div id="main-slider">
         <div class="slider-inner"></div>
     </div>
-
     <main id="main-content">
         <!-- Trabajos recientes -->
         <section id="preview" style="position:relative;">
@@ -507,19 +626,78 @@
                 </div>
             </div>
         </section>
+        <!-- Servicios -->
+        <section id="servicios">
+            <h2>Servicios</h2>
+            <div class="nav-oval" style="justify-content: center; gap: 30px; flex-wrap: wrap;">
+                <div class="service-island nav-item" onclick="toggleServiceModal('icloud')">
+                    <img id="icloud-icon" class="service-icon" src="" alt="Desbloqueo iCloud">
+                    <div>Desbloqueo iCloud</div>
+                </div>
+                <div class="service-island nav-item" onclick="toggleServiceModal('paijoi')">
+                    <img id="paijoi-icon" class="service-icon" src="" alt="Desbloqueo Paijoi">
+                    <div>Desbloqueo Paijoi</div>
+                </div>
+                <div class="service-island nav-item" onclick="window.location.href='curriculum.html'">
+                    <i class="fas fa-users fa-users-service"></i>
+                    <div>Quiero ser socio</div>
+                </div>
+            </div>
+        </section>
+        <!-- Preguntas frecuentes (disposición vertical tipo ladrillo) -->
+        <section id="faq">
+            <h2>Preguntas frecuentes</h2>
+            <div class="faq-container">
+                <div class="faq-item" onclick="toggleFaq('garantia')">¿Tiene garantía?</div>
+                <div class="faq-answer" id="garantia-answer">
+                    <p>Información sobre la garantía del servicio...</p>
+                </div>
 
-        <!-- Otras secciones (placeholders) -->
-        <section id="nosotros"><h2>Nosotros</h2><p>Aquí escribe sobre tu equipo...</p></section>
-        <section id="servicios"><h2>Servicios</h2><p>Describe tus servicios...</p></section>
-        <section id="resenas"><h2>Reseñas</h2><p>Reseñas de clientes...</p></section>
-        <section id="faq"><h2>Preguntas frecuentes</h2><p>Lista de preguntas...</p></section>
-        <section id="info-dispositivos"><h2>Cómo quedan los dispositivos</h2><p>Información detallada...</p></section>
+                <div class="faq-item" onclick="toggleFaq('estado')">¿Cómo va a quedar mi teléfono?</div>
+                <div class="faq-answer" id="estado-answer">
+                    <p>Información sobre el estado final del dispositivo...</p>
+                </div>
 
+                <div class="faq-item" onclick="toggleFaq('compatible')">¿Mi teléfono es compatible?</div>
+                <div class="faq-answer" id="compatible-answer">
+                    <p>Información sobre compatibilidad...</p>
+                </div>
+
+                <div class="faq-item" onclick="toggleFaq('funciona')">¿Cómo funciona el desbloqueo?</div>
+                <div class="faq-answer" id="funciona-answer">
+                    <p>Explicación paso a paso del proceso...</p>
+                </div>
+
+                <div class="faq-item" onclick="toggleFaq('otros')">¿Qué otros servicios ofrecen?</div>
+                <div class="faq-answer" id="otros-answer">
+                    <p>Lista de otros servicios disponibles...</p>
+                </div>
+            </div>
+        </section>
+        <!-- Botón CTA -->
         <div class="cta-container">
             <button class="cta-button" onclick="window.location.href='crea-cita.html'">¡Agenda ahora tu desbloqueo!</button>
         </div>
     </main>
-
+    <!-- Modales de servicios -->
+    <div id="icloud-modal" class="service-modal">
+        <div class="service-content">
+            <div class="modal-close" onclick="toggleServiceModal('icloud')">×</div>
+            <h2>Desbloqueo iCloud</h2>
+            <div class="service-text">
+                <p>Información detallada sobre el desbloqueo iCloud...</p>
+            </div>
+        </div>
+    </div>
+    <div id="paijoi-modal" class="service-modal">
+        <div class="service-content">
+            <div class="modal-close" onclick="toggleServiceModal('paijoi')">×</div>
+            <h2>Desbloqueo Paijoi</h2>
+            <div class="service-text">
+                <p>Información detallada sobre el desbloqueo Paijoi...</p>
+            </div>
+        </div>
+    </div>
     <script>
         // Términos y menú
         const termsScreen = document.getElementById('terms-screen');
@@ -529,7 +707,6 @@
         const hamburger = document.getElementById('hamburger');
         const sideMenu = document.getElementById('side-menu');
         const menuClose = document.getElementById('menu-close');
-
         if (localStorage.getItem('termsAccepted') === 'true') {
             termsScreen.classList.add('hidden');
             mainContent.classList.add('visible');
@@ -542,10 +719,8 @@
                 setTimeout(() => mainContent.classList.add('visible'), 300);
             }
         });
-
         hamburger.addEventListener('click', () => sideMenu.classList.add('active'));
         menuClose.addEventListener('click', () => sideMenu.classList.remove('active'));
-
         // Swipe en carruseles
         document.querySelectorAll('.carousel-container').forEach(container => {
             let touchStartX = 0, currentIndex = 0;
@@ -560,6 +735,48 @@
                     update();
                 }
             }, { passive: true });
+        });
+        // Función para togglear modales de servicios
+        let activeModal = null;
+        function toggleServiceModal(service) {
+            const modal = document.getElementById(`${service}-modal`);
+            if (activeModal && activeModal !== modal) {
+                activeModal.classList.remove('active');
+            }
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                activeModal = null;
+            } else {
+                modal.classList.add('active');
+                activeModal = modal;
+            }
+        }
+        // FAQ accordion
+        let activeFaq = null;
+        function toggleFaq(id) {
+            const answer = document.getElementById(id + '-answer');
+            const item = answer.previousElementSibling;
+            if (activeFaq && activeFaq !== answer) {
+                activeFaq.classList.remove('visible');
+                activeFaq.previousElementSibling.classList.remove('active');
+            }
+            if (answer.classList.contains('visible')) {
+                answer.classList.remove('visible');
+                item.classList.remove('active');
+                activeFaq = null;
+            } else {
+                answer.classList.add('visible');
+                item.classList.add('active');
+                activeFaq = answer;
+            }
+        }
+        // Cerrar FAQ al hacer click fuera
+        document.addEventListener('click', (e) => {
+            if (activeFaq && !e.target.closest('.faq-item') && !e.target.closest('.faq-answer')) {
+                activeFaq.classList.remove('visible');
+                activeFaq.previousElementSibling.classList.remove('active');
+                activeFaq = null;
+            }
         });
     </script>
 </body>
