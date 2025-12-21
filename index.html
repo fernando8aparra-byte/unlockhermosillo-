@@ -3,259 +3,532 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHAMBING - Guía Técnica</title>
+    <title>Desbloqueo tu iPhone</title>
+    <!-- Fuentes -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://sf.abarba.me/SF.css">
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getStorage, ref, listAll, getDownloadURL, getMetadata } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
+            authDomain: "comprobantes-363c9.firebaseapp.com",
+            databaseURL: "https://comprobantes-363c9-default-rtdb.firebaseio.com",
+            projectId: "comprobantes-363c9",
+            storageBucket: "comprobantes-363c9.firebasestorage.app",
+            messagingSenderId: "390391998056",
+            appId: "1:390391998056:web:23e22073d88bc247d43ddd",
+            measurementId: "G-8W03RJD0TZ"
+        };
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+
+        // Cargar slider principal
+        async function loadMainSlider() {
+            const folderRef = ref(storage, 'slider');
+            const sliderInner = document.querySelector('#main-slider .slider-inner');
+            try {
+                const listResult = await listAll(folderRef);
+                if (listResult.items.length === 0) {
+                    sliderInner.innerHTML = '<div class="slider-item active"><div class="placeholder">No hay imágenes en el slider</div></div>';
+                    return;
+                }
+                listResult.items.forEach(async (itemRef, index) => {
+                    const url = await getDownloadURL(itemRef);
+                    const metadata = await getMetadata(itemRef);
+                    const div = document.createElement('div');
+                    div.className = 'slider-item' + (index === 0 ? ' active' : '');
+                    let content = '';
+                    if (metadata.contentType.startsWith('video/')) {
+                        content = `<video src="${url}" autoplay muted loop playsinline></video>`;
+                    } else {
+                        content = `<img src="${url}" alt="Slider ${index + 1}" loading="lazy">`;
+                    }
+                    div.innerHTML = content;
+                    sliderInner.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Error cargando slider:", error);
+                sliderInner.innerHTML = '<div class="slider-item active"><div class="placeholder">Error al cargar slider</div></div>';
+            }
+        }
+
+        // Cargar carruseles de trabajos recientes
+        async function loadCarousel(folder, carouselId) {
+            const folderRef = ref(storage, folder);
+            const carouselInner = document.querySelector(`#${carouselId} .carousel-inner`);
+            carouselInner.innerHTML = '';
+            try {
+                const listResult = await listAll(folderRef);
+                if (listResult.items.length === 0) {
+                    carouselInner.innerHTML = '<div class="carousel-item active"><div class="fb-image-placeholder">No hay contenido disponible</div></div>';
+                    return;
+                }
+                listResult.items.forEach(async (itemRef, index) => {
+                    const url = await getDownloadURL(itemRef);
+                    const metadata = await getMetadata(itemRef);
+                    const div = document.createElement('div');
+                    div.className = 'carousel-item' + (index === 0 ? ' active' : '');
+                    let content = '';
+                    if (metadata.contentType.startsWith('video/')) {
+                        content = `<video src="${url}" controls preload="metadata" playsinline></video>`;
+                    } else {
+                        content = `<img src="${url}" alt="Trabajo reciente" loading="lazy">`;
+                    }
+                    div.innerHTML = content + '<div class="fb-image-placeholder">Contenido no disponible</div>';
+                    carouselInner.appendChild(div);
+                });
+            } catch (error) {
+                console.error("Error cargando carrusel:", error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainContent = document.getElementById('main-content');
+            loadMainSlider(); // Cargar slider principal siempre
+
+            const observer = new MutationObserver(() => {
+                if (mainContent.classList.contains('visible')) {
+                    loadCarousel('ads-1', 'carousel-1');
+                    loadCarousel('ads-2', 'carousel-2');
+                    observer.disconnect();
+                }
+            });
+            observer.observe(mainContent, { attributes: true, attributeFilter: ['class'] });
+            if (mainContent.classList.contains('visible')) {
+                loadCarousel('ads-1', 'carousel-1');
+                loadCarousel('ads-2', 'carousel-2');
+            }
+
+            // Flechita guía primera vez
+            if (!localStorage.getItem('guiaVista')) {
+                document.getElementById('guia-flecha').classList.add('visible');
+            }
+            document.body.addEventListener('click', () => {
+                document.getElementById('guia-flecha').classList.remove('visible');
+                localStorage.setItem('guiaVista', 'true');
+            }, { once: true });
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 200) {
+                    document.getElementById('guia-flecha').classList.remove('visible');
+                    localStorage.setItem('guiaVista', 'true');
+                }
+            });
+        });
+    </script>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
             margin: 0;
-            padding: 20px;
-            min-height: 100vh;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+        }
+
+        /* Header fijo */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hamburger {
+            position: absolute;
+            left: 20px;
+            font-size: 28px;
+            color: #1d1d1f;
+            cursor: pointer;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+
+        /* Navegación ovalada */
+        .nav-oval {
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 20px;
+            margin-top: 80px;
         }
-        .container {
+        .nav-item {
             background: white;
-            padding: 35px;
-            border-radius: 25px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            max-width: 900px;
+            padding: 12px 28px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .nav-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Slider principal (nuevo) */
+        #main-slider {
             width: 100%;
+            overflow: hidden;
             position: relative;
-            margin-top: 40px;
+            margin: 40px 0;
         }
-        h1 {text-align: center; color: #333; font-size: 32px; margin-bottom: 10px;}
-        .subtitle {text-align: center; color: #667eea; font-size: 20px; margin-bottom: 40px; font-weight: bold;}
-        /* Menú hamburguesa (igual que en mis-trabajos) */
-        .menu-hamburguesa {position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.9); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: 0.3s; z-index: 100;}
-        .menu-hamburguesa:hover {background: white; transform: scale(1.05);}
-        .barra {width: 24px; height: 3px; background: #333; margin: 3px 0; border-radius: 2px; transition: 0.3s;}
-        .menu-hamburguesa.activo .barra:nth-child(1) {transform: rotate(45deg) translate(6px, 6px);}
-        .menu-hamburguesa.activo .barra:nth-child(2) {opacity: 0;}
-        .menu-hamburguesa.activo .barra:nth-child(3) {transform: rotate(-45deg) translate(6px, -6px);}
-        .menu-lateral {position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: #2c3e50; box-shadow: 5px 0 20px rgba(0,0,0,0.4); transition: left 0.4s ease; z-index: 999; padding-top: 80px;}
-        .menu-lateral.abierto {left: 0;}
-        .menu-lateral .usuario-info {text-align: center; color: white; padding: 20px; background: #34495e;}
-        .menu-lateral .usuario-info h3 {margin: 0; font-size: 20px;}
-        .menu-lateral ul {list-style: none; padding: 0; margin: 30px 0 0;}
-        .menu-lateral ul li {padding: 18px 25px; color: #ecf0f1; font-size: 18px; cursor: pointer; transition: 0.3s; border-left: 4px solid transparent;}
-        .menu-lateral ul li:hover {background: #34495e; border-left: 4px solid #667eea;}
-        .menu-lateral ul li.activo {background: #34495e; border-left: 4px solid #667eea;}
-        .menu-lateral ul li.cerrar-sesion {color: #e74c3c; margin-top: 40px;}
-        .menu-lateral ul li.cerrar-sesion:hover {border-left: 4px solid #e74c3c;}
-        .overlay {position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: 0.4s; z-index: 998;}
-        .overlay.activo {opacity: 1; visibility: visible;}
-        /* Contenido guía */
-        .seccion-modelo {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        .slider-inner {
+            display: flex;
+            transition: transform 0.6s ease;
         }
-        .seccion-modelo h2 {
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 8px;
-            margin-top: 0;
+        .slider-item {
+            min-width: 100%;
+            position: relative;
         }
-        .importante {
-            background: #fff3cd;
-            border-left: 5px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 0 8px 8px 0;
+        .slider-item img, .slider-item video {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            object-fit: cover;
+            display: block;
         }
-        .prohibido {
-            background: #f8d7da;
-            border-left: 5px solid #dc3545;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 0 8px 8px 0;
+        .placeholder {
+            width: 100%;
+            height: 400px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 20px;
         }
-        .mensaje-ejemplo {
-            background: #d4edda;
-            border-left: 5px solid #28a745;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 0 8px 8px 0;
-            font-style: italic;
+
+        /* Secciones */
+        section {
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        ul {padding-left: 20px;}
-        li {margin-bottom: 8px;}
-        /* Modal confirmación cerrar sesión */
-        #modalConfirmacion {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; justify-content: center; align-items: center;}
-        .modal-contenido {background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); max-width: 400px; width: 90%;}
-        .modal-contenido h3 {margin: 0 0 20px; color: #333; font-size: 22px;}
-        .modal-botones button {padding: 12px 24px; margin: 0 10px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer;}
-        #btnCancelar {background: #95a5a6; color: white;}
-        #btnConfirmarCerrar {background: #e74c3c; color: white;}
+        h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+
+        /* Preview / Trabajos recientes */
+        #preview {
+            position: relative;
+        }
+        #preview .posts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+        @media (min-width: 768px) {
+            #preview .posts-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .fb-carousel-container {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .fb-carousel-container:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+        }
+        .fb-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+        }
+        .fb-profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e4e6eb;
+            margin-right: 12px;
+        }
+        .fb-name-time { flex: 1; }
+        .fb-name { font-weight: 600; font-size: 15px; color: #1c1e21; }
+        .fb-time { font-size: 13px; color: #65676b; }
+        .fb-content {
+            padding: 0 16px 12px;
+            font-size: 15px;
+            color: #1c1e21;
+        }
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            overflow: hidden;
+        }
+        .carousel-inner {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease;
+        }
+        .carousel-item {
+            min-width: 100%;
+            position: relative;
+        }
+        .carousel-item img, .carousel-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Ahora se ve completa la imagen/video */
+            background: black;
+            display: block;
+        }
+        .fb-image-placeholder {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 18px;
+        }
+
+        /* Flechita guía */
+        #guia-flecha {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            background: #1d1d1f;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 10;
+        }
+        #guia-flecha::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            transform: translateY(-50%) rotate(45deg);
+            width: 20px;
+            height: 20px;
+            background: #1d1d1f;
+        }
+        #guia-flecha.visible {
+            opacity: 1;
+        }
+
+        /* Otras secciones */
+        #nosotros, #servicios, #resenas, #faq, #info-dispositivos {
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .cta-container {
+            text-align: center;
+            margin: 60px 0;
+        }
+        .cta-button {
+            background: #1d1d1f;
+            color: white;
+            padding: 20px 56px;
+            font-size: 26px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            background: #000;
+            transform: translateY(-3px);
+        }
+
+        /* Términos */
+        #terms-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.8s ease;
+        }
+        #terms-screen.hidden { opacity: 0; pointer-events: none; }
+        .terms-card {
+            background: rgba(255,255,255,0.9);
+            padding: 40px;
+            border-radius: 18px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+
+        main { margin-top: 80px; }
     </style>
 </head>
 <body>
-    <!-- Menú hamburguesa -->
-    <div class="menu-hamburguesa" id="menuHamburguesa">
-        <div class="barra"></div>
-        <div class="barra"></div>
-        <div class="barra"></div>
-    </div>
-    <!-- Menú lateral -->
-    <div class="menu-lateral" id="menuLateral">
-        <div class="usuario-info">
-            <h3 id="nombreMenu">Tec. Cargando...</h3>
-        </div>
-        <ul>
-            <li id="opcionMisTrabajos">Mis trabajos</li>
-            <li id="opcionRegistro">Registro de trabajo</li>
-            <li class="activo" id="opcionGuia">Guía técnica</li>
-            <li class="cerrar-sesion" id="opcionCerrarSesion">Cerrar sesión</li>
-        </ul>
-    </div>
-    <!-- Overlay menú -->
-    <div class="overlay" id="overlay"></div>
 
-    <div class="container">
-        <h1>CHAMBING</h1>
-        <div class="subtitle">Guía técnica - Qué decir y qué NO decir al cliente</div>
+    <!-- Header fijo -->
+    <header>
+        <div class="hamburger" id="hamburger">☰</div>
+        <div class="header-title">Desbloqueo tu iPhone</div>
+    </header>
 
-        <div class="importante">
-            <strong>REGLA DE ORO:</strong> Siempre sé 100% honesto con el cliente. La transparencia evita reclamos, mala reputación y problemas legales. Nunca prometas algo que no puedas garantizar.
-        </div>
-
-        <div class="seccion-modelo">
-            <h2>iPhone 7 / 7 Plus / 8 / 8 Plus / SE (2020)</h2>
-            <p><strong>Qué decirle al cliente:</strong></p>
-            <ul>
-                <li>El teléfono quedará completamente funcional: señal celular, iCloud propio, apps, todo como nuevo.</li>
-                <li>No hay riesgos de que pierda señal ni funciones.</li>
-                <li>Se puede actualizar a las últimas versiones de iOS sin problemas.</li>
+    <!-- Términos primera vez -->
+    <div id="terms-screen">
+        <div class="terms-card">
+            <h2>Términos y Condiciones</h2>
+            <p>Al utilizar este servicio, usted declara que:</p>
+            <ul style="text-align:left;">
+                <li>El teléfono iPhone es de su propiedad exclusiva.</li>
+                <li>Entiende que cualquier procedimiento conlleva riesgos.</li>
+                <li>El técnico no se responsabiliza por daños o pérdida de datos.</li>
+                <li>Usted asume completa responsabilidad.</li>
             </ul>
-            <div class="mensaje-ejemplo">
-                "Hola! Tu iPhone 8 quedará totalmente liberado. Podrás poner tu propia cuenta de iCloud, usar chip de cualquier compañía y actualizar iOS sin problema. Todo funciona al 100% como de fábrica."
+            <div style="margin:20px 0;">
+                <input type="checkbox" id="accept-checkbox">
+                <label for="accept-checkbox">Acepto los términos y condiciones</label>
             </div>
-            <p><strong>Qué NO decir:</strong></p>
-            <div class="prohibido">
-                Nunca digas “es oficial de Apple” o “Apple lo desbloquea”. Es un bypass, no un desbloqueo oficial.
-            </div>
-        </div>
-
-        <div class="seccion-modelo">
-            <h2>iPhone X / XR / XS / XS Max</h2>
-            <p><strong>Qué decirle al cliente:</strong></p>
-            <ul>
-                <li>El teléfono quedará funcional para todo MENOS la señal celular (no detectará chip).</li>
-                <li>Puede usar Wi-Fi, poner su propia cuenta iCloud, descargar apps, WhatsApp, fotos, etc.</li>
-                <li>Es ideal como iPod touch o para uso con Wi-Fi.</li>
-                <li>Este comportamiento es permanente; no hay solución conocida actualmente.</li>
-            </ul>
-            <div class="mensaje-ejemplo">
-                "El iPhone XR quedará desbloqueado de iCloud y podrás usar tu propia cuenta, Wi-Fi, apps, cámara, todo. La única limitación es que no tendrá señal celular (no detecta chip). Es perfecto si lo vas a usar con Wi-Fi."
-            </div>
-            <div class="prohibido">
-                <strong>PROHIBIDO decir:</strong> “Después se le puede poner señal”, “en unos meses sale solución”, “es temporal”, o cualquier promesa de señal futura. Eso genera reclamos seguros.
-            </div>
-        </div>
-
-        <div class="seccion-modelo">
-            <h2>iPhone 11 / 11 Pro / 11 Pro Max / 12 / 12 Mini / 12 Pro / 12 Pro Max</h2>
-            <p><strong>Qué decirle al cliente:</strong></p>
-            <ul>
-                <li>Igual que los modelos XR en adelante: sin señal celular.</li>
-                <li>Todo lo demás funciona perfectamente con Wi-Fi.</li>
-                <li>En algunos casos raros puede haber notificaciones de iCloud, pero no bloquea el uso.</li>
-            </ul>
-            <div class="mensaje-ejemplo">
-                "El iPhone 12 quedará completamente usable con tu cuenta de iCloud, Wi-Fi, apps y todo. Solo no tendrá señal celular. Te lo explico en persona para que no tengas dudas."
-            </div>
-            <div class="prohibido">
-                Nunca garantices señal ni digas que “es solo temporal”.
-            </div>
-        </div>
-
-        <div class="seccion-modelo">
-            <h2>iPhone 13 / 13 Mini / 13 Pro / 13 Pro Max / 14 / 14 Plus / 14 Pro / 14 Pro Max / 15 / 15 Plus / 15 Pro / 15 Pro Max</h2>
-            <p><strong>Qué decirle al cliente:</strong></p>
-            <ul>
-                <li>Actualmente NO hay bypass estable para estos modelos.</li>
-                <li>Si alguien ofrece desbloqueo, probablemente es estafa o método temporal que volverá a bloquearse.</li>
-                <li>Recomienda esperar o considerar otras opciones (vender por partes, etc.).</li>
-            </ul>
-            <div class="mensaje-ejemplo">
-                "Lamentablemente para iPhone 14 y 15 aún no existe un método confiable de desbloqueo. Te recomiendo no pagar a nadie que prometa algo, porque la mayoría son métodos temporales que vuelven a bloquear. Te aviso en cuanto salga algo estable."
-            </div>
-            <div class="prohibido">
-                <strong>NUNCA</strong> ofrezcas desbloqueo de estos modelos ni aceptes dinero por intentarlo.
-            </div>
-        </div>
-
-        <div class="importante">
-            <strong>Consejos generales de honestidad:</strong>
-            <ul>
-                <li>Siempre explica las limitaciones ANTES de cobrar.</li>
-                <li>Si el cliente no acepta las condiciones, no hagas el trabajo.</li>
-                <li>Toma captura o graba (con permiso) la conversación donde el cliente acepta las condiciones.</li>
-                <li>La reputación vale más que un trabajo rápido.</li>
-            </ul>
+            <button id="accept-btn" disabled>Aceptar y continuar</button>
         </div>
     </div>
 
-    <!-- Modal confirmación cerrar sesión -->
-    <div id="modalConfirmacion">
-        <div class="modal-contenido">
-            <h3>¿Estás seguro de cerrar sesión?</h3>
-            <div class="modal-botones">
-                <button id="btnCancelar">No</button>
-                <button id="btnConfirmarCerrar">Sí, cerrar</button>
-            </div>
-        </div>
+    <!-- Navegación ovalada -->
+    <div class="nav-oval">
+        <div class="nav-item" onclick="document.getElementById('nosotros').scrollIntoView({behavior:'smooth'})">Nosotros</div>
+        <div class="nav-item" onclick="document.getElementById('servicios').scrollIntoView({behavior:'smooth'})">Servicios</div>
+        <div class="nav-item" onclick="document.getElementById('preview').scrollIntoView({behavior:'smooth'})">Reseñas</div>
+        <div class="nav-item" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">Preguntas frecuentes</div>
     </div>
+
+    <!-- Slider principal (nuevo) -->
+    <div id="main-slider">
+        <div class="slider-inner"></div>
+    </div>
+
+    <main id="main-content">
+
+        <!-- Sección Preview / Trabajos recientes -->
+        <section id="preview" style="position:relative;">
+            <div id="guia-flecha">Mira el proceso de desbloqueo aquí →</div>
+            <h2>Trabajos recientes</h2>
+            <div class="posts-grid">
+                <div class="fb-carousel-container">
+                    <div class="fb-header" onclick="window.open('https://www.instagram.com/ferv_hs', '_blank')">
+                        <div class="fb-profile-pic"></div>
+                        <div class="fb-name-time">
+                            <div class="fb-name">ferv_hs</div>
+                            <div class="fb-time">Trabajo reciente</div>
+                        </div>
+                    </div>
+                    <div class="fb-content">¡Otro iPhone desbloqueado con éxito! 🚀</div>
+                    <div class="carousel-container" id="carousel-1">
+                        <div class="carousel-inner"></div>
+                    </div>
+                </div>
+                <div class="fb-carousel-container">
+                    <div class="fb-header" onclick="window.open('https://www.instagram.com/ferv_hs', '_blank')">
+                        <div class="fb-profile-pic"></div>
+                        <div class="fb-name-time">
+                            <div class="fb-name">ferv_hs</div>
+                            <div class="fb-time">Trabajo reciente</div>
+                        </div>
+                    </div>
+                    <div class="fb-content">¡Otro iPhone desbloqueado con éxito! 🚀</div>
+                    <div class="carousel-container" id="carousel-2">
+                        <div class="carousel-inner"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Placeholders para que escribas después -->
+        <section id="nosotros">
+            <h2>Nosotros</h2>
+            <p>Aquí escribe tu texto sobre el equipo, experiencia, etc.</p>
+        </section>
+
+        <section id="servicios">
+            <h2>Servicios</h2>
+            <p>Aquí describe los servicios que ofreces.</p>
+        </section>
+
+        <section id="resenas">
+            <h2>Reseñas</h2>
+            <p>Aquí puedes agregar reseñas de clientes o más carruseles.</p>
+        </section>
+
+        <section id="faq">
+            <h2>Preguntas frecuentes</h2>
+            <p>Aquí pon el acordeón o lista de preguntas.</p>
+        </section>
+
+        <section id="info-dispositivos">
+            <h2>Cómo quedan los dispositivos</h2>
+            <p>Aquí escribe toda la información honesta sobre cómo quedan los iPhone según modelo, riesgos, qué no prometer, etc.</p>
+        </section>
+
+        <div class="cta-container">
+            <button class="cta-button" onclick="window.location.href='crea-cita.html'">¡Agenda ahora tu desbloqueo!</button>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>© 2025 Todos los derechos reservados.</p>
+        <a href="https://www.instagram.com/ferv_hs" target="_blank" class="instagram-link">
+            <i class="fab fa-instagram"></i>
+        </a>
+    </footer>
 
     <script>
-        // === SESIÓN ===
-        const logueado = localStorage.getItem('logueado') === 'true';
-        let nombreTecnico = localStorage.getItem('nombreTecnico');
-        if (!logueado || !nombreTecnico) {
-            window.location.href = 'login.html';
+        // Términos
+        const termsScreen = document.getElementById('terms-screen');
+        const checkbox = document.getElementById('accept-checkbox');
+        const acceptBtn = document.getElementById('accept-btn');
+        const mainContent = document.getElementById('main-content');
+
+        if (localStorage.getItem('termsAccepted') === 'true') {
+            termsScreen.classList.add('hidden');
+            mainContent.classList.add('visible');
         }
-        const nombreCompleto = `Tec. ${nombreTecnico.trim()}`;
-        document.getElementById('nombreMenu').textContent = nombreCompleto;
-
-        // === MENÚ ===
-        const menuHamburguesa = document.getElementById('menuHamburguesa');
-        const menuLateral = document.getElementById('menuLateral');
-        const overlay = document.getElementById('overlay');
-        const opcionMisTrabajos = document.getElementById('opcionMisTrabajos');
-        const opcionRegistro = document.getElementById('opcionRegistro');
-        const opcionCerrarSesion = document.getElementById('opcionCerrarSesion');
-        const modalConfirmacion = document.getElementById('modalConfirmacion');
-        const btnCancelar = document.getElementById('btnCancelar');
-        const btnConfirmarCerrar = document.getElementById('btnConfirmarCerrar');
-
-        menuHamburguesa.addEventListener('click', () => {
-            menuHamburguesa.classList.toggle('activo');
-            menuLateral.classList.toggle('abierto');
-            overlay.classList.toggle('activo');
-        });
-        overlay.addEventListener('click', () => {
-            menuHamburguesa.classList.remove('activo');
-            menuLateral.classList.remove('abierto');
-            overlay.classList.remove('activo');
-        });
-
-        opcionMisTrabajos.addEventListener('click', () => window.location.href = 'mis-trabajos.html');
-        opcionRegistro.addEventListener('click', () => window.location.href = 'index.html');
-        opcionCerrarSesion.addEventListener('click', () => {
-            modalConfirmacion.style.display = 'flex';
-            menuHamburguesa.classList.remove('activo');
-            menuLateral.classList.remove('abierto');
-            overlay.classList.remove('activo');
-        });
-        btnCancelar.addEventListener('click', () => modalConfirmacion.style.display = 'none');
-        btnConfirmarCerrar.addEventListener('click', () => {
-            localStorage.removeItem('logueado');
-            localStorage.removeItem('nombreTecnico');
-            window.location.href = 'login.html';
+        checkbox.addEventListener('change', () => acceptBtn.disabled = !checkbox.checked);
+        acceptBtn.addEventListener('click', () => {
+            if (checkbox.checked) {
+                localStorage.setItem('termsAccepted', 'true');
+                termsScreen.classList.add('hidden');
+                setTimeout(() => mainContent.classList.add('visible'), 300);
+            }
         });
     </script>
 </body>
