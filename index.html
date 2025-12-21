@@ -111,18 +111,18 @@
                 console.error("Error cargando icono iCloud:", error);
             }
         }
-        // Cargar imagen Paijoi para el botón
-        async function loadPaijoiIcon() {
+        // Cargar imagen Payjoy para el botón
+        async function loadPayjoyIcon() {
             const folderRef = ref(storage, 'payjoi');
             try {
                 const listResult = await listAll(folderRef);
                 if (listResult.items.length > 0) {
                     const firstItem = listResult.items[0];
                     const url = await getDownloadURL(firstItem);
-                    document.getElementById('paijoi-icon').src = url;
+                    document.getElementById('payjoy-icon').src = url;
                 }
             } catch (error) {
-                console.error("Error cargando icono Paijoi:", error);
+                console.error("Error cargando icono Payjoy:", error);
             }
         }
         document.addEventListener('DOMContentLoaded', () => {
@@ -130,7 +130,7 @@
             loadMainSlider();
             loadProfileImage();
             loadICloudIcon();
-            loadPaijoiIcon();
+            loadPayjoyIcon();
             const observer = new MutationObserver(() => {
                 if (mainContent.classList.contains('visible')) {
                     loadCarousel('ads-1', 'carousel-1');
@@ -270,9 +270,10 @@
             object-fit: contain;
             margin-bottom: 12px;
         }
-        /* Para Paijoi específicamente: asegurar que se vea completa */
-        #paijoi-icon {
-            object-fit: contain;
+        /* Para Payjoy: imagen redonda completa */
+        #payjoy-icon {
+            border-radius: 50%;
+            object-fit: cover;
         }
         .fa-users-service {
             font-size: 80px;
@@ -544,6 +545,72 @@
             cursor: pointer;
         }
         main { margin-top: 80px; }
+
+        /* Acomodo servicios en pantallas pequeñas: 1 arriba, 2 abajo */
+        @media (max-width: 767px) {
+            #servicios .nav-oval {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+                justify-items: center;
+            }
+            #servicios .nav-oval > .service-island:nth-child(1) {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: #1d1d1f;
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 15px;
+        }
+        .social-icons {
+            margin: 20px 0;
+        }
+        .social-icons a {
+            color: #fff;
+            font-size: 28px;
+            margin: 0 20px;
+            transition: opacity 0.3s;
+        }
+        .social-icons a:hover {
+            opacity: 0.8;
+        }
+        .contact-info {
+            margin: 15px 0;
+        }
+
+        /* WhatsApp flotante */
+        #whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+        #whatsapp-float:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -634,9 +701,9 @@
                     <img id="icloud-icon" class="service-icon" src="" alt="Desbloqueo iCloud">
                     <div>Desbloqueo iCloud</div>
                 </div>
-                <div class="service-island nav-item" onclick="toggleServiceModal('paijoi')">
-                    <img id="paijoi-icon" class="service-icon" src="" alt="Desbloqueo Paijoi">
-                    <div>Desbloqueo Paijoi</div>
+                <div class="service-island nav-item" onclick="toggleServiceModal('payjoy')">
+                    <img id="payjoy-icon" class="service-icon" src="" alt="Desbloqueo Payjoy">
+                    <div>Desbloqueo Payjoy</div>
                 </div>
                 <div class="service-island nav-item" onclick="window.location.href='curriculum.html'">
                     <i class="fas fa-users fa-users-service"></i>
@@ -652,33 +719,48 @@
                 <div class="faq-answer" id="garantia-answer">
                     <p>Información sobre la garantía del servicio...</p>
                 </div>
-
                 <div class="faq-item" onclick="toggleFaq('estado')">¿Cómo va a quedar mi teléfono?</div>
                 <div class="faq-answer" id="estado-answer">
                     <p>Información sobre el estado final del dispositivo...</p>
                 </div>
-
                 <div class="faq-item" onclick="toggleFaq('compatible')">¿Mi teléfono es compatible?</div>
                 <div class="faq-answer" id="compatible-answer">
                     <p>Información sobre compatibilidad...</p>
                 </div>
-
                 <div class="faq-item" onclick="toggleFaq('funciona')">¿Cómo funciona el desbloqueo?</div>
                 <div class="faq-answer" id="funciona-answer">
                     <p>Explicación paso a paso del proceso...</p>
                 </div>
-
                 <div class="faq-item" onclick="toggleFaq('otros')">¿Qué otros servicios ofrecen?</div>
                 <div class="faq-answer" id="otros-answer">
                     <p>Lista de otros servicios disponibles...</p>
                 </div>
             </div>
         </section>
-        <!-- Botón CTA -->
-        <div class="cta-container">
-            <button class="cta-button" onclick="window.location.href='crea-cita.html'">¡Agenda ahora tu desbloqueo!</button>
-        </div>
+        <!-- Botón CTA eliminado -->
     </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="nosotros.html">Acerca de nosotros</a>
+        </div>
+        <div class="social-icons">
+            <a href="https://instagram.com/ferv_hs" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
+        </div>
+        <div class="contact-info">
+            Contacto: 6624672947
+        </div>
+        <div>© 2025 Todos los derechos reservados</div>
+    </footer>
+
+    <!-- Botón flotante WhatsApp -->
+    <a href="https://wa.me/6624672947" target="_blank" id="whatsapp-float">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
     <!-- Modales de servicios -->
     <div id="icloud-modal" class="service-modal">
         <div class="service-content">
@@ -689,12 +771,12 @@
             </div>
         </div>
     </div>
-    <div id="paijoi-modal" class="service-modal">
+    <div id="payjoy-modal" class="service-modal">
         <div class="service-content">
-            <div class="modal-close" onclick="toggleServiceModal('paijoi')">×</div>
-            <h2>Desbloqueo Paijoi</h2>
+            <div class="modal-close" onclick="toggleServiceModal('payjoy')">×</div>
+            <h2>Desbloqueo Payjoy</h2>
             <div class="service-text">
-                <p>Información detallada sobre el desbloqueo Paijoi...</p>
+                <p>Información detallada sobre el desbloqueo Payjoy...</p>
             </div>
         </div>
     </div>
