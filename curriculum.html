@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMPROPAGO - Quiero ser socio</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #ffffff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            color: #000000;
+        }
+        .container {
+            background: #ffffff;
+            padding: 40px;
+            border: 3px solid #000000;
+            max-width: 700px;
+            width: 100%;
+            margin-top: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #000000;
+            font-size: 32px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .intro {
+            text-align: center;
+            font-size: 17px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            padding: 20px;
+            border-bottom: 2px solid #000000;
+        }
+        .progress-container {
+            height: 12px;
+            background: #cccccc;
+            border: 2px solid #000000;
+            margin: 30px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #000000;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        .step-indicator {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        .steps .step {
+            display: none;
+        }
+        .steps .step.active {
+            display: block;
+        }
+        .steps .step h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .steps .step p.info {
+            text-align: center;
+            color: #333333;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+        label {
+            display: block;
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            border: 2px solid #000000;
+            font-size: 16px;
+            box-sizing: border-box;
+            background: #ffffff;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            background: #f0f0f0;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+        .checkbox-item input {
+            width: auto;
+            margin-right: 12px;
+            transform: scale(1.4);
+        }
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+        .navigation button {
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        #btnAnterior {
+            background: #cccccc;
+            color: #000000;
+        }
+        #btnAnterior:hover {
+            background: #bbbbbb;
+        }
+        #btnSiguiente {
+            background: #000000;
+            color: #ffffff;
+        }
+        #btnSiguiente:hover {
+            background: #333333;
+        }
+        #btnSiguiente:disabled {
+            background: #999999;
+            color: #cccccc;
+            cursor: not-allowed;
+        }
+        #notificacion {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            background: #000000;
+            color: #ffffff;
+            padding: 50px 100px;
+            font-size: 36px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s;
+        }
+        #notificacion.mostrar {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QUIERO SER SOCIO</h1>
+        <div class="intro">
+            <p>Nos complace tu interés en formar parte del equipo COMPROPAGO.</p>
+            <p>Por favor, completa el siguiente formulario paso a paso. Cada sección se desbloquea al responder la anterior.</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="step-indicator" id="stepText">Paso 1 de 7</p>
+
+        <form id="formSocio" novalidate>
+            <div class="steps">
+                <!-- Paso 1: Especialidades -->
+                <div class="step active">
+                    <h2>¿En qué campo(s) te especializas?</h2>
+                    <p class="info">Selecciona todas las que apliquen. Es obligatorio elegir al menos una.</p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" value="Reparaciones de hardware (pantallas, baterías, etc.)"> Reparaciones de hardware (pantallas, baterías, etc.)</label>
+                        <label class="checkbox-item"><input type="checkbox" value="Desbloqueos iCloud"> Desbloqueos iCloud</label>
+                        <label class="checkbox-item"><input type="checkbox" value="Desbloqueos Google/FRP"> Desbloqueos Google/FRP</label>
+                        <label class="checkbox-item"><input type="checkbox" value="Diagnóstico y software"> Diagnóstico y software (actualizaciones, reinstalaciones)</label>
+                        <label class="checkbox-item"><input type="checkbox" value="Atención al cliente"> Atención al cliente</label>
+                        <label class="checkbox-item"><input type="checkbox" value="Ventas y asesoría"> Ventas y asesoría técnica</label>
+                        <label class="checkbox-item"><input type="checkbox" value="Otro"> Otro (especifica abajo)</label>
+                    </div>
+                    <div id="otroContainer" style="display:none;">
+                        <label>Otro (especifica)</label>
+                        <input type="text" id="especialidadOtro" placeholder="Describe tu especialidad">
+                    </div>
+                </div>
+
+                <!-- Paso 2: Años de experiencia -->
+                <div class="step">
+                    <h2>Años de experiencia en el sector</h2>
+                    <select id="añosExperiencia">
+                        <option value="">Seleccionar...</option>
+                        <option>Menos de 1 año</option>
+                        <option>1 - 2 años</option>
+                        <option>3 - 5 años</option>
+                        <option>Más de 5 años</option>
+                    </select>
+                </div>
+
+                <!-- Paso 3: Descripción experiencia -->
+                <div class="step">
+                    <h2>Describe brevemente tu experiencia y habilidades principales</h2>
+                    <textarea id="experiencia" placeholder="Ejemplo: He trabajado 4 años en reparación de dispositivos Apple y Samsung..."></textarea>
+                </div>
+
+                <!-- Paso 4: Marcas y modelos -->
+                <div class="step">
+                    <h2>Marcas o modelos en los que tienes mayor experiencia</h2>
+                    <textarea id="marcasModelos" rows="3" placeholder="Ejemplo: Apple (iPhone 11-16), Samsung Galaxy S y A series, Xiaomi, Huawei..."></textarea>
+                </div>
+
+                <!-- Paso 5: Disponibilidad -->
+                <div class="step">
+                    <h2>Disponibilidad horaria y días de la semana</h2>
+                    <textarea id="disponibilidad" rows="3" placeholder="Ejemplo: Lunes a sábado de 10:00 a 19:00, disponibilidad para guardias..."></textarea>
+                </div>
+
+                <!-- Paso 6: Motivación -->
+                <div class="step">
+                    <h2>¿Por qué deseas unirte a COMPROPAGO?</h2>
+                    <textarea id="motivacion" rows="4" placeholder="Cuéntanos tu motivación para formar parte de nuestro equipo..."></textarea>
+                </div>
+
+                <!-- Paso 7: Datos de contacto -->
+                <div class="step">
+                    <h2>Información de contacto</h2>
+                    <label>Nombre completo</label>
+                    <input type="text" id="nombreCompleto" placeholder="Ej: Juan Pérez Gómez">
+
+                    <label>Teléfono (WhatsApp preferido)</label>
+                    <input type="tel" id="telefono" placeholder="Ej: 55 1234 5678">
+
+                    <label>Correo electrónico</label>
+                    <input type="email" id="email" placeholder="Ej: juan@example.com">
+                </div>
+            </div>
+        </form>
+
+        <div class="navigation">
+            <button type="button" id="btnAnterior">ANTERIOR</button>
+            <button type="button" id="btnSiguiente" disabled>SIGUIENTE</button>
+        </div>
+    </div>
+
+    <div id="notificacion">¡Te contactaremos pronto!</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
+            authDomain: "comprobantes-363c9.firebaseapp.com",
+            databaseURL: "https://comprobantes-363c9-default-rtdb.firebaseio.com",
+            projectId: "comprobantes-363c9",
+            storageBucket: "comprobantes-363c9.firebasestorage.app",
+            messagingSenderId: "390391998056",
+            appId: "1:390391998056:web:23e22073d88bc247d43ddd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const solicitudesRef = ref(db, 'solicitudes_socio');
+
+        const totalSteps = 7;
+        let currentStep = 1;
+
+        const steps = document.querySelectorAll('.step');
+        const progressBar = document.getElementById('progressBar');
+        const stepText = document.getElementById('stepText');
+        const btnAnterior = document.getElementById('btnAnterior');
+        const btnSiguiente = document.getElementById('btnSiguiente');
+        const otroCheckbox = document.querySelector('input[value="Otro"]');
+        const otroContainer = document.getElementById('otroContainer');
+        const otroInput = document.getElementById('especialidadOtro');
+        const notificacion = document.getElementById('notificacion');
+
+        function updateView() {
+            steps.forEach((step, i) => {
+                step.classList.toggle('active', i + 1 === currentStep);
+            });
+            stepText.textContent = `Paso ${currentStep} de ${totalSteps}`;
+            progressBar.style.width = `${((currentStep - 1) / (totalSteps - 1)) * 100}%`;
+            btnAnterior.style.display = currentStep === 1 ? 'none' : 'block';
+            btnSiguiente.textContent = currentStep === totalSteps ? 'ENVIAR SOLICITUD' : 'SIGUIENTE';
+            checkValid();
+        }
+
+        function checkValid() {
+            let valid = false;
+
+            if (currentStep === 1) {
+                const checkedCount = document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').length;
+                const otroChecked = otroCheckbox.checked;
+                const otroText = otroInput.value.trim();
+                valid = checkedCount > 0 && (!otroChecked || otroText !== '');
+            } else if (currentStep === 2) {
+                valid = document.getElementById('añosExperiencia').value !== '';
+            } else if (currentStep === 3) {
+                valid = document.getElementById('experiencia').value.trim() !== '';
+            } else if (currentStep === 6) {
+                valid = document.getElementById('motivacion').value.trim() !== '';
+            } else if (currentStep === 7) {
+                const nombre = document.getElementById('nombreCompleto').value.trim();
+                const telefono = document.getElementById('telefono').value.trim();
+                const email = document.getElementById('email').value.trim();
+                valid = nombre !== '' && telefono !== '' && email !== '';
+            } else {
+                valid = true; // pasos 4 y 5 son opcionales
+            }
+
+            btnSiguiente.disabled = !valid;
+        }
+
+        // Mostrar/ocultar campo "Otro"
+        otroCheckbox.addEventListener('change', () => {
+            otroContainer.style.display = otroCheckbox.checked ? 'block' : 'none';
+            checkValid();
+        });
+
+        // Validación en tiempo real
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.addEventListener('input', checkValid);
+            el.addEventListener('change', checkValid);
+        });
+        document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', checkValid);
+        });
+
+        btnSiguiente.addEventListener('click', () => {
+            if (currentStep === totalSteps) {
+                enviarSolicitud();
+            } else {
+                currentStep++;
+                updateView();
+            }
+        });
+
+        btnAnterior.addEventListener('click', () => {
+            currentStep--;
+            updateView();
+        });
+
+        async function enviarSolicitud() {
+            if (btnSiguiente.disabled) return;
+
+            // Recopilar especialidades
+            let especialidades = Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+            if (otroCheckbox.checked) {
+                const otro = otroInput.value.trim();
+                if (otro) especialidades.push(otro);
+            }
+
+            const datos = {
+                fecha: new Date().toLocaleString('es-MX'),
+                nombreCompleto: document.getElementById('nombreCompleto').value.trim(),
+                telefono: document.getElementById('telefono').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                añosExperiencia: document.getElementById('añosExperiencia').value,
+                especialidades: especialidades.length > 0 ? especialidades : 'No especificado',
+                experiencia: document.getElementById('experiencia').value.trim(),
+                marcasModelos: document.getElementById('marcasModelos').value.trim(),
+                disponibilidad: document.getElementById('disponibilidad').value.trim(),
+                motivacion: document.getElementById('motivacion').value.trim()
+            };
+
+            btnSiguiente.disabled = true;
+            btnSiguiente.textContent = 'ENVIANDO...';
+
+            try {
+                await push(solicitudesRef, datos);
+                notificacion.classList.add('mostrar');
+                setTimeout(() => {
+                    notificacion.classList.remove('mostrar');
+                    document.getElementById('formSocio').reset();
+                    otroContainer.style.display = 'none';
+                    currentStep = 1;
+                    updateView();
+                }, 3000);
+            } catch (error) {
+                alert("Error al enviar la solicitud: " + error.message);
+                btnSiguiente.textContent = 'ENVIAR SOLICITUD';
+                btnSiguiente.disabled = false;
+            }
+        }
+
+        // Inicializar
+        updateView();
+    </script>
+</body>
+</html>
