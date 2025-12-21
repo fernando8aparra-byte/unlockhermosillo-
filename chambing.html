@@ -113,9 +113,59 @@
         .modal-botones button {padding: 12px 24px; margin: 0 10px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer;}
         #btnCancelar {background: #95a5a6; color: white;}
         #btnConfirmarCerrar {background: #e74c3c; color: white;}
+
+        /* NUEVO: Modal Términos y Condiciones (solo para alejandroatondo4@gmail.com) */
+        #modalTerminos {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 20000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .terminos-contenido {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .terminos-contenido h2 {color: #e74c3c; margin-bottom: 20px;}
+        .terminos-contenido p {font-size: 20px; font-weight: bold; margin: 30px 0;}
+        .acepto-checkbox {margin: 20px 0; font-size: 18px;}
+        #btnAceptarTerminos {
+            background: #27ae60;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #btnAceptarTerminos:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
+    <!-- NUEVO: Modal Términos y Condiciones -->
+    <div id="modalTerminos">
+        <div class="terminos-contenido">
+            <h2>Términos y Condiciones Especiales</h2>
+            <p>Soy luisimp y acepto ser un simp de mierda</p>
+            <label class="acepto-checkbox">
+                <input type="checkbox" id="checkboxAcepto"> Acepto los términos y condiciones
+            </label>
+            <button id="btnAceptarTerminos" disabled>Aceptar</button>
+        </div>
+    </div>
+
     <!-- Menú hamburguesa -->
     <div class="menu-hamburguesa" id="menuHamburguesa">
         <div class="barra"></div>
@@ -163,7 +213,6 @@
         <div id="noTrabajos">Cargando tus trabajos...</div>
         <div class="trabajos-list" id="trabajosList"></div>
     </div>
-
     <!-- Modal detalle trabajo -->
     <div id="modalDetalle">
         <div class="detalle-contenido">
@@ -172,7 +221,6 @@
             <div class="evidencias" id="evidencias"></div>
         </div>
     </div>
-
     <!-- Modal edición -->
     <div id="modalEdicion">
         <div class="edicion-contenido">
@@ -191,7 +239,6 @@
             </div>
         </div>
     </div>
-
     <!-- Modal confirmación eliminación -->
     <div id="modalEliminar">
         <div class="modal-contenido">
@@ -203,13 +250,11 @@
             </div>
         </div>
     </div>
-
     <!-- Lightbox imagen -->
     <div id="lightbox">
         <span id="cerrarLightbox">×</span>
         <img id="imagenAmpliada" src="" alt="Evidencia">
     </div>
-
     <!-- Modal confirmación cerrar sesión -->
     <div id="modalConfirmacion">
         <div class="modal-contenido">
@@ -220,11 +265,9 @@
             </div>
         </div>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
         import { getDatabase, ref, get, update, remove } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
-
         const firebaseConfig = {
             apiKey: "AIzaSyAt8TuulnlY3IKPaFVctgaGNQWewfzONEI",
             authDomain: "comprobantes-363c9.firebaseapp.com",
@@ -234,49 +277,66 @@
             messagingSenderId: "390391998056",
             appId: "1:390391998056:web:23e22073d88bc247d43ddd"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
+        const cuentasRef = ref(db, 'cuentas');
 
-        // === ELEMENTOS ===
-        const menuHamburguesa = document.getElementById('menuHamburguesa');
-        const menuLateral = document.getElementById('menuLateral');
-        const overlay = document.getElementById('overlay');
-        const nombreMenu = document.getElementById('nombreMenu');
-        const opcionRegistro = document.getElementById('opcionRegistro');
-        const opcionCerrarSesion = document.getElementById('opcionCerrarSesion');
-        const modalConfirmacion = document.getElementById('modalConfirmacion');
-        const btnCancelar = document.getElementById('btnCancelar');
-        const btnConfirmarCerrar = document.getElementById('btnConfirmarCerrar');
-        const seccionConsejos = document.getElementById('seccionConsejos');
-        const cerrarConsejos = document.getElementById('cerrarConsejos');
-        const modalDetalle = document.getElementById('modalDetalle');
-        const cerrarDetalle = document.getElementById('cerrarDetalle');
-        const modalEdicion = document.getElementById('modalEdicion');
-        const cancelarEdicion = document.getElementById('cancelarEdicion');
-        const guardarEdicion = document.getElementById('guardarEdicion');
-        const modalEliminar = document.getElementById('modalEliminar');
-        const btnCancelarEliminar = document.getElementById('btnCancelarEliminar');
-        const btnConfirmarEliminar = document.getElementById('btnConfirmarEliminar');
-        const lightbox = document.getElementById('lightbox');
-        const cerrarLightbox = document.getElementById('cerrarLightbox');
-
-        // Variables globales para edición/eliminación
-        let trabajoActual = null;
+        // === ELEMENTOS NUEVOS PARA TÉRMINOS ===
+        const modalTerminos = document.getElementById('modalTerminos');
+        const checkboxAcepto = document.getElementById('checkboxAcepto');
+        const btnAceptarTerminos = document.getElementById('btnAceptarTerminos');
 
         // === SESIÓN ===
         const logueado = localStorage.getItem('logueado') === 'true';
         let nombreTecnico = localStorage.getItem('nombreTecnico');
+        let usuarioKey = localStorage.getItem('usuario'); // nombre de usuario en la base
+
         if (!logueado || !nombreTecnico) {
             window.location.href = 'login.html';
         }
+
+        // === VERIFICAR SI ES EL USUARIO ESPECIAL Y MOSTRAR TÉRMINOS ===
+        async function verificarTerminosEspeciales() {
+            if (!usuarioKey) return;
+
+            try {
+                const snapshot = await get(ref(db, `cuentas/${usuarioKey}`));
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const email = data.email ? data.email.toLowerCase().trim() : '';
+
+                    if (email === 'alejandroatondo4@gmail.com') {
+                        const aceptado = localStorage.getItem('terminos_luisimp_aceptado') === 'true';
+                        if (!aceptado) {
+                            modalTerminos.style.display = 'flex';
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error verificando usuario especial:", err);
+            }
+        }
+
+        // Eventos del modal de términos
+        checkboxAcepto.addEventListener('change', () => {
+            btnAceptarTerminos.disabled = !checkboxAcepto.checked;
+        });
+
+        btnAceptarTerminos.addEventListener('click', () => {
+            if (checkboxAcepto.checked) {
+                localStorage.setItem('terminos_luisimp_aceptado', 'true');
+                modalTerminos.style.display = 'none';
+            }
+        });
+
+        // === RESTO DEL CÓDIGO ORIGINAL (sin cambios) ===
         const nombreCompleto = `Tec. ${nombreTecnico.trim()}`;
         document.getElementById('tituloTecnico').textContent = `Trabajos de ${nombreCompleto}`;
         nombreMenu.textContent = nombreCompleto;
         menuHamburguesa.style.display = 'flex';
 
-        // Eventos menú
+        // Eventos menú (igual)
         menuHamburguesa.addEventListener('click', () => {
             menuHamburguesa.classList.toggle('activo');
             menuLateral.classList.toggle('abierto');
@@ -298,6 +358,8 @@
         btnConfirmarCerrar.addEventListener('click', () => {
             localStorage.removeItem('logueado');
             localStorage.removeItem('nombreTecnico');
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('terminos_luisimp_aceptado'); // opcional
             window.location.href = 'login.html';
         });
         cerrarConsejos.addEventListener('click', () => seccionConsejos.style.display = 'none');
@@ -310,8 +372,12 @@
         cerrarLightbox.addEventListener('click', () => lightbox.style.display = 'none');
         lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.style.display = 'none'; });
 
+        // Variables globales para edición/eliminación
+        let trabajoActual = null;
+
         // === CARGAR TRABAJOS ===
         async function cargarTrabajos() {
+            // ... (todo el código original de cargarTrabajos, mostrarDetalle, abrirEdicion, etc. permanece exactamente igual)
             try {
                 const snapshot = await get(ordenesRef);
                 if (!snapshot.exists()) {
@@ -321,16 +387,13 @@
                 const datos = snapshot.val();
                 let trabajos = Object.entries(datos).map(([id, t]) => ({id, ...t}));
                 trabajos = trabajos.filter(t => t.tecnico && t.tecnico.includes(nombreTecnico.trim()));
-
                 if (trabajos.length === 0) {
                     document.getElementById('noTrabajos').textContent = 'Aún no tienes trabajos registrados.';
                     return;
                 }
-
                 // Ordenar por fecha descendente
                 trabajos.sort((a, b) => new Date(b.fecha.split(' ')[0].split('/').reverse().join('-')) - new Date(a.fecha.split(' ')[0].split('/').reverse().join('-')));
-
-                // Resumen financiero y consejos (igual que antes)
+                // Resumen financiero y consejos
                 let totalCobrado = 0, totalGastos = 0;
                 const dias = {}, tipos = {};
                 trabajos.forEach(t => {
@@ -347,11 +410,9 @@
                     const tipo = t.tipo || 'Otro';
                     tipos[tipo] = (tipos[tipo] || 0) + (cobrado - gastos);
                 });
-
                 document.getElementById('totalCobrado').textContent = `$${totalCobrado.toFixed(2)}`;
                 document.getElementById('totalGastos').textContent = `$${totalGastos.toFixed(2)}`;
                 document.getElementById('gananciaNeta').textContent = `$${(totalCobrado - totalGastos).toFixed(2)}`;
-
                 const mejorDia = Object.keys(dias).length > 0 ? Object.keys(dias).reduce((a, b) => dias[a] > dias[b] ? a : b) : 'ninguno';
                 const mejorTipo = Object.keys(tipos).length > 0 ? Object.keys(tipos).reduce((a, b) => tipos[a] > tipos[b] ? a : b) : 'ninguno';
                 const consejos = [
@@ -361,7 +422,6 @@
                     trabajos.length > 10 ? `Has completado ${trabajos.length} trabajos. ¡Sigue así!` : `Estás empezando fuerte. ¡Cada trabajo cuenta!`
                 ];
                 document.getElementById('listaConsejos').innerHTML = consejos.map(c => `<li>${c}</li>`).join('');
-
                 // Renderizar tarjetas
                 const list = document.getElementById('trabajosList');
                 list.innerHTML = '';
@@ -381,9 +441,7 @@
                             <button class="btn-accion btn-eliminar" data-id="${t.id}">🗑️ Eliminar</button>
                         </div>
                     `;
-                    // Click en info abre detalle
                     card.querySelector('.trabajo-info').addEventListener('click', () => mostrarDetalle(t));
-                    // Botones
                     card.querySelector('.btn-editar').addEventListener('click', (e) => {
                         e.stopPropagation();
                         abrirEdicion(t);
@@ -421,7 +479,10 @@
                 trabajo.evidencias.forEach(url => {
                     const img = document.createElement('img');
                     img.src = url;
-                    img.className = 'evidencia-img';
+                    img.style.width = '100%';
+                    img.style.marginBottom = '10px';
+                    img.style.borderRadius = '10px';
+                    img.style.cursor = 'pointer';
                     img.alt = 'Evidencia';
                     img.addEventListener('click', () => {
                         document.getElementById('imagenAmpliada').src = url;
@@ -463,7 +524,7 @@
             try {
                 await update(ref(db, 'ordenes/' + trabajoActual.id), updates);
                 modalEdicion.style.display = 'none';
-                cargarTrabajos(); // Recargar lista
+                cargarTrabajos();
             } catch (error) {
                 alert('Error al guardar cambios: ' + error.message);
             }
@@ -480,7 +541,10 @@
             }
         });
 
-        cargarTrabajos();
+        // Iniciar verificación de términos y carga de trabajos
+        verificarTerminosEspeciales().then(() => {
+            cargarTrabajos();
+        });
     </script>
 </body>
 </html>
