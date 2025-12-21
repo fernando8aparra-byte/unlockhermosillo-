@@ -113,8 +113,7 @@
         .modal-botones button {padding: 12px 24px; margin: 0 10px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer;}
         #btnCancelar {background: #95a5a6; color: white;}
         #btnConfirmarCerrar {background: #e74c3c; color: white;}
-
-        /* NUEVO: Modal Términos y Condiciones (solo para alejandroatondo4@gmail.com) */
+        /* Modal Términos y Condiciones */
         #modalTerminos {
             display: none;
             position: fixed;
@@ -154,18 +153,17 @@
     </style>
 </head>
 <body>
-    <!-- NUEVO: Modal Términos y Condiciones -->
+    <!-- Modal Términos y Condiciones (para el usuario Luis/luisim) -->
     <div id="modalTerminos">
         <div class="terminos-contenido">
             <h2>Términos y Condiciones Especiales</h2>
-            <p>Soy luisimp y acepto ser un simp de mierda</p>
+            <p>Acepto que yo luisim soy un simp de mierda</p>
             <label class="acepto-checkbox">
                 <input type="checkbox" id="checkboxAcepto"> Acepto los términos y condiciones
             </label>
             <button id="btnAceptarTerminos" disabled>Aceptar</button>
         </div>
     </div>
-
     <!-- Menú hamburguesa -->
     <div class="menu-hamburguesa" id="menuHamburguesa">
         <div class="barra"></div>
@@ -281,103 +279,74 @@
         const db = getDatabase(app);
         const ordenesRef = ref(db, 'ordenes');
         const cuentasRef = ref(db, 'cuentas');
-
-        // === ELEMENTOS NUEVOS PARA TÉRMINOS ===
+        // === ELEMENTOS PARA TÉRMINOS ===
         const modalTerminos = document.getElementById('modalTerminos');
         const checkboxAcepto = document.getElementById('checkboxAcepto');
         const btnAceptarTerminos = document.getElementById('btnAceptarTerminos');
-
         // === SESIÓN ===
         const logueado = localStorage.getItem('logueado') === 'true';
         let nombreTecnico = localStorage.getItem('nombreTecnico');
         let usuarioKey = localStorage.getItem('usuario'); // nombre de usuario en la base
-
         if (!logueado || !nombreTecnico) {
             window.location.href = 'login.html';
         }
-
-        // === VERIFICAR SI ES EL USUARIO ESPECIAL Y MOSTRAR TÉRMINOS ===
-        async function verificarTerminosEspeciales() {
-            if (!usuarioKey) return;
-
-            try {
-                const snapshot = await get(ref(db, `cuentas/${usuarioKey}`));
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    const email = data.email ? data.email.toLowerCase().trim() : '';
-
-                    if (email === 'alejandroatondo4@gmail.com') {
-                        const aceptado = localStorage.getItem('terminos_luisimp_aceptado') === 'true';
-                        if (!aceptado) {
-                            modalTerminos.style.display = 'flex';
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error("Error verificando usuario especial:", err);
+        // === MOSTRAR TÉRMINOS CADA VEZ QUE RECARGUE (solo para usuario luisim) ===
+        function verificarTerminosEspeciales() {
+            if (usuarioKey && usuarioKey.toLowerCase() === 'luisim') {
+                modalTerminos.style.display = 'flex';
             }
         }
-
         // Eventos del modal de términos
         checkboxAcepto.addEventListener('change', () => {
             btnAceptarTerminos.disabled = !checkboxAcepto.checked;
         });
-
         btnAceptarTerminos.addEventListener('click', () => {
             if (checkboxAcepto.checked) {
-                localStorage.setItem('terminos_luisimp_aceptado', 'true');
                 modalTerminos.style.display = 'none';
             }
         });
-
-        // === RESTO DEL CÓDIGO ORIGINAL (sin cambios) ===
+        // === RESTO DEL CÓDIGO ORIGINAL ===
         const nombreCompleto = `Tec. ${nombreTecnico.trim()}`;
         document.getElementById('tituloTecnico').textContent = `Trabajos de ${nombreCompleto}`;
-        nombreMenu.textContent = nombreCompleto;
-        menuHamburguesa.style.display = 'flex';
-
-        // Eventos menú (igual)
-        menuHamburguesa.addEventListener('click', () => {
-            menuHamburguesa.classList.toggle('activo');
-            menuLateral.classList.toggle('abierto');
-            overlay.classList.toggle('activo');
+        document.getElementById('nombreMenu').textContent = nombreCompleto;
+        document.getElementById('menuHamburguesa').style.display = 'flex';
+        // Eventos menú
+        document.getElementById('menuHamburguesa').addEventListener('click', () => {
+            document.getElementById('menuHamburguesa').classList.toggle('activo');
+            document.getElementById('menuLateral').classList.toggle('abierto');
+            document.getElementById('overlay').classList.toggle('activo');
         });
-        overlay.addEventListener('click', () => {
-            menuHamburguesa.classList.remove('activo');
-            menuLateral.classList.remove('abierto');
-            overlay.classList.remove('activo');
+        document.getElementById('overlay').addEventListener('click', () => {
+            document.getElementById('menuHamburguesa').classList.remove('activo');
+            document.getElementById('menuLateral').classList.remove('abierto');
+            document.getElementById('overlay').classList.remove('activo');
         });
-        opcionRegistro.addEventListener('click', () => window.location.href = 'index.html');
-        opcionCerrarSesion.addEventListener('click', () => {
-            modalConfirmacion.style.display = 'flex';
-            menuHamburguesa.classList.remove('activo');
-            menuLateral.classList.remove('abierto');
-            overlay.classList.remove('activo');
+        document.getElementById('opcionRegistro').addEventListener('click', () => window.location.href = 'index.html');
+        document.getElementById('opcionCerrarSesion').addEventListener('click', () => {
+            document.getElementById('modalConfirmacion').style.display = 'flex';
+            document.getElementById('menuHamburguesa').classList.remove('activo');
+            document.getElementById('menuLateral').classList.remove('abierto');
+            document.getElementById('overlay').classList.remove('activo');
         });
-        btnCancelar.addEventListener('click', () => modalConfirmacion.style.display = 'none');
-        btnConfirmarCerrar.addEventListener('click', () => {
+        document.getElementById('btnCancelar').addEventListener('click', () => document.getElementById('modalConfirmacion').style.display = 'none');
+        document.getElementById('btnConfirmarCerrar').addEventListener('click', () => {
             localStorage.removeItem('logueado');
             localStorage.removeItem('nombreTecnico');
             localStorage.removeItem('usuario');
-            localStorage.removeItem('terminos_luisimp_aceptado'); // opcional
             window.location.href = 'login.html';
         });
-        cerrarConsejos.addEventListener('click', () => seccionConsejos.style.display = 'none');
-
+        document.getElementById('cerrarConsejos').addEventListener('click', () => document.getElementById('seccionConsejos').style.display = 'none');
         // Modales generales
-        cerrarDetalle.addEventListener('click', () => modalDetalle.style.display = 'none');
-        modalDetalle.addEventListener('click', (e) => { if (e.target === modalDetalle) modalDetalle.style.display = 'none'; });
-        cancelarEdicion.addEventListener('click', () => modalEdicion.style.display = 'none');
-        btnCancelarEliminar.addEventListener('click', () => modalEliminar.style.display = 'none');
-        cerrarLightbox.addEventListener('click', () => lightbox.style.display = 'none');
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.style.display = 'none'; });
-
+        document.getElementById('cerrarDetalle').addEventListener('click', () => document.getElementById('modalDetalle').style.display = 'none');
+        document.getElementById('modalDetalle').addEventListener('click', (e) => { if (e.target === document.getElementById('modalDetalle')) document.getElementById('modalDetalle').style.display = 'none'; });
+        document.getElementById('cancelarEdicion').addEventListener('click', () => document.getElementById('modalEdicion').style.display = 'none');
+        document.getElementById('btnCancelarEliminar').addEventListener('click', () => document.getElementById('modalEliminar').style.display = 'none');
+        document.getElementById('cerrarLightbox').addEventListener('click', () => document.getElementById('lightbox').style.display = 'none');
+        document.getElementById('lightbox').addEventListener('click', (e) => { if (e.target === document.getElementById('lightbox')) document.getElementById('lightbox').style.display = 'none'; });
         // Variables globales para edición/eliminación
         let trabajoActual = null;
-
         // === CARGAR TRABAJOS ===
         async function cargarTrabajos() {
-            // ... (todo el código original de cargarTrabajos, mostrarDetalle, abrirEdicion, etc. permanece exactamente igual)
             try {
                 const snapshot = await get(ordenesRef);
                 if (!snapshot.exists()) {
@@ -449,7 +418,7 @@
                     card.querySelector('.btn-eliminar').addEventListener('click', (e) => {
                         e.stopPropagation();
                         trabajoActual = t;
-                        modalEliminar.style.display = 'flex';
+                        document.getElementById('modalEliminar').style.display = 'flex';
                     });
                     list.appendChild(card);
                 });
@@ -459,7 +428,6 @@
                 document.getElementById('noTrabajos').textContent = 'Error al cargar datos.';
             }
         }
-
         function mostrarDetalle(trabajo) {
             const ganancia = (parseFloat(trabajo.cobrado) - parseFloat(trabajo.gastos || 0)).toFixed(2);
             document.getElementById('detalleInfo').innerHTML = `
@@ -486,16 +454,15 @@
                     img.alt = 'Evidencia';
                     img.addEventListener('click', () => {
                         document.getElementById('imagenAmpliada').src = url;
-                        lightbox.style.display = 'flex';
+                        document.getElementById('lightbox').style.display = 'flex';
                     });
                     evidencias.appendChild(img);
                 });
             } else {
                 evidencias.innerHTML = '<p>No hay evidencias fotográficas.</p>';
             }
-            modalDetalle.style.display = 'flex';
+            document.getElementById('modalDetalle').style.display = 'flex';
         }
-
         function abrirEdicion(trabajo) {
             trabajoActual = trabajo;
             document.getElementById('editFecha').value = trabajo.fecha || '';
@@ -506,10 +473,9 @@
             document.getElementById('editCliente').value = trabajo.cliente || '';
             document.getElementById('editCobrado').value = trabajo.cobrado || '';
             document.getElementById('editGastos').value = trabajo.gastos || '';
-            modalEdicion.style.display = 'flex';
+            document.getElementById('modalEdicion').style.display = 'flex';
         }
-
-        guardarEdicion.addEventListener('click', async () => {
+        document.getElementById('guardarEdicion').addEventListener('click', async () => {
             if (!trabajoActual) return;
             const updates = {
                 fecha: document.getElementById('editFecha').value,
@@ -523,28 +489,25 @@
             };
             try {
                 await update(ref(db, 'ordenes/' + trabajoActual.id), updates);
-                modalEdicion.style.display = 'none';
+                document.getElementById('modalEdicion').style.display = 'none';
                 cargarTrabajos();
             } catch (error) {
                 alert('Error al guardar cambios: ' + error.message);
             }
         });
-
-        btnConfirmarEliminar.addEventListener('click', async () => {
+        document.getElementById('btnConfirmarEliminar').addEventListener('click', async () => {
             if (!trabajoActual) return;
             try {
                 await remove(ref(db, 'ordenes/' + trabajoActual.id));
-                modalEliminar.style.display = 'none';
+                document.getElementById('modalEliminar').style.display = 'none';
                 cargarTrabajos();
             } catch (error) {
                 alert('Error al eliminar: ' + error.message);
             }
         });
-
         // Iniciar verificación de términos y carga de trabajos
-        verificarTerminosEspeciales().then(() => {
-            cargarTrabajos();
-        });
+        verificarTerminosEspeciales();
+        cargarTrabajos();
     </script>
 </body>
 </html>
