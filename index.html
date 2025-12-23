@@ -309,6 +309,8 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             margin-top: -10px;
             display: none;
+            text-align: left;
+            line-height: 1.6;
         }
         .faq-answer.visible {
             display: block;
@@ -530,7 +532,7 @@
             background: white;
             padding: 40px;
             border-radius: 18px;
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
             box-shadow: 0 8px 32px rgba(0,0,0,0.12);
             position: relative;
@@ -545,7 +547,6 @@
             cursor: pointer;
         }
         main { margin-top: 80px; }
-
         /* Acomodo servicios en pantallas pequeñas: 1 arriba, 2 abajo */
         @media (max-width: 767px) {
             #servicios .nav-oval {
@@ -558,7 +559,6 @@
                 grid-column: 1 / -1;
             }
         }
-
         /* Footer */
         footer {
             background: #1d1d1f;
@@ -588,7 +588,6 @@
         .contact-info {
             margin: 15px 0;
         }
-
         /* WhatsApp flotante */
         #whatsapp-float {
             position: fixed;
@@ -610,6 +609,158 @@
         }
         #whatsapp-float:hover {
             transform: scale(1.1);
+        }
+
+        /* === ESTILOS PARA EL MODAL DE ICLOUD === */
+        .icloud-options-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .icloud-option-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 18px;
+            padding: 30px 40px;
+            width: 300px;
+            text-align: center;
+            cursor: default;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .icloud-option-card:hover {
+            border-color: #007aff;
+            box-shadow: 0 12px 30px rgba(0,102,255,0.15);
+        }
+
+        .icloud-option-card h3 {
+            margin-bottom: 12px;
+            font-size: 24px;
+        }
+
+        .icloud-option-card p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .what-is-link {
+            color: #007aff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .what-is-link:hover {
+            opacity: 0.8;
+        }
+
+        .icloud-info-container,
+        .icloud-risks-container {
+            margin-top: 20px;
+            text-align: center;
+            position: relative;
+            min-height: 500px;
+            padding: 20px;
+            padding-bottom: 120px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .icloud-info-container h3,
+        .icloud-risks-container h3 {
+            margin-bottom: 30px;
+            font-size: 26px;
+        }
+
+        .info-text {
+            max-width: 850px;
+            margin: 0 auto 40px;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #333;
+            text-align: left;
+        }
+
+        .risks-table {
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto 40px;
+            border-collapse: separate;
+            border-spacing: 0 14px;
+        }
+
+        .risks-table td {
+            background: #f9f9f9;
+            padding: 20px 25px;
+            border-radius: 14px;
+            text-align: left;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .extra-info {
+            max-width: 850px;
+            margin: 0 auto 40px;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        .accept-btn {
+            background: #5AC8FA;
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(90,200,250,0.3);
+            transition: all 0.3s ease;
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+        }
+
+        .accept-btn:hover {
+            background: #007aff;
+            transform: translateY(-2px);
+        }
+
+        .risks-close,
+        .info-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            color: #1d1d1f;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f0f0;
+            border-radius: 50%;
+        }
+
+        @media (max-width: 767px) {
+            .accept-btn {
+                position: static;
+                margin: 30px auto 0;
+                display: block;
+            }
+            .icloud-info-container,
+            .icloud-risks-container {
+                padding-bottom: 40px;
+            }
         }
     </style>
 </head>
@@ -711,35 +862,37 @@
                 </div>
             </div>
         </section>
-        <!-- Preguntas frecuentes (disposición vertical tipo ladrillo) -->
+        <!-- Preguntas frecuentes -->
         <section id="faq">
             <h2>Preguntas frecuentes</h2>
             <div class="faq-container">
                 <div class="faq-item" onclick="toggleFaq('garantia')">¿Tiene garantía?</div>
                 <div class="faq-answer" id="garantia-answer">
-                    <p>Información sobre la garantía del servicio...</p>
+                    <p>Sí. Para Bypass: garantía mientras no reinicies ni formatees el dispositivo. Para Desbloqueo de Raíz: garantía permanente (teléfono 100% libre). Si no podemos desbloquearlo, devolución completa del dinero.</p>
                 </div>
+
                 <div class="faq-item" onclick="toggleFaq('estado')">¿Cómo va a quedar mi teléfono?</div>
                 <div class="faq-answer" id="estado-answer">
-                    <p>Información sobre el estado final del dispositivo...</p>
+                    <p>Depende del método: Bypass permite uso básico (App Store, fotos, Wi-Fi), pero con limitaciones (sin señal en XR y posteriores, sin iCloud). Desbloqueo de Raíz deja el teléfono 100% funcional como nuevo: señal, iCloud, actualizaciones y todo.</p>
                 </div>
+
                 <div class="faq-item" onclick="toggleFaq('compatible')">¿Mi teléfono es compatible?</div>
                 <div class="faq-answer" id="compatible-answer">
-                    <p>Información sobre compatibilidad...</p>
+                    <p>La mayoría de modelos iPhone son compatibles con ambos métodos. Para Desbloqueo de Raíz hacemos verificación previa del IMEI ($150 no reembolsables) para confirmar compatibilidad y precio exacto.</p>
                 </div>
+
                 <div class="faq-item" onclick="toggleFaq('funciona')">¿Cómo funciona el desbloqueo?</div>
                 <div class="faq-answer" id="funciona-answer">
-                    <p>Explicación paso a paso del proceso...</p>
+                    <p>Nos envías el IMEI y fotos del dispositivo. Verificamos compatibilidad, cobramos, y realizamos el desbloqueo remotamente. Te entregamos el teléfono activado y listo para usar (Bypass rápido, Raíz puede tardar más).</p>
                 </div>
+
                 <div class="faq-item" onclick="toggleFaq('otros')">¿Qué otros servicios ofrecen?</div>
                 <div class="faq-answer" id="otros-answer">
-                    <p>Lista de otros servicios disponibles...</p>
+                    <p>Además de iCloud (Bypass y Raíz), ofrecemos desbloqueo Payjoy y la posibilidad de convertirte en socio distribuidor para ganar comisiones por referidos.</p>
                 </div>
             </div>
         </section>
-        <!-- Botón CTA eliminado -->
     </main>
-
     <!-- Footer -->
     <footer>
         <div class="footer-links">
@@ -755,22 +908,100 @@
         </div>
         <div>© 2025 Todos los derechos reservados</div>
     </footer>
-
     <!-- Botón flotante WhatsApp -->
     <a href="https://wa.me/6624672947" target="_blank" id="whatsapp-float">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- Modales de servicios -->
+    <!-- Modal de iCloud (MEJORADO) -->
     <div id="icloud-modal" class="service-modal">
         <div class="service-content">
             <div class="modal-close" onclick="toggleServiceModal('icloud')">×</div>
             <h2>Desbloqueo iCloud</h2>
-            <div class="service-text">
-                <p>Información detallada sobre el desbloqueo iCloud...</p>
+
+            <!-- Pantalla principal: selección -->
+            <div id="icloud-selection" class="icloud-options-container">
+                <div class="icloud-option-card">
+                    <h3>Bypass iCloud</h3>
+                    <p>Precio accesible<br>Desbloqueo rápido</p>
+                    <div class="what-is-link" onclick="showICloudInfo('bypass')">Qué es Bypass iCloud</div>
+                    <button style="margin-top:30px; padding:12px 30px; background:#007aff; color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer;" onclick="showICloudOption('bypass')">Seleccionar este método</button>
+                </div>
+                <div class="icloud-option-card">
+                    <h3>Desbloqueo de Raíz</h3>
+                    <p>Desbloqueo total<br>Puede ser tardado</p>
+                    <div class="what-is-link" onclick="showICloudInfo('raiz')">Qué es Desbloqueo de Raíz</div>
+                    <button style="margin-top:30px; padding:12px 30px; background:#007aff; color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer;" onclick="showICloudOption('raiz')">Seleccionar este método</button>
+                </div>
+            </div>
+
+            <!-- Información Bypass -->
+            <div id="icloud-bypass-info" class="icloud-info-container" style="display:none;">
+                <div class="info-close" onclick="backToICloudSelection()">×</div>
+                <h3>Qué es Bypass iCloud</h3>
+                <div class="info-text">
+                    <p>El <strong>Bypass iCloud</strong> es un método que permite activar y usar el iPhone evitando el bloqueo de activación de iCloud, sin eliminarlo por completo del dispositivo.</p>
+                    <p>Es la opción más rápida y económica. En cuestión de horas puedes tener tu teléfono funcionando para uso diario: llamadas (en modelos compatibles), App Store, fotos, videos, juegos y aplicaciones.</p>
+                    <p>Sin embargo, tiene limitaciones importantes:</p>
+                    <ul style="margin-left:20px; text-align:left;">
+                        <li>No hay señal celular en iPhone XR y modelos posteriores.</li>
+                        <li>No podrás usar servicios de iCloud como iCloud, Encontrar mi iPhone, etc.</li>
+                        <li>Si el dispositivo se reinicia, formatea o se apaga completamente, el bloqueo volverá a aparecer.</li>
+                    </ul>
+                    <p>Ideal si buscas una solución rápida y barata para uso básico (Wi-Fi). Si quieres un teléfono 100% libre, considera el Desbloqueo de Raíz.</p>
+                </div>
+            </div>
+
+            <!-- Información Raíz -->
+            <div id="icloud-raiz-info" class="icloud-info-container" style="display:none;">
+                <div class="info-close" onclick="backToICloudSelection()">×</div>
+                <h3>Qué es Desbloqueo de Raíz</h3>
+                <div class="info-text">
+                    <p>El <strong>Desbloqueo de Raíz</strong> (también llamado desbloqueo permanente o clean) elimina completamente el bloqueo iCloud del sistema del dispositivo.</p>
+                    <p>Es el método premium: una vez realizado, el iPhone queda 100% libre como si nunca hubiera estado bloqueado.</p>
+                    <p>Ventajas:</p>
+                    <ul style="margin-left:20px; text-align:left;">
+                        <li>Señal celular completa en todos los modelos.</li>
+                        <li>Todas las funciones de iCloud (iCloud, Encontrar mi iPhone, etc.).</li>
+                        <li>Actualizaciones oficiales de iOS sin problemas.</li>
+                        <li>No vuelve a bloquearse nunca, incluso si se reinicia o formatea.</li>
+                    </ul>
+                    <p>Requiere una verificación previa del IMEI (costo $150 no reembolsable) para confirmar compatibilidad y darte el precio exacto. Puede tardar más tiempo, pero el resultado es un teléfono completamente funcional y limpio.</p>
+                    <p>Recomendado si quieres vender el dispositivo o usarlo sin ninguna limitación.</p>
+                </div>
+            </div>
+
+            <!-- Riesgos Bypass -->
+            <div id="icloud-bypass-risks" class="icloud-risks-container" style="display:none;">
+                <div class="risks-close" onclick="backToICloudSelection()">×</div>
+                <h3>Riesgos y limitaciones del Bypass</h3>
+                <table class="risks-table">
+                    <tr><td>• Pérdida de señal a partir del iPhone XR en adelante</td></tr>
+                    <tr><td>• Si se reinicia, formatea o apaga completamente, se volverá a bloquear</td></tr>
+                    <tr><td>• Limitaciones en apps de iCloud (iCloud, Encontrar mi iPhone y otras apps del sistema)</td></tr>
+                    <tr><td>• Sí podrás usar: App Store para descargar apps y juegos, fotos, videos y uso común del teléfono</td></tr>
+                </table>
+                <button class="accept-btn" onclick="window.location.href='iphone-modelo.html'">Aceptar</button>
+            </div>
+
+            <!-- Riesgos Raíz -->
+            <div id="icloud-raiz-risks" class="icloud-risks-container" style="display:none;">
+                <div class="risks-close" onclick="backToICloudSelection()">×</div>
+                <h3>Información y condiciones del Desbloqueo de Raíz</h3>
+                <table class="risks-table">
+                    <tr><td>• En caso de incompatibilidad, se devuelve el 100% del dinero</td></tr>
+                    <tr><td>• Antes del desbloqueo se solicitan $150 pesos para verificar el IMEI (tarda de 1 hora a 1 día). Esto confirma compatibilidad y el precio final exacto</td></tr>
+                    <tr><td>• Los $150 pesos de verificación NO son reembolsables</td></tr>
+                    <tr><td>• El reembolso del servicio (si no es compatible) tarda lo que la tarjeta de la empresa demore en devolver el dinero</td></tr>
+                    <tr><td>• Este método es más tardado, pero el teléfono queda 100% libre y se puede usar con total normalidad (señal, iCloud, actualizaciones, todo)</td></tr>
+                </table>
+                <p class="extra-info">Con esta verificación de $150 quitas toda duda: sabes de antemano si tu dispositivo es compatible y cuánto costará exactamente el desbloqueo completo. Es una pequeña inversión que te protege y te da certeza antes de continuar.</p>
+                <button class="accept-btn" onclick="window.location.href='iphone-modelo.html'">Aceptar</button>
             </div>
         </div>
     </div>
+
+    <!-- Modal de Payjoy -->
     <div id="payjoy-modal" class="service-modal">
         <div class="service-content">
             <div class="modal-close" onclick="toggleServiceModal('payjoy')">×</div>
@@ -780,6 +1011,7 @@
             </div>
         </div>
     </div>
+
     <script>
         // Términos y menú
         const termsScreen = document.getElementById('terms-screen');
@@ -803,6 +1035,7 @@
         });
         hamburger.addEventListener('click', () => sideMenu.classList.add('active'));
         menuClose.addEventListener('click', () => sideMenu.classList.remove('active'));
+
         // Swipe en carruseles
         document.querySelectorAll('.carousel-container').forEach(container => {
             let touchStartX = 0, currentIndex = 0;
@@ -818,7 +1051,8 @@
                 }
             }, { passive: true });
         });
-        // Función para togglear modales de servicios
+
+        // Toggle modales
         let activeModal = null;
         function toggleServiceModal(service) {
             const modal = document.getElementById(`${service}-modal`);
@@ -828,12 +1062,46 @@
             if (modal.classList.contains('active')) {
                 modal.classList.remove('active');
                 activeModal = null;
+                backToICloudSelection(); // Reset iCloud
             } else {
                 modal.classList.add('active');
                 activeModal = modal;
+                backToICloudSelection(); // Mostrar selección al abrir
             }
         }
-        // FAQ accordion
+
+        // Funciones iCloud
+        function showICloudOption(option) {
+            document.getElementById('icloud-selection').style.display = 'none';
+            document.getElementById('icloud-bypass-info').style.display = 'none';
+            document.getElementById('icloud-raiz-info').style.display = 'none';
+            if (option === 'bypass') {
+                document.getElementById('icloud-bypass-risks').style.display = 'block';
+            } else if (option === 'raiz') {
+                document.getElementById('icloud-raiz-risks').style.display = 'block';
+            }
+        }
+
+        function showICloudInfo(option) {
+            document.getElementById('icloud-selection').style.display = 'none';
+            document.getElementById('icloud-bypass-risks').style.display = 'none';
+            document.getElementById('icloud-raiz-risks').style.display = 'none';
+            if (option === 'bypass') {
+                document.getElementById('icloud-bypass-info').style.display = 'block';
+            } else if (option === 'raiz') {
+                document.getElementById('icloud-raiz-info').style.display = 'block';
+            }
+        }
+
+        function backToICloudSelection() {
+            document.getElementById('icloud-bypass-risks').style.display = 'none';
+            document.getElementById('icloud-raiz-risks').style.display = 'none';
+            document.getElementById('icloud-bypass-info').style.display = 'none';
+            document.getElementById('icloud-raiz-info').style.display = 'none';
+            document.getElementById('icloud-selection').style.display = 'flex';
+        }
+
+        // FAQ
         let activeFaq = null;
         function toggleFaq(id) {
             const answer = document.getElementById(id + '-answer');
@@ -852,7 +1120,6 @@
                 activeFaq = answer;
             }
         }
-        // Cerrar FAQ al hacer click fuera
         document.addEventListener('click', (e) => {
             if (activeFaq && !e.target.closest('.faq-item') && !e.target.closest('.faq-answer')) {
                 activeFaq.classList.remove('visible');
