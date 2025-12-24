@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecciona Modelo - Desbloqueo iCloud</title>
+    <!-- Fuentes -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://sf.abarba.me/SF.css">
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            overflow-x: hidden;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 20px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .hamburger {
+            position: absolute;
+            left: 20px;
+            font-size: 28px;
+            color: #1d1d1f;
+            cursor: pointer;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d1d1f;
+        }
+        #side-menu {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            transition: left 0.3s ease;
+            z-index: 1100;
+            padding-top: 20px;
+        }
+        #side-menu.active {
+            left: 0;
+        }
+        .menu-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            color: #1d1d1f;
+            cursor: pointer;
+        }
+        .menu-items {
+            padding-top: 60px;
+        }
+        .menu-item {
+            display: block;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d1d1f;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        main {
+            margin-top: 80px;
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: 80px auto 0;
+        }
+        h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+        select, input[type="text"] {
+            display: block;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 16px 20px;
+            font-size: 18px;
+            border-radius: 18px;
+            border: 1px solid #ddd;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .section {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .result-card {
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            font-size: 20px;
+            line-height: 1.6;
+        }
+        .price-highlight {
+            font-size: 36px;
+            font-weight: 700;
+            color: #007aff;
+            margin: 20px 0;
+        }
+        .btn-large {
+            background: #007aff;
+            color: white;
+            padding: 18px 40px;
+            font-size: 20px;
+            font-weight: 600;
+            border: none;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,122,255,0.3);
+            margin: 20px;
+            display: inline-block;
+        }
+        .btn-large:hover {
+            background: #005bb5;
+        }
+        .btn-transfer {
+            background: #34C759;
+        }
+        .btn-transfer:hover {
+            background: #24843e;
+        }
+        .incompatible-btn {
+            background: #FF3B30;
+        }
+        .incompatible-btn:hover {
+            background: #cc2e26;
+        }
+        #whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+        #whatsapp-float:hover {
+            transform: scale(1.1);
+        }
+        footer {
+            background: #1d1d1f;
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 80px;
+        }
+        .footer-links a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        .social-icons a {
+            color: #fff;
+            font-size: 28px;
+            margin: 0 20px;
+        }
+        .contact-info {
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header fijo -->
+    <header>
+        <div class="hamburger" id="hamburger">☰</div>
+        <div class="header-title">Desbloqueo tu iPhone</div>
+    </header>
+
+    <!-- Menú lateral -->
+    <nav id="side-menu">
+        <div class="menu-close" id="menu-close">×</div>
+        <div class="menu-items">
+            <a href="index.html" class="menu-item">Inicio</a>
+            <a href="nosotros.html" class="menu-item">Nosotros</a>
+            <a href="index.html#servicios" class="menu-item">Servicios</a>
+            <a href="index.html#preview" class="menu-item">Reseñas</a>
+            <a href="index.html#faq" class="menu-item">Preguntas frecuentes</a>
+        </div>
+    </nav>
+
+    <main>
+        <h2>Selecciona los datos de tu dispositivo</h2>
+
+        <div class="section" id="device-section">
+            <select id="device">
+                <option value="">Selecciona dispositivo</option>
+                <option value="iphone">iPhone</option>
+                <option value="ipad">iPad</option>
+                <option value="macbook" disabled>MacBook (próximamente)</option>
+                <option value="applewatch" disabled>Apple Watch (próximamente)</option>
+            </select>
+        </div>
+
+        <div class="section" id="model-section">
+            <select id="model">
+                <option value="">Primero selecciona el dispositivo</option>
+            </select>
+        </div>
+
+        <div class="section" id="ios-section">
+            <select id="ios">
+                <option value="">Selecciona versión de iOS</option>
+                <option value="no-se">No conozco la versión de iOS</option>
+                <option value="12">iOS 12 o inferior</option>
+                <option value="13">iOS 13</option>
+                <option value="14">iOS 14</option>
+                <option value="15">iOS 15</option>
+                <option value="16">iOS 16</option>
+                <option value="17">iOS 17</option>
+                <option value="18">iOS 18</option>
+                <option value="19">iOS 19 o superior</option>
+            </select>
+        </div>
+
+        <div id="result-section"></div>
+    </main>
+
+    <!-- WhatsApp flotante -->
+    <a href="https://wa.me/6624672947" target="_blank" id="whatsapp-float">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="nosotros.html">Acerca de nosotros</a>
+        </div>
+        <div class="social-icons">
+            <a href="https://instagram.com/ferv_hs" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-tiktok"></i></a>
+        </div>
+        <div class="contact-info">
+            Contacto: 6624672947
+        </div>
+        <div>© 2025 Todos los derechos reservados</div>
+    </footer>
+
+    <script>
+        // Menú hamburguesa
+        document.getElementById('hamburger').addEventListener('click', () => {
+            document.getElementById('side-menu').classList.add('active');
+        });
+        document.getElementById('menu-close').addEventListener('click', () => {
+            document.getElementById('side-menu').classList.remove('active');
+        });
+
+        // Obtener método desde URL (?method=bypass o ?method=raiz)
+        const params = new URLSearchParams(window.location.search);
+        const method = params.get('method') || 'bypass'; // default bypass si no hay param
+
+        // Modelos
+        const iphoneModels = [
+            "iPhone 6", "iPhone 6 Plus",
+            "iPhone 6s", "iPhone 6s Plus",
+            "iPhone SE (1ra gen)",
+            "iPhone 7", "iPhone 7 Plus",
+            "iPhone 8", "iPhone 8 Plus",
+            "iPhone X",
+            "iPhone XR",
+            "iPhone XS", "iPhone XS Max",
+            "iPhone 11", "iPhone 11 Pro", "iPhone 11 Pro Max",
+            "iPhone 12", "iPhone 12 mini", "iPhone 12 Pro", "iPhone 12 Pro Max",
+            "iPhone 13", "iPhone 13 mini", "iPhone 13 Pro", "iPhone 13 Pro Max",
+            "iPhone 14", "iPhone 14 Plus", "iPhone 14 Pro", "iPhone 14 Pro Max",
+            "iPhone 15", "iPhone 15 Plus", "iPhone 15 Pro", "iPhone 15 Pro Max",
+            "iPhone 16", "iPhone 16 Plus", "iPhone 16 Pro", "iPhone 16 Pro Max"
+        ];
+
+        const ipadModels = [
+            "iPad (2da gen)", "iPad (3ra gen)", "iPad (4ta gen)",
+            "iPad Air", "iPad Air 2", "iPad Air (3ra gen)", "iPad Air (4ta gen)", "iPad Air (5ta gen)",
+            "iPad mini", "iPad mini 2", "iPad mini 3", "iPad mini 4", "iPad mini (5ta gen)", "iPad mini (6ta gen)",
+            "iPad Pro 9.7\"", "iPad Pro 10.5\"", "iPad Pro 11\"", "iPad Pro 12.9\" (todas generaciones)",
+            "iPad (5ta gen en adelante)"
+        ];
+
+        // Grupos para precios Bypass
+        function getPriceGroup(model) {
+            if (["iPhone 6", "iPhone 6 Plus", "iPhone 6s", "iPhone 6s Plus", "iPhone SE (1ra gen)", "iPhone 7", "iPhone 7 Plus", "iPhone 8", "iPhone 8 Plus", "iPhone X"].includes(model)) return "old";
+            if (model === "iPhone XR") return "xr";
+            if (model.startsWith("iPhone 11") || model.startsWith("iPhone 12") || model.startsWith("iPhone 13")) return "11-13";
+            if (model.startsWith("iPhone 14") || model.startsWith("iPhone 15") || model.startsWith("iPhone 16")) return "14+";
+            return null;
+        }
+
+        function getIOSNumber(ios) {
+            if (ios === "no-se") return null;
+            if (ios === "12") return 12;
+            return parseInt(ios);
+        }
+
+        // Eventos
+        document.getElementById('device').addEventListener('change', function() {
+            const device = this.value;
+            const modelSelect = document.getElementById('model');
+            modelSelect.innerHTML = '<option value="">Selecciona el modelo</option>';
+            document.getElementById('model-section').style.display = 'block';
+            document.getElementById('ios-section').style.display = 'none';
+            document.getElementById('result-section').innerHTML = '';
+
+            if (device === 'iphone') {
+                iphoneModels.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m;
+                    modelSelect.appendChild(opt);
+                });
+            } else if (device === 'ipad') {
+                ipadModels.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.textContent = m;
+                    modelSelect.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.textContent = 'Servicio próximamente disponible';
+                opt.disabled = true;
+                modelSelect.appendChild(opt);
+            }
+        });
+
+        document.getElementById('model').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('ios-section').style.display = 'block';
+            } else {
+                document.getElementById('ios-section').style.display = 'none';
+            }
+            document.getElementById('result-section').innerHTML = '';
+        });
+
+        document.getElementById('ios').addEventListener('change', function() {
+            const device = document.getElementById('device').value;
+            const model = document.getElementById('model').value;
+            const ios = this.value;
+
+            if (!device || !model || !ios) return;
+
+            const resultDiv = document.getElementById('result-section');
+            resultDiv.innerHTML = '';
+
+            if (device !== 'iphone') {
+                resultDiv.innerHTML = '<div class="result-card"><p>El desbloqueo iCloud para ' + device.toUpperCase() + ' está disponible bajo cotización personalizada.</p><p>Contacta por WhatsApp para obtener precio y detalles.</p></div>';
+                return;
+            }
+
+            if (method === 'bypass') {
+                // Lógica Bypass
+                const group = getPriceGroup(model);
+                if (!group) {
+                    resultDiv.innerHTML = '<div class="result-card"><p>Modelo no soportado para Bypass en este momento. Contacta por WhatsApp.</p></div>';
+                    return;
+                }
+
+                const iosNum = getIOSNumber(ios);
+
+                let compatible = true;
+                if ((group === '11-13' || group === '14+') && iosNum !== null && iosNum > 16) {
+                    compatible = false;
+                }
+
+                if (ios === 'no-se') {
+                    resultDiv.innerHTML = '<div class="result-card"><p>No conocemos la versión de iOS, por lo que no podemos dar precio exacto.</p><p>Contacta por WhatsApp con tu modelo para cotización precisa.</p></div>';
+                    return;
+                }
+
+                if (!compatible) {
+                    resultDiv.innerHTML = '<div class="result-card"><p>Para iOS superior a 16.1 solo está disponible el <strong>Desbloqueo de Raíz</strong> (permanente).</p><button class="btn-large incompatible-btn" onclick="window.location.href=\'index.html\'">Volver y seleccionar Desbloqueo de Raíz</button></div>';
+                    return;
+                }
+
+                let priceText = '';
+                if (group === 'old') {
+                    priceText = '450 MXN (sin señal) o 600 MXN (con señal, según modelo)';
+                } else if (group === 'xr') {
+                    priceText = '550 MXN (solo sin señal)';
+                } else if (group === '11-13') {
+                    priceText = '550 MXN (solo sin señal)';
+                } else if (group === '14+') {
+                    priceText = '700 MXN (solo sin señal)';
+                }
+
+                resultDiv.innerHTML = `<div class="result-card">
+                    <p>Precio para <strong>${model}</strong> con Bypass:</p>
+                    <div class="price-highlight">${priceText}</div>
+                    <p>Contacta por WhatsApp para realizar el pago y comenzar el desbloqueo.</p>
+                </div>`;
+            } else {
+                // Lógica Raíz
+                resultDiv.innerHTML = `<div class="result-card">
+                    <p>Para confirmar compatibilidad y obtener el precio exacto del Desbloqueo de Raíz, necesitamos verificar tu IMEI.</p>
+                    <p><strong>Costo de verificación: 150 MXN (no reembolsable)</strong></p>
+                    <input type="text" id="imei" placeholder="Ingresa tu IMEI aquí (15 dígitos)">
+                    <button class="btn-large" onclick="alert('Función PayPal en desarrollo. Usa transferencia por ahora.')">Pagar con PayPal (150 MXN)</button>
+                    <button class="btn-large btn-transfer" onclick="pagarTransferencia()">Pagar por transferencia</button>
+                </div>`;
+            }
+        });
+
+        function pagarTransferencia() {
+            const imei = document.getElementById('imei').value.trim();
+            if (!imei || imei.length !== 15 || isNaN(imei)) {
+                alert('Por favor ingresa un IMEI válido de 15 dígitos.');
+                return;
+            }
+            localStorage.setItem('imei', imei);
+            localStorage.setItem('method', 'raiz');
+            localStorage.setItem('device', document.getElementById('device').value);
+            localStorage.setItem('model', document.getElementById('model').value);
+            localStorage.setItem('ios', document.getElementById('ios').value);
+            window.location.href = 'pago.html';
+        }
+    </script>
+</body>
+</html>
